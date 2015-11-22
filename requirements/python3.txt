@@ -1,0 +1,6 @@
+#
+#
+# Dependencies for Python3.
+#
+#
+-r common.txt

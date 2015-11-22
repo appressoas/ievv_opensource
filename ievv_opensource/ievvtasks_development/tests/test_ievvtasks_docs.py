@@ -1,12 +1,12 @@
 import os
 import shutil
-from unittest import mock
 
 from django.core import management
 from django.core.management import CommandError
 from django.test import TestCase
 
 from ievv_opensource.utils import virtualenvutils
+from ievv_opensource.python2_compatibility import mock
 
 
 class TestDocs(TestCase):

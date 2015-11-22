@@ -1,7 +1,7 @@
 import os
-from unittest import mock
 from django.test import TestCase
 from ievv_opensource.utils import virtualenvutils
+from ievv_opensource.python2_compatibility import mock
 
 
 class TestVirtualenvUtils(TestCase):
