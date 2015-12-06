@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
-    # 'ievv_opensource.ievv_tagframework',
+    'ievv_opensource.ievv_tagframework',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.ievvtasks_common',
     'ievv_opensource.ievvtasks_development',

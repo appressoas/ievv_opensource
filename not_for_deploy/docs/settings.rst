@@ -138,3 +138,10 @@ ievv_tagframework
 IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES
 =================================
 The legal values for :obj:`ievv_opensource.ievv_tagframework.models.Tag.tagtype`.
+
+Example::
+
+    IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
+        ('', ''),
+        ('mytype', 'My tag type'),
+    ]

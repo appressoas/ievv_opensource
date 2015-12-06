@@ -1,11 +1,9 @@
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-
-# def get_tagtype_choices():
-#     return settings.IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES
 
 
 class Tag(models.Model):
@@ -29,14 +27,51 @@ class Tag(models.Model):
     #: The tagtype is a way for applications to group tags by type.
     #: No logic is assigned to this field by default, other than
     #: that is is ``db_indexed``. The valid choices for the field
-    #: is configured via the
-    #: :obj:`~ievv_opensource.project.default.projectspecific_settings.IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES`
+    #: is configured via the :setting:`IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES`
     #: setting.
     tagtype = models.CharField(
         max_length=255,
         db_index=True,
-        # choices=get_tagtype_choices
+        blank=True, null=False,
+        default=''
     )
+
+    @staticmethod
+    def get_tagtype_choices():
+        """
+        Returns choices for :obj:`.tagtype`.
+
+        This is not set as choices on the field (because changing that would
+        trigger a migration), but it should be used in any form displaying
+        tagtype.
+
+        You configure the return value via the
+        ``IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES`` Django setting.
+        """
+        choices = getattr(settings, 'IEVV_TAGFRAMEWORK_SITE_TYPE_CHOICES',
+                          [('', '')])
+        for choice in choices:
+            yield choice
+
+    @classmethod
+    def get_tagtype_valid_values(cls):
+        """
+        Returns an iterator over the choices returned by
+        :meth:`.get_tagtype_choices`, but only the values (not the labels)
+        as a flat list.
+        """
+        for value, label in cls.get_tagtype_choices():
+            yield value
+
+    def clean(self):
+        tagtype_valid_values = set(Tag.get_tagtype_valid_values())
+        if self.tagtype not in tagtype_valid_values:
+            raise ValidationError({
+                'tagtype': _('Must be one of: %(choices)s. Current value: %(value)s.') % {
+                    'choices': ', '.join(repr(value) for value in tagtype_valid_values),
+                    'value': repr(self.tagtype),
+                }
+            })
 
 
 class TaggedObject(models.Model):
