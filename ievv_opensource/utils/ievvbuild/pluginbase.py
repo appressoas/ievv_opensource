@@ -1,4 +1,7 @@
+from watchdog.observers import Observer
+
 from ievv_opensource.utils.ievvbuild.buildloggable import BuildLoggable
+from ievv_opensource.utils.ievvbuild.watcher import EventHandler
 
 
 class Plugin(BuildLoggable):
@@ -28,8 +31,27 @@ class Plugin(BuildLoggable):
     def run(self):
         pass
 
-    def get_watch_file_patterns(self):
-        return r'.*'
+    def watch(self):
+        watchfolder = self.get_watch_folder()
+        if watchfolder is None:
+            return
+        watchregexes = self.get_watch_regexes()
+        event_handler = EventHandler(
+            plugin=self,
+            regexes=watchregexes
+        )
+        observer = Observer()
+        observer.schedule(event_handler, watchfolder, recursive=True)
+        self.get_logger().info('Starting watcher for folder %s with regexes %r',
+                               watchfolder, watchregexes)
+        observer.start()
+        return observer
+
+    def get_watch_regexes(self):
+        return [r'^.*$']
+
+    def get_watch_folder(self):
+        return None
 
     def get_logger_name(self):
         return '{}.{}'.format(self.app.get_logger_name(), self.name)

@@ -11,11 +11,17 @@ IEVVTASKS_BUILD_APPS = ievvbuild.config.Apps(
         appname='demoapp',
         version='1.0.0',
         plugins=[
-            # ievvbuild.npminstall.Plugin(),
-            # BowerInstall(),
             ievvbuild.lessbuild.Plugin(sourcefile='theme.less'),
+            ievvbuild.mediacopy.Plugin(),
             # ievvbuild.clessbuild.Plugin(),
-            # ievvbuild.lessbuild.Plugin(sourcefolder='less/themes/default'),
+            # ievvbuild.lessbuild.Plugin(
+            #     sourcefolder='styles/themes/default',
+            #     sourcefile='theme.less',
+            #     other_sourcefolders=[
+            #         'styles/cradmin_theme_base',
+            #         'styles/cradmin_theme_default',
+            #     ],
+            # ),
             # ievvbuild.lessbuild.Plugin(sourcefolder='less/themes/dark'),
             # ievvbuild.lessbuild.Plugin(sourcefolder='less/themes/red'),
             # CoffeeBuild(sourcefolder='scripts'),
@@ -25,8 +31,6 @@ IEVVTASKS_BUILD_APPS = ievvbuild.config.Apps(
     ),
     # ievvbuild.config.App(
     #     'themeapp',
-    #     NpmInstall(),
-    #     BowerInstall(),
     #     LessBuild()
     # ),
 )

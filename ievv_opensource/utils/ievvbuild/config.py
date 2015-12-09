@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from django.apps import apps
 
@@ -88,23 +89,20 @@ class App(BuildLoggable):
                 path, extension = os.path.splitext(path)
                 path = path + new_extension
                 return path
+            else:
+                return path
         else:
             return destinationfolder
 
     def watch(self):
         """
-        Start a watcher thread, and trigger run in all plugins when file change is
-        detected. Only trigger run if plugin.get_watch_file_patterns matches the
-        changed file.
+        Start a watcher thread for each plugin.
         """
-        # for plugin in self.plugins:
-        #     try:
-        #         plugin.watch()
-        #     except NotImplementedError:
-        #         pass
-
-    # def get_buildfolder(self):
-    #     return os.path.join(self.apps.buildfolder, self.appname)
+        observers = []
+        for plugin in self.plugins:
+            observer = plugin.watch()
+            observers.append(observer)
+        return observers
 
     def get_installer(self, installerclass):
         if installerclass.name not in self.installers:
@@ -135,8 +133,20 @@ class Apps(BuildLoggable):
             app.run()
 
     def watch(self):
+        all_observers = []
         for app in self.apps:
-            app.watch()
+            app_observers = app.watch()
+            all_observers.extend(app_observers)
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            for observer in all_observers:
+                observer.stop()
+
+        for observer in all_observers:
+            observer.join()
 
     def get_logger_name(self):
         return 'ievvbuild'
