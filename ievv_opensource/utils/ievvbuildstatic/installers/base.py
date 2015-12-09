@@ -1,8 +1,8 @@
 from ievv_opensource.utils.ievvbuildstatic.buildloggable import BuildLoggable
-from ievv_opensource.utils.ievvbuildstatic.executablebase import ExecutableMixin
+from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandMixin
 
 
-class AbstractInstaller(BuildLoggable, ExecutableMixin):
+class AbstractInstaller(BuildLoggable, ShellCommandMixin):
     name = None
 
     def __init__(self, app):

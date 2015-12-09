@@ -1,6 +1,6 @@
 import json
-import sh
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
+from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandError
 
 
 class NpmInstaller(AbstractInstaller):
@@ -50,9 +50,21 @@ class NpmInstaller(AbstractInstaller):
             json.dumps(packagedata, indent=2).encode('utf-8'))
 
     def install(self):
-        self.get_logger().info('Installing %s', self.app.appname)
+        self.get_logger().info('Running npm install for %s',
+                               self.app.get_source_path())
         self.create_packagejson()
-        self.execute('npm', 'install', _cwd=self.app.get_source_path())
+        # self.execute('npm', 'install', _cwd=self.app.get_source_path())
+        try:
+            self.run_shell_command('npm',
+                                   args=['install'],
+                                   kwargs={
+                                       '_cwd': self.app.get_source_path()
+                                   })
+        except ShellCommandError:
+            self.get_logger().exception('npm install failed.')
+            raise SystemExit()
+        else:
+            self.get_logger().info('Build successful!')
 
     def find_executable(self, executablename):
         """

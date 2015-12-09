@@ -1,10 +1,11 @@
 import os
-import sh
+
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandMixin, ShellCommandError
 
 
-class Plugin(pluginbase.Plugin):
+class Plugin(pluginbase.Plugin, ShellCommandMixin):
     name = 'lessbuild'
 
     def __init__(self, sourcefile, sourcefolder='styles',
@@ -39,10 +40,18 @@ class Plugin(pluginbase.Plugin):
             'less', version=self.get_less_version())
 
     def run(self):
-        lessc = sh.Command(self.app.get_installer(NpmInstaller).find_executable(
-            'lessc'))
-        output = lessc(self.get_sourcefile_path(), self.get_destinationfile_path())
-        self.get_logger().info(output)
+        self.get_logger().info('Building %s', self.get_sourcefile_path())
+        executable = self.app.get_installer(NpmInstaller).find_executable('lessc')
+        try:
+            self.run_shell_command(executable,
+                                   args=[
+                                       self.get_sourcefile_path(),
+                                       self.get_destinationfile_path()
+                                   ])
+        except ShellCommandError:
+            self.get_logger().warning('Build failed - see the output above.')
+        else:
+            self.get_logger().info('Build successful!')
 
     def get_watch_folders(self):
         """
