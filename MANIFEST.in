@@ -12,3 +12,4 @@ recursive-include ievv_opensource *.woff
 recursive-include ievv_opensource *.woff2
 recursive-include ievv_opensource *.svg
 recursive-include ievv_opensource *.otf
+prune ievv_opensource/demo
