@@ -101,7 +101,8 @@ class App(BuildLoggable):
         observers = []
         for plugin in self.plugins:
             observer = plugin.watch()
-            observers.append(observer)
+            if observer:
+                observers.append(observer)
         return observers
 
     def get_installer(self, installerclass):

@@ -51,9 +51,3 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             raise SystemExit()
         else:
             self.get_logger().info('bower install succeeded!')
-
-    def get_watch_folders(self):
-        """
-        Bower install does not need watch, so it is disabled.
-        """
-        return None

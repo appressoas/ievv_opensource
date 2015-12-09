@@ -67,9 +67,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                    ],
                                    kwargs=kwargs)
         except ShellCommandError:
-            self.get_logger().warning('Build failed - see the output above.')
+            self.get_logger().warning('LESS build failed - see the output above.')
         else:
-            self.get_logger().info('Build successful!')
+            self.get_logger().info('LESS build successful!')
         print('*' * 70)
         print()
 

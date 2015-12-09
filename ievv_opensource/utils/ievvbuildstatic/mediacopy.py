@@ -24,11 +24,17 @@ class Plugin(pluginbase.Plugin):
         return self.app.get_destination_path(self.sourcefolder)
 
     def run(self):
-        destinationfolder = self.get_destinationfolder_path()
         sourcefolder = self.get_sourcefolder_path()
+        if not os.path.exists(sourcefolder):
+            self.get_logger().warning('Media source folder, %s, does not exist.',
+                                      sourcefolder)
+            return
+
+        destinationfolder = self.get_destinationfolder_path()
         if os.path.exists(destinationfolder):
             self.get_logger().info('Removing %s', destinationfolder)
             shutil.rmtree(destinationfolder)
+
         self.get_logger().info('Copying %s -> %s', sourcefolder, destinationfolder)
         shutil.copytree(sourcefolder, destinationfolder)
 
