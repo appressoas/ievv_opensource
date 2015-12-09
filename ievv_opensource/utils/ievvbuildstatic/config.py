@@ -150,7 +150,7 @@ class Apps(BuildLoggable):
             observer.join()
 
     def get_logger_name(self):
-        return 'ievvbuild'
+        return 'ievvbuildstatic'
 
     def __configure_shlogger(self, loglevel, handler):
         shlogger = logging.getLogger('sh.command')
@@ -158,19 +158,19 @@ class Apps(BuildLoggable):
         shlogger.addHandler(handler)
         shlogger.propagate = False
 
-    def __configure_ievvbuild_logger(self, loglevel, handler):
-        logger = self.get_logger()
-        logger.setLevel(loglevel)
-        logger.addHandler(handler)
-        logger.propagate = False
+    # def __configure_ievvbuild_logger(self, loglevel, handler):
+    #     logger = self.get_logger()
+    #     logger.setLevel(loglevel)
+    #     logger.addHandler(handler)
+    #     logger.propagate = False
 
     def configure_logging(self, loglevel=logging.INFO,
                           shlibrary_loglevel=logging.WARNING):
-        formatter = logging.Formatter('[%(name)s:%(levelname)s] %(message)s')
+        # formatter = logging.Formatter('[%(name)s:%(levelname)s] %(message)s')
         handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        handler.setLevel(loglevel)
-        self.__configure_ievvbuild_logger(loglevel=loglevel,
-                                          handler=handler)
+        # handler.setFormatter(formatter)
+        # handler.setLevel(loglevel)
+        # self.__configure_ievvbuild_logger(loglevel=loglevel,
+        #                                   handler=handler)
         self.__configure_shlogger(loglevel=shlibrary_loglevel,
                                   handler=handler)

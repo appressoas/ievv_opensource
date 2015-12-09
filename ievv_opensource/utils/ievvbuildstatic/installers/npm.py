@@ -19,8 +19,8 @@ class NpmInstaller(AbstractInstaller):
         """
         if not version:
             version = '*'
-        self.get_logger().info('Queued install of %s (version=%s) for %s',
-                               package, version, self.app.appname)
+        self.get_logger().debug('Queued install of {} (version={}) for {}.'.format(
+            package, version, self.app.appname))
         self.queued_packages[package] = version
 
     def get_packagejson_path(self):
@@ -36,8 +36,8 @@ class NpmInstaller(AbstractInstaller):
             json.dumps(packagedata, indent=2).encode('utf-8'))
 
     def install(self):
-        self.get_logger().info('Running npm install for %s',
-                               self.app.get_source_path())
+        self.get_logger().command_start(
+            'Running npm install for {}'.format(self.app.get_source_path()))
         self.create_packagejson()
         try:
             self.run_shell_command('npm',
@@ -46,10 +46,10 @@ class NpmInstaller(AbstractInstaller):
                                        '_cwd': self.app.get_source_path()
                                    })
         except ShellCommandError:
-            self.get_logger().exception('npm install failed.')
+            self.get_logger().command_error('npm install failed.')
             raise SystemExit()
         else:
-            self.get_logger().info('npm install succeeded!')
+            self.get_logger().command_success('npm install succeeded!')
 
     def find_executable(self, executablename):
         """

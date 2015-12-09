@@ -50,15 +50,13 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             'less', version=self.get_less_version())
 
     def run(self):
-        print()
-        print('*' * 70)
-        self.get_logger().info('Building %s', self.get_sourcefile_path())
+        self.get_logger().command_start('Building {}.'.format(self.get_sourcefile_path()))
         executable = self.app.get_installer(NpmInstaller).find_executable('lessc')
         kwargs = {}
         less_include_paths = self.format_less_include_paths()
         if less_include_paths:
             kwargs['include_path'] = less_include_paths
-            self.get_logger().info('Using --include-path=%s', less_include_paths)
+            self.get_logger().info('Using --include-path={}'.format(less_include_paths))
         try:
             self.run_shell_command(executable,
                                    args=[
@@ -67,11 +65,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                    ],
                                    kwargs=kwargs)
         except ShellCommandError:
-            self.get_logger().warning('LESS build failed - see the output above.')
+            self.get_logger().command_error('LESS build failed - see the output above.')
         else:
-            self.get_logger().info('LESS build successful!')
-        print('*' * 70)
-        print()
+            self.get_logger().command_success('LESS build successful!')
 
     def get_watch_folders(self):
         """

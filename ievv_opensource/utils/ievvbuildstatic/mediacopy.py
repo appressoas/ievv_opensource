@@ -25,18 +25,20 @@ class Plugin(pluginbase.Plugin):
 
     def run(self):
         sourcefolder = self.get_sourcefolder_path()
+        self.get_logger().command_start('Copying media')
         if not os.path.exists(sourcefolder):
-            self.get_logger().warning('Media source folder, %s, does not exist.',
-                                      sourcefolder)
+            self.get_logger().warning('Media source folder, {}, does not exist.'.format(
+                sourcefolder))
             return
 
         destinationfolder = self.get_destinationfolder_path()
         if os.path.exists(destinationfolder):
-            self.get_logger().info('Removing %s', destinationfolder)
+            self.get_logger().debug('Removing {}'.format(destinationfolder))
             shutil.rmtree(destinationfolder)
 
-        self.get_logger().info('Copying %s -> %s', sourcefolder, destinationfolder)
+        self.get_logger().debug('Copying {} -> {}'.format(sourcefolder, destinationfolder))
         shutil.copytree(sourcefolder, destinationfolder)
+        self.get_logger().command_success('Copied media successfully!')
 
     def get_watch_folders(self):
         """

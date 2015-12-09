@@ -20,6 +20,7 @@ setup(
         'Django',
         'django_dbdev',
         'watchdog',
+        'termcolor',
     ],
     entry_points={
         'console_scripts': [

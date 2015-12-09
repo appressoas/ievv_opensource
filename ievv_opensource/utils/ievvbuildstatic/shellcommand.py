@@ -16,10 +16,10 @@ class ShellCommandMixin(object):
     Requires :class:`~ievv_opensource.utils.ievvbuildstatic.buildloggable.BuildLoggable`.
     """
     def log_shell_command_stdout(self, line):
-        print(line.rstrip())
+        self.get_logger().stdout(line.rstrip())
 
     def log_shell_command_stderr(self, line):
-        print(line.rstrip())
+        self.get_logger().stderr(line.rstrip())
 
     def run_shell_command(self, executable, args=None, kwargs=None):
         command = sh.Command(executable)

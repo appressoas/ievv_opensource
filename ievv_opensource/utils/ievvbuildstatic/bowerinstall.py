@@ -36,8 +36,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             'bower', version=self.get_bower_version())
 
     def run(self):
-        self.get_logger().info('Running bower install for %s',
-                               self.app.get_source_path())
+        self.get_logger().command_start('Running bower install for {}'.format(
+            self.app.get_source_path()))
         self.create_bowerjson()
         bower_executable = self.app.get_installer(NpmInstaller).find_executable('bower')
         try:
@@ -47,7 +47,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                        '_cwd': self.app.get_source_path()
                                    })
         except ShellCommandError:
-            self.get_logger().exception('bower install failed.')
+            self.get_logger().command_error('bower install failed.')
             raise SystemExit()
         else:
-            self.get_logger().info('bower install succeeded!')
+            self.get_logger().command_success('bower install succeeded!')

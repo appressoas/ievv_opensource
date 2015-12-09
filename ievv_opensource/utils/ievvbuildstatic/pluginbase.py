@@ -44,8 +44,8 @@ class Plugin(BuildLoggable):
         observer = Observer()
         for watchfolder in watchfolders:
             observer.schedule(event_handler, watchfolder, recursive=True)
-        self.get_logger().info('Starting watcher for folders %r with regexes %r',
-                               watchfolders, watchregexes)
+        self.get_logger().info('Starting watcher for folders {!r} with regexes {!r}.'.format(
+            watchfolders, watchregexes))
         observer.start()
         return observer
 
