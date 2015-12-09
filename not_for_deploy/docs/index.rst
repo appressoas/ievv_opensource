@@ -19,7 +19,6 @@ Development
    :maxdepth: 2
 
    development
-   the_ievv_command
 
 
 ****
@@ -31,6 +30,7 @@ Apps
 
    ievv_tagframework
 
+
 ********
 Settings
 ********
@@ -39,6 +39,17 @@ Settings
    :maxdepth: 2
 
    settings
+
+
+****************
+The ievv command
+****************
+
+.. toctree::
+   :maxdepth: 2
+
+   the_ievv_command
+   ievvtask_buildstatic
 
 
 *********

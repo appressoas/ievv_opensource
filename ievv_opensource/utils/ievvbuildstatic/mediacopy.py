@@ -38,7 +38,7 @@ class Plugin(pluginbase.Plugin):
 
         self.get_logger().debug('Copying {} -> {}'.format(sourcefolder, destinationfolder))
         shutil.copytree(sourcefolder, destinationfolder)
-        self.get_logger().command_success('Copied media successfully!')
+        self.get_logger().command_success('Copied media successfully :)')
 
     def get_watch_folders(self):
         """

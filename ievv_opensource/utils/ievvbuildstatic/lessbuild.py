@@ -65,9 +65,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                    ],
                                    kwargs=kwargs)
         except ShellCommandError:
-            self.get_logger().command_error('LESS build failed - see the output above.')
+            self.get_logger().command_error('LESS build FAILED!')
         else:
-            self.get_logger().command_success('LESS build successful!')
+            self.get_logger().command_success('LESS build successful :)')
 
     def get_watch_folders(self):
         """

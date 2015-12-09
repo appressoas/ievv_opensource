@@ -1,4 +1,5 @@
 from termcolor import colored
+from ievv_opensource.utils import desktopnotifications
 
 
 class Logger(object):
@@ -40,9 +41,15 @@ class Logger(object):
 
     def command_error(self, message):
         self.__command_end(message, color='red', attrs=['bold'])
+        desktopnotifications.show_message(
+            title='ERROR - {}'.format(self.name),
+            message=message)
 
     def command_success(self, message):
         self.__command_end(message, color='green', attrs=['bold'])
+        desktopnotifications.show_message(
+            title='SUCCESS - {}'.format(self.name),
+            message=message)
 
 
 class BuildLoggable(object):

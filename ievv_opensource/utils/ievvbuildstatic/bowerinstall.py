@@ -47,7 +47,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                        '_cwd': self.app.get_source_path()
                                    })
         except ShellCommandError:
-            self.get_logger().command_error('bower install failed.')
+            self.get_logger().command_error('bower install FAILED!')
             raise SystemExit()
         else:
-            self.get_logger().command_success('bower install succeeded!')
+            self.get_logger().command_success('bower install succeeded :)')

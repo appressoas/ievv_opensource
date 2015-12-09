@@ -46,10 +46,10 @@ class NpmInstaller(AbstractInstaller):
                                        '_cwd': self.app.get_source_path()
                                    })
         except ShellCommandError:
-            self.get_logger().command_error('npm install failed.')
+            self.get_logger().command_error('npm install FAILED!')
             raise SystemExit()
         else:
-            self.get_logger().command_success('npm install succeeded!')
+            self.get_logger().command_success('npm install succeeded :)')
 
     def find_executable(self, executablename):
         """
