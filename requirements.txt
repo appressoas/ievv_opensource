@@ -1,1 +1,1 @@
--r requirements/production.txt
+-r requirements/python3.txt
