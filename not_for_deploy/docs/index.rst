@@ -22,6 +22,15 @@ Development
    the_ievv_command
 
 
+****
+Apps
+****
+
+.. toctree::
+   :maxdepth: 1
+
+   ievv_tagframework
+
 ********
 Settings
 ********

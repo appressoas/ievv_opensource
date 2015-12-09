@@ -47,7 +47,7 @@ Create a virtualenv using Python 3 (an isolated Python environment)::
 
 Install the development requirements::
 
-    $ pip install -r requirements/develop.txt
+    $ pip install -r requirements/python3.txt
 
 
 .. _enable-virtualenv:

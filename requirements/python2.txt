@@ -1,0 +1,8 @@
+#
+#
+# Dependencies for Python2.
+#
+#
+-r common.txt
+
+mock==1.3.0

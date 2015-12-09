@@ -27,8 +27,6 @@ from django.db.models.fields.files import FileDescriptor
 FileDescriptor.__get__ = lambda self, *args, **kwargs: self
 
 
-
-
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -117,9 +115,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #html_theme = 'default'
 
-import sphinx_rtd_theme
-html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -269,3 +265,7 @@ texinfo_documents = [
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
 napoleon_numpy_docstring = False
+
+autoclass_content = 'both'
+autodoc_member_order = 'bysource'
+autodoc_default_flags = ['members', 'show-inheritance']
