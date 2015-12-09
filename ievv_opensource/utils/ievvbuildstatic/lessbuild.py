@@ -28,6 +28,9 @@ class Plugin(pluginbase.Plugin):
         return self.app.get_destination_path(
             self.sourcefile, new_extension='.css')
 
+    def get_other_sourcefolders_paths(self):
+        return map(self.app.get_source_path, self.other_sourcefolders)
+
     def get_less_version(self):
         return None
 
@@ -48,7 +51,7 @@ class Plugin(pluginbase.Plugin):
         """
         folders = [self.app.get_source_path(self.sourcefolder)]
         if self.other_sourcefolders:
-            folders.extend(self.other_sourcefolders)
+            folders.extend(self.get_other_sourcefolders_paths())
         return folders
 
     def get_watch_regexes(self):

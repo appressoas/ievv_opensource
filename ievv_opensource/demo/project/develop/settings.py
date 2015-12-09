@@ -12,20 +12,12 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         version='1.0.0',
         plugins=[
             ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
-            ievvbuildstatic.lessbuild.Plugin(
-                sourcefolder='styles/themes/default',
-                sourcefile='theme.less',
-                other_sourcefolders=[
-                    'styles/cradmin_theme_base',
-                    'styles/cradmin_theme_default',
-                ],
-            ),
             ievvbuildstatic.mediacopy.Plugin(),
             # CoffeeBuild(sourcefolder='scripts'),
         ]
     ),
     ievvbuildstatic.config.App(
-        appname='themeapp',
+        appname='demoapp2',
         version='2.0.1',
         plugins=[
             ievvbuildstatic.lessbuild.Plugin(
