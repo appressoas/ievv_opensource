@@ -53,7 +53,6 @@ class NpmInstaller(AbstractInstaller):
         self.get_logger().info('Running npm install for %s',
                                self.app.get_source_path())
         self.create_packagejson()
-        # self.execute('npm', 'install', _cwd=self.app.get_source_path())
         try:
             self.run_shell_command('npm',
                                    args=['install'],

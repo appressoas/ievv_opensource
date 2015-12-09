@@ -9,6 +9,7 @@ class Plugin(BuildLoggable):
 
     def __init__(self):
         self.app = None
+        self.__is_running = False
         self.is_executing = False
 
     def install(self):
