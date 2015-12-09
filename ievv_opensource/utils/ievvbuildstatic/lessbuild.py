@@ -1,7 +1,7 @@
 import os
 import sh
-from ievv_opensource.utils.ievvbuild import pluginbase
-from ievv_opensource.utils.ievvbuild.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic import pluginbase
+from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 
 
 class Plugin(pluginbase.Plugin):
@@ -18,6 +18,7 @@ class Plugin(pluginbase.Plugin):
 
         """
         self.sourcefolder = sourcefolder
+        self.other_sourcefolders = other_sourcefolders
         self.sourcefile = os.path.join(sourcefolder, sourcefile)
 
     def get_sourcefile_path(self):
@@ -40,12 +41,15 @@ class Plugin(pluginbase.Plugin):
         output = lessc(self.get_sourcefile_path(), self.get_destinationfile_path())
         self.get_logger().info(output)
 
-    def get_watch_folder(self):
+    def get_watch_folders(self):
         """
         We only watch the folder where the less sources are located,
         so this returns the absolute path of the ``sourcefolder``.
         """
-        return self.app.get_source_path(self.sourcefolder)
+        folders = [self.app.get_source_path(self.sourcefolder)]
+        if self.other_sourcefolders:
+            folders.extend(self.other_sourcefolders)
+        return folders
 
     def get_watch_regexes(self):
         return ['^.+[.]less$']

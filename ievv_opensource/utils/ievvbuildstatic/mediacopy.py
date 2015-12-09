@@ -1,8 +1,8 @@
 import os
 import sh
 import shutil
-from ievv_opensource.utils.ievvbuild import pluginbase
-from ievv_opensource.utils.ievvbuild.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic import pluginbase
+from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 
 
 class Plugin(pluginbase.Plugin):
@@ -32,9 +32,9 @@ class Plugin(pluginbase.Plugin):
         self.get_logger().info('Copying %s -> %s', sourcefolder, destinationfolder)
         shutil.copytree(sourcefolder, destinationfolder)
 
-    def get_watch_folder(self):
+    def get_watch_folders(self):
         """
         We only watch the folder where the less sources are located,
         so this returns the absolute path of the ``sourcefolder``.
         """
-        return self.app.get_source_path(self.sourcefolder)
+        return [self.app.get_source_path(self.sourcefolder)]

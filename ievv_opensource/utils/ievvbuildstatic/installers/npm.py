@@ -1,6 +1,6 @@
 import json
 import sh
-from ievv_opensource.utils.ievvbuild.installers.base import AbstractInstaller
+from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
 
 
 class NpmInstaller(AbstractInstaller):

@@ -4,7 +4,7 @@ import time
 
 from django.apps import apps
 
-from ievv_opensource.utils.ievvbuild.buildloggable import BuildLoggable
+from ievv_opensource.utils.ievvbuildstatic.buildloggable import BuildLoggable
 
 
 class App(BuildLoggable):

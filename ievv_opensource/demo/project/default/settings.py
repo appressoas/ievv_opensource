@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.demo.demoapp',
+    'ievv_opensource.demo.demoapp2',
     'ievv_opensource.ievvtasks_common',
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
