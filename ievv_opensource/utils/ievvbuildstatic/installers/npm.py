@@ -10,20 +10,6 @@ class NpmInstaller(AbstractInstaller):
         super(NpmInstaller, self).__init__(*args, **kwargs)
         self.queued_packages = {}
 
-    # def get_packageinfo(self):
-    #     package_json = self.app.get_source_path('package.json')
-    #     if os.path.exists(package_json):
-    #         json.loads(package_json)
-    #     else:
-    #         return None
-    #
-    # def get_installed_package_version(self, package):
-    #     packageinfo = self.get_packageinfo()
-    #     if packageinfo:
-    #         return packageinfo.get('devDependencies', {}).get(package, None)
-    #     else:
-    #         return None
-
     def queue_install(self, package, version=None):
         """
         Installs the given npm package in the build
@@ -43,7 +29,7 @@ class NpmInstaller(AbstractInstaller):
     def create_packagejson(self):
         packagedata = {
             'name': self.app.appname,
-            'version': '1.0.0',
+            'version': self.app.version,
             'devDependencies': self.queued_packages
         }
         open(self.get_packagejson_path(), 'wb').write(
@@ -63,7 +49,7 @@ class NpmInstaller(AbstractInstaller):
             self.get_logger().exception('npm install failed.')
             raise SystemExit()
         else:
-            self.get_logger().info('Build successful!')
+            self.get_logger().info('npm install succeeded!')
 
     def find_executable(self, executablename):
         """
@@ -74,3 +60,8 @@ class NpmInstaller(AbstractInstaller):
         executablepath = self.app.get_source_path(
             'node_modules', '.bin', executablename)
         return executablepath
+
+    def log_shell_command_stderr(self, line):
+        if 'npm WARN package.json' in line:
+            return
+        super(NpmInstaller, self).log_shell_command_stderr(line)

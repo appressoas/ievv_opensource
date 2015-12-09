@@ -24,6 +24,7 @@ dbdev_tempdata/
 
 vitalstyles_styleguide/
 node_modules/
+bower_components/
 
 # Ignore user-specific pycharm settings
 .idea/workspace.xml
@@ -40,3 +41,4 @@ node_modules/
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/package.json
 ievv_opensource/demo/demoapp2/staticsources/demoapp2/package.json
+ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json

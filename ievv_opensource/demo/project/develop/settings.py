@@ -20,12 +20,20 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='demoapp2',
         version='2.0.1',
         plugins=[
+            ievvbuildstatic.bowerinstall.Plugin(
+                packages={
+                    'bootstrap': '~3.1.1'
+                }
+            ),
             ievvbuildstatic.lessbuild.Plugin(
                 sourcefolder='styles/theme',
                 sourcefile='theme.less',
                 other_sourcefolders=[
                     'styles/base',
                 ],
+                less_include_paths=[
+                    'bower_components'
+                ]
             ),
             ievvbuildstatic.mediacopy.Plugin(),
         ]

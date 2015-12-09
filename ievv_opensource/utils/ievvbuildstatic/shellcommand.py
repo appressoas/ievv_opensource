@@ -15,10 +15,10 @@ class ShellCommandMixin(object):
 
     Requires :class:`~ievv_opensource.utils.ievvbuildstatic.buildloggable.BuildLoggable`.
     """
-    def __log_shell_command_stdout(self, line):
+    def log_shell_command_stdout(self, line):
         print(line.rstrip())
 
-    def __log_shell_command_stderr(self, line):
+    def log_shell_command_stderr(self, line):
         print(line.rstrip())
 
     def run_shell_command(self, executable, args=None, kwargs=None):
@@ -27,8 +27,8 @@ class ShellCommandMixin(object):
         kwargs = kwargs or {}
         try:
             command(*args,
-                    _out=self.__log_shell_command_stdout,
-                    _err=self.__log_shell_command_stderr,
+                    _out=self.log_shell_command_stdout,
+                    _err=self.log_shell_command_stderr,
                     **kwargs)
         except sh.ErrorReturnCode:
             # We do not need to show any more errors here - they
