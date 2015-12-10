@@ -8,6 +8,9 @@ from ievv_opensource.utils.ievvbuildstatic.buildloggable import BuildLoggable
 
 
 class App(BuildLoggable):
+    """
+    Configures how ``ievv buildstatic`` should build the static files for a Django app.
+    """
     def __init__(self, appname, version, plugins,
                  sourcefolder='staticsources',
                  destinationfolder='static'):
@@ -31,14 +34,25 @@ class App(BuildLoggable):
             self.add_plugin(plugin)
 
     def add_plugin(self, plugin):
+        """
+        Add a :class:`ievv_opensource.utils.ievvbuildstatic.lessbuild.Plugin`.
+        """
         plugin.app = self
         self.plugins.append(plugin)
 
     def run(self):
+        """
+        Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
+        for all plugins within the app.
+        """
         for plugin in self.plugins:
             plugin.run()
 
     def install(self):
+        """
+        Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
+        for all plugins within the app.
+        """
         for plugin in self.plugins:
             plugin.install()
         for installer in self.installers.values():
@@ -106,6 +120,13 @@ class App(BuildLoggable):
         return observers
 
     def get_installer(self, installerclass):
+        """
+        Get an instance of the given ``installerclass``.
+
+        Parameters:
+            installerclass: A subclass of
+                :class:`ievv_opensource.utils.ievvbuildstatic.installers.base.AbstractInstaller`.
+        """
         if installerclass.name not in self.installers:
             installer = installerclass(app=self)
             self.installers[installerclass.name] = installer
@@ -116,24 +137,49 @@ class App(BuildLoggable):
 
 
 class Apps(BuildLoggable):
+    """
+    Basically a list around :class:`.App` objects.
+    """
     def __init__(self, *apps):
+        """
+        Parameters:
+            apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
+        """
         self.apps = []
         for app in apps:
             self.add_app(app)
 
     def add_app(self, app):
+        """
+        Add an :class:`.App`.
+        """
         app.apps = self
         self.apps.append(app)
 
     def install(self):
+        """
+        Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
+        for all plugins within all :class:`apps <.App>`.
+        """
         for app in self.apps:
             app.install()
 
     def run(self):
+        """
+        Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
+        for all plugins within all :class:`apps <.App>`.
+        """
         for app in self.apps:
             app.run()
 
     def watch(self):
+        """
+        Start watcher threads for all
+        :class:`plugins <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
+        for all plugins within all :class:`apps <.App>`.
+
+        Blocks until ``CTRL-c`` is pressed.
+        """
         all_observers = []
         for app in self.apps:
             app_observers = app.watch()

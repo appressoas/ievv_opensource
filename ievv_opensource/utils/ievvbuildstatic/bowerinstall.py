@@ -6,6 +6,35 @@ from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandError
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
+    """
+    Bower install plugin --- installs bower packages.
+
+    The packages are installed when ``ievv buildstatic`` starts up.
+    The plugin creates a ``bower.json`` file, and runs ``bower install``
+    using the created ``bower.json``-file.
+
+    You will most likely want to add ``bower.json`` and ``bower_components``
+    to your VCS ignore file.
+
+    Examples:
+
+        Install bootstrap 3.1.1 and angularjs 1.4.1::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.bowerinstall.Plugin(
+                            packages={
+                                'bootstrap': '~3.1.1',
+                                'angular': '~1.4.1'
+                            }
+                        ),
+                    ]
+                )
+            )
+    """
     name = 'bowerinstall'
 
     def __init__(self, packages):

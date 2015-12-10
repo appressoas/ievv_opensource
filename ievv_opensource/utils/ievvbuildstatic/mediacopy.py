@@ -6,6 +6,39 @@ from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 
 
 class Plugin(pluginbase.Plugin):
+    """
+    Media copy plugin --- copies media files from staticsources into
+    the static directory, and supports watching for file changes.
+
+    Examples:
+
+        Copy all files in ``demoapp/staticsources/media/`` into
+        ``demoapp/static/1.0.0/media/``::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.mediacopy.Plugin(),
+                    ]
+                )
+            )
+
+        Using a different source folder. This will copy
+        all files in ``demoapp/staticsources/assets/`` into
+        ``demoapp/static/1.0.0/assets/``::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.mediacopy.Plugin(sourcefolder="assets"),
+                    ]
+                )
+            )
+    """
     name = 'mediacopy'
 
     def __init__(self, sourcefolder='media'):

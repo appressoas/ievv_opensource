@@ -3,6 +3,16 @@ from watchdog.events import RegexMatchingEventHandler
 
 
 class EventHandler(RegexMatchingEventHandler):
+    """
+    Event handler for watchdog --- this is used by each watcher
+    thread to react to changes in the filesystem.
+
+    This is instantiated by :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.watch`
+    to watch for changes in files matching
+    :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.get_watch_regexes`
+    in the folders specified in
+    :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.get_watch_folders`.
+    """
     def __init__(self, *args, **kwargs):
         self.plugin = kwargs.pop('plugin')
         self.runtimer = None

@@ -84,9 +84,14 @@ tedious. You can watch for changes using::
     $ ievv buildstatic --watch
 
 
-*******************
+
+***************
+Advanced topics
+***************
+
 Using multiple apps
-*******************
+===================
+
 Using multiple apps is easy. You just add another
 :class:`ievv_opensource.utils.ievvbuildstatic.config.App` to
 the ``IEVVTASKS_BUILDSTATIC_APPS`` setting::
@@ -108,3 +113,97 @@ the ``IEVVTASKS_BUILDSTATIC_APPS`` setting::
             ]
         ),
     )
+
+
+*******
+Plugins
+*******
+
+Overview
+========
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic
+
+.. autosummary::
+
+   pluginbase.Plugin
+   lessbuild.Plugin
+   mediacopy.Plugin
+   bowerinstall.Plugin
+
+
+Details
+=======
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.lessbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.lessbuild
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.mediacopy
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.mediacopy
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
+
+
+************
+Apps and App
+************
+
+Overview
+========
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.config
+
+.. autosummary::
+
+    App
+    Apps
+
+
+Details
+=======
+
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.config
+
+
+**********
+Installers
+**********
+
+Overview
+========
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.installers
+
+.. autosummary::
+
+   base.AbstractInstaller
+   npm.NpmInstaller
+
+
+Details
+=======
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.installers.base
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.installers.base
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.installers.npm
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.installers.npm
+
+
+*************
+Low level API
+*************
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.buildloggable
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.buildloggable
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.shellcommand
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.shellcommand
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.watcher
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.watcher
+

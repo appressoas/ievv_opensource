@@ -6,6 +6,56 @@ from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandMixin
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
+    """
+    LESS build plugin --- builds .less files into css, and supports watching
+    for changes.
+
+    Examples:
+
+        Very simple example where the source file is in
+        ``demoapp/staticsources/styles/theme.less``::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
+                    ]
+                )
+            )
+
+        A more complex example that builds a django-cradmin theme
+        where sources are split in multiple directories, and
+        the bower install directory is on the less path
+        (the example also uses :class:`ievv_opensource.utils.ievvbuildstatic.bowerinstall.Plugin`)::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.bowerinstall.Plugin(
+                            packages={
+                                'bootstrap': '~3.1.1'
+                            }
+                        ),
+                        ievvbuildstatic.lessbuild.Plugin(
+                            sourcefolder='styles/cradmin_theme_demoapp',
+                            sourcefile='theme.less',
+                            other_sourcefolders=[
+                                'styles/cradmin_base',
+                                'styles/cradmin_theme_default',
+                            ],
+                            less_include_paths=[
+                                'bower_components',
+                            ]
+                        )
+                    ]
+                )
+            )
+    """
+
     name = 'lessbuild'
 
     def __init__(self, sourcefile, sourcefolder='styles',

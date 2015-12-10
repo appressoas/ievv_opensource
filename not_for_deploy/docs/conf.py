@@ -36,6 +36,7 @@ FileDescriptor.__get__ = lambda self, *args, **kwargs: self
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.napoleon',

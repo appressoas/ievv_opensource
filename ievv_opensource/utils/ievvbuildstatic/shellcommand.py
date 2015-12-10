@@ -16,13 +16,30 @@ class ShellCommandMixin(object):
     Requires :class:`~ievv_opensource.utils.ievvbuildstatic.buildloggable.BuildLoggable`.
     """
     def log_shell_command_stdout(self, line):
+        """
+        Called by :meth:`.run_shell_command` each time the shell
+        command outputs anything to stdout.
+        """
         self.get_logger().stdout(line.rstrip())
 
     def log_shell_command_stderr(self, line):
+        """
+        Called by :meth:`.run_shell_command` each time the shell
+        command outputs anything to stderr.
+        """
         self.get_logger().stderr(line.rstrip())
 
     def run_shell_command(self, executable, args=None, kwargs=None):
         """
+        Run a shell command.
+
+        Parameters:
+            executable: The name or path of the executable.
+            args: List of arguments for the ``sh.Command`` object.
+            kwargs: Dict of keyword arguments for the ``sh.Command`` object.
+
+        Raises:
+            ShellCommandError: When the command fails. See :class:`.ShellCommandError`.
         """
         command = sh.Command(executable)
         args = args or []

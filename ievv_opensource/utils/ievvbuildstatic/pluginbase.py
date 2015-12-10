@@ -5,12 +5,15 @@ from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler
 
 
 class Plugin(BuildLoggable):
+    """
+    Base class for all plugins in ``ievvbuildstatic``.
+    """
+
+    #: The name of the plugin.
     name = None
 
     def __init__(self):
         self.app = None
-        self.__is_running = False
-        self.is_executing = False
 
     def install(self):
         """
@@ -30,9 +33,20 @@ class Plugin(BuildLoggable):
         """
 
     def run(self):
+        """
+        Run the plugin. Put the code executed by the plugin each time files
+        change here.
+        """
         pass
 
     def watch(self):
+        """
+        Start a watching thread and return the thread.
+
+        You should not need to override this --- override
+        :meth:`.get_watch_folders` and :meth:`.get_watch_regexes`
+        instead.
+        """
         watchfolders = self.get_watch_folders()
         if not watchfolders:
             return
@@ -50,9 +64,25 @@ class Plugin(BuildLoggable):
         return observer
 
     def get_watch_regexes(self):
+        """
+        Get the regex used when watching for changes to files.
+
+        Defaults to a regex matching any files.
+        """
         return [r'^.*$']
 
     def get_watch_folders(self):
+        """
+        Get folders to watch for changes when using ``ievv buildstatic --watch``.
+
+        Defaults to an empty list, which means that no watching thread is started
+        for the plugin.
+
+        The folder paths must be absolute, so in most cases you should
+        use ``self.app.get_source_path()`` (see
+        :meth:`ievv_opensource.utils.ievvbuildstatic.config.App#get_source_path`)
+        to turn user provided relative folder names into absolute paths.
+        """
         return []
 
     def get_logger_name(self):

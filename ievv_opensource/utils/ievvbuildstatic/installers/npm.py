@@ -4,6 +4,9 @@ from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandError
 
 
 class NpmInstaller(AbstractInstaller):
+    """
+    NPM installer.
+    """
     name = 'npminstall'
 
     def __init__(self, *args, **kwargs):
