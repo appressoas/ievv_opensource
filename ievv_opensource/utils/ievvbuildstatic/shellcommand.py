@@ -22,6 +22,8 @@ class ShellCommandMixin(object):
         self.get_logger().stderr(line.rstrip())
 
     def run_shell_command(self, executable, args=None, kwargs=None):
+        """
+        """
         command = sh.Command(executable)
         args = args or []
         kwargs = kwargs or {}

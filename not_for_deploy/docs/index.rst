@@ -60,6 +60,7 @@ Utilities
    :maxdepth: 1
 
    virtualenvutils
+   desktopnotifications
 
 
 ******************

@@ -41,7 +41,7 @@ Build the docs
 **************
 :ref:`Enable the virtualenv <enable-virtualenv>`, and run::
 
-    $ ievv docs --open
+    $ ievv docs --build --open
 
 
 *****************************

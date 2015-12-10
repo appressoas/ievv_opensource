@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# APPRESSOPROJECT_NAME documentation build configuration file, created by
-# sphinx-quickstart on Mon May  5 23:04:47 2014.
+# ievv_opensource documentation build configuration file, created by
+# sphinx-quickstart on Mon May  5 23:04:47 2015.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -44,8 +44,8 @@ extensions = [
 ]
 
 extlinks = {
-    'issue': ('https://github.com/appressoas/APPRESSOPROJECT_NAME/issues/%s', 'issue '),
-    'wikipage': ('https://github.com/appressoas/APPRESSOPROJECT_NAME/wiki/%s', 'Wiki page: '),
+    'issue': ('https://github.com/appressoas/ievv_opensource/issues/%s', 'issue '),
+    'wikipage': ('https://github.com/appressoas/ievv_opensource/wiki/%s', 'Wiki page: '),
 }
 
 
@@ -62,8 +62,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'APPRESSOPROJECT_NAME'
-copyright = u'2014, APPRESSOPROJECT_NAME'
+project = u'ievv_opensource'
+copyright = u'2015, ievv_opensource'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -188,7 +188,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'APPRESSOPROJECT_NAMEdoc'
+htmlhelp_basename = 'ievv_opensourcedoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -207,8 +207,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'APPRESSOPROJECT_NAME.tex', u'APPRESSOPROJECT_NAME Documentation',
-   u'APPRESSOPROJECT_NAME', 'manual'),
+  ('index', 'ievv_opensource.tex', u'ievv_opensource Documentation',
+   u'ievv_opensource', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -237,8 +237,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'APPRESSOPROJECT_NAME', u'APPRESSOPROJECT_NAME Documentation',
-     [u'APPRESSOPROJECT_NAME'], 1)
+    ('index', 'ievv_opensource', u'ievv_opensource Documentation',
+     [u'ievv_opensource'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -251,8 +251,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'APPRESSOPROJECT_NAME', u'APPRESSOPROJECT_NAME Documentation',
-   u'APPRESSOPROJECT_NAME', 'APPRESSOPROJECT_NAME', 'One line description of project.',
+  ('index', 'ievv_opensource', u'ievv_opensource Documentation',
+   u'ievv_opensource', 'ievv_opensource', 'One line description of project.',
    'Miscellaneous'),
 ]
 
