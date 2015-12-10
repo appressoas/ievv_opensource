@@ -1,6 +1,4 @@
-ievv_opensource
-====================
+# ievv_opensource
 
 ## Documentation
-Read ``not_for_deploy/docs/django/gettingstarted.rst`` for instructions for getting started.
-
+http://ievv-opensource.readthedocs.org/
