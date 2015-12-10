@@ -1,8 +1,7 @@
 import os
-import sh
 import shutil
+
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 
 
 class Plugin(pluginbase.Plugin):
