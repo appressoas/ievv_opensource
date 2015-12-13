@@ -4,7 +4,7 @@ import time
 
 from django.apps import apps
 
-from ievv_opensource.utils.ievvbuildstatic.logmixin import LogMixin
+from ievv_opensource.utils.logmixin import LogMixin
 
 
 class App(LogMixin):

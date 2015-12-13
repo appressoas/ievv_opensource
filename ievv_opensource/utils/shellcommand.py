@@ -13,7 +13,7 @@ class ShellCommandMixin(object):
     """
     Shell command mixin - for classes that need to run shell commands.
 
-    Requires :class:`~ievv_opensource.utils.ievvbuildstatic.logmixin.LogMixin`.
+    Requires :class:`~ievv_opensource.utils.logmixin.LogMixin`.
     """
     def log_shell_command_stdout(self, line):
         """

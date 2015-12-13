@@ -198,8 +198,8 @@ Details
 Low level API
 *************
 
-.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.logmixin
-.. automodule:: ievv_opensource.utils.ievvbuildstatic.logmixin
+.. currentmodule:: ievv_opensource.utils.logmixin
+.. automodule:: ievv_opensource.utils.logmixin
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.shellcommand
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.shellcommand

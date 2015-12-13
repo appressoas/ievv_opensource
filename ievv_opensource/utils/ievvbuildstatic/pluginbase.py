@@ -1,6 +1,6 @@
 from watchdog.observers import Observer
 
-from ievv_opensource.utils.ievvbuildstatic.logmixin import LogMixin
+from ievv_opensource.utils.logmixin import LogMixin
 from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler
 
 

@@ -1,5 +1,5 @@
-from ievv_opensource.utils.ievvbuildstatic.logmixin import LogMixin
-from ievv_opensource.utils.ievvbuildstatic.shellcommand import ShellCommandMixin
+from ievv_opensource.utils.logmixin import LogMixin
+from ievv_opensource.utils.shellcommand import ShellCommandMixin
 
 
 class AbstractInstaller(LogMixin, ShellCommandMixin):
@@ -10,7 +10,7 @@ class AbstractInstaller(LogMixin, ShellCommandMixin):
     have in common is a reference to their
     :class:`ievv_opensource.utils.ievvbuildstatic.config.App`,
     a :obj:`~.AbstractInstaller.name` and the methods
-    defined in :class:`ievv_opensource.utils.ievvbuildstatic.logmixin.LogMixin`
+    defined in :class:`ievv_opensource.utils.logmixin.LogMixin`
     and :class:`ievv_opensource.utils.ievvbuildstatic.shellcommand.ShellCommandMixin`.
 
     Plugins instantiate installers using
