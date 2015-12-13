@@ -2,8 +2,8 @@ import json
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
-from ievv_opensource.utils.shellcommand import ShellCommandError
-from ievv_opensource.utils.shellcommand import ShellCommandMixin
+from ievv_opensource.utils.shellcommandmixin import ShellCommandError
+from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):

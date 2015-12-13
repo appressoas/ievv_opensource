@@ -1,5 +1,5 @@
 from ievv_opensource.utils.logmixin import LogMixin
-from ievv_opensource.utils.shellcommand import ShellCommandMixin
+from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
 class AbstractInstaller(LogMixin, ShellCommandMixin):

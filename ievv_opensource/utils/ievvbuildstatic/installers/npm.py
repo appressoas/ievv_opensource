@@ -1,7 +1,7 @@
 import json
 
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
-from ievv_opensource.utils.shellcommand import ShellCommandError
+from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 
 
 class NpmInstaller(AbstractInstaller):
