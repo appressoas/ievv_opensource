@@ -1,11 +1,27 @@
 from termcolor import colored
 from ievv_opensource.utils import desktopnotifications
+import threading
 
 
 class Logger(object):
     """
     Logger class used by :class:`.LogMixin`.
     """
+    loggers = {}
+    messagelock = threading.Lock()
+
+    @classmethod
+    def get_instance(cls, name):
+        """
+        Get an instance of the logger by the given name.
+
+        Parameters:
+            name: The name of the logger.
+        """
+        if name not in cls.loggers:
+            cls.loggers[name] = cls(name=name)
+        return cls.loggers[name]
+
     def __init__(self, name):
         """
         Parameters:
@@ -13,18 +29,47 @@ class Logger(object):
         """
         self.name = name
         self.colors_enabled = True
+        self._has_messagelock = False
+        self._messagelocktimer = None
+        # self._messagequeue = []
+
+    def _acquire_messagelock(self):
+        if not self._has_messagelock:
+            self.__class__.messagelock.acquire()
+            self._has_messagelock = True
+
+    def _release_messagelock(self):
+        self._messagelocktimer = None
+        self.__class__.messagelock.release()
+        self._has_messagelock = False
+
+    def _slowrelease_messagelock(self):
+        if not self._messagelocktimer:
+            self._messagelocktimer = threading.Timer(0.3, self._release_messagelock)
+            self._messagelocktimer.start()
+
+    def _queue_message(self, message=''):
+        # self._messagequeue.append(message)
+        # self._flush_message_queue()
+        self._acquire_messagelock()
+        print(message)
+        self._slowrelease_messagelock()
+
+    # def _flush_message_queue(self):
+    #     for message in self._messagequeue:
+    #         print(message)
 
     def stdout(self, line):
         """
         Use this to redirecting sys.stdout when running shell commands.
         """
-        print(line.rstrip())
+        self._queue_message(line.rstrip())
 
     def stderr(self, line):
         """
         Use this to redirecting sys.stderr when running shell commands.
         """
-        print(line.rstrip())
+        self._queue_message(line.rstrip())
 
     def __colorize(self, message, *args, **kwargs):
         if self.colors_enabled:
@@ -33,7 +78,7 @@ class Logger(object):
             return message
 
     def __colorprint(self, message, *args, **kwargs):
-        print(self.__colorize(message, *args, **kwargs))
+        self._queue_message(self.__colorize(message, *args, **kwargs))
 
     def info(self, message):
         """
@@ -58,12 +103,12 @@ class Logger(object):
         Log the start of a command. This should be used in the beginning
         of each :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`.
         """
-        print()
+        self._queue_message()
         self.info(message)
 
     def __command_end(self, message, *args, **kwargs):
         self.__colorprint(message, *args, **kwargs)
-        print()
+        self._queue_message()
 
     def command_error(self, message):
         """
@@ -107,4 +152,39 @@ class LogMixin(object):
         Get an instance of :meth:`.Logger` with :meth:`.get_logger_name`
         as the logger name.
         """
-        return Logger(name=self.get_logger_name())
+        return Logger.get_instance(name=self.get_logger_name())
+
+
+if __name__ == '__main__':
+    import time
+    import random
+
+    class DemoThread(threading.Thread):
+        def __init__(self, *args, **kwargs):
+            self.text = kwargs.pop('text')
+            self.logger = Logger(name=self.text)
+            super(DemoThread, self).__init__(*args, **kwargs)
+
+        def run(self):
+            for x in range(30):
+                self.logger.info(self.text)
+            time.sleep(random.randint(1, 3))
+
+            for x in range(10):
+                self.logger.debug(self.text)
+            time.sleep(random.randint(1, 3))
+
+            for x in range(10):
+                self.logger.warning(self.text)
+
+
+    threads = [
+        DemoThread(text='Hello world'),
+        DemoThread(text='A test'),
+        DemoThread(text='Yo!'),
+    ]
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
