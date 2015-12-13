@@ -97,6 +97,9 @@ class LogMixin(object):
     and use :meth:`.~LogMixin.get_logger`.
     """
     def get_logger_name(self):
+        """
+        Get the name of the logger.
+        """
         raise NotImplementedError()
 
     def get_logger(self):

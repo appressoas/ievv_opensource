@@ -60,7 +60,9 @@ Utilities
    :maxdepth: 1
 
    virtualenvutils
-   desktopnotifications
+   utils.desktopnotifications
+   utils.logmixin
+   utils.shellcommandmixin
 
 
 ******************
