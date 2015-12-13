@@ -5,7 +5,7 @@ import sh
 
 class ShellCommandError(Exception):
     """
-    Raised when :meth:`.BuildLoggable.run_shell_command` fails.
+    Raised when :meth:`.LogMixin.run_shell_command` fails.
     """
 
 
@@ -13,7 +13,7 @@ class ShellCommandMixin(object):
     """
     Shell command mixin - for classes that need to run shell commands.
 
-    Requires :class:`~ievv_opensource.utils.ievvbuildstatic.buildloggable.BuildLoggable`.
+    Requires :class:`~ievv_opensource.utils.ievvbuildstatic.logmixin.LogMixin`.
     """
     def log_shell_command_stdout(self, line):
         """

@@ -4,7 +4,7 @@ from ievv_opensource.utils import desktopnotifications
 
 class Logger(object):
     """
-    Logger class used by :class:`.BuildLoggable`.
+    Logger class used by :class:`.LogMixin`.
     """
     def __init__(self, name):
         """
@@ -88,13 +88,13 @@ class Logger(object):
             message=message)
 
 
-class BuildLoggable(object):
+class LogMixin(object):
     """
     Mixin class that takes care of logging for all the classes
     in the ``ievvbuildstatic`` package.
 
-    Subclasses must override :meth:`.~BuildLoggable.get_logger_name`,
-    and use :meth:`.~BuildLoggable.get_logger`.
+    Subclasses must override :meth:`.~LogMixin.get_logger_name`,
+    and use :meth:`.~LogMixin.get_logger`.
     """
     def get_logger_name(self):
         raise NotImplementedError()

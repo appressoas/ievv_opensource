@@ -4,10 +4,10 @@ import time
 
 from django.apps import apps
 
-from ievv_opensource.utils.ievvbuildstatic.buildloggable import BuildLoggable
+from ievv_opensource.utils.ievvbuildstatic.logmixin import LogMixin
 
 
-class App(BuildLoggable):
+class App(LogMixin):
     """
     Configures how ``ievv buildstatic`` should build the static files for a Django app.
     """
@@ -136,7 +136,7 @@ class App(BuildLoggable):
         return '{}.{}'.format(self.apps.get_logger_name(), self.appname)
 
 
-class Apps(BuildLoggable):
+class Apps(LogMixin):
     """
     Basically a list around :class:`.App` objects.
     """

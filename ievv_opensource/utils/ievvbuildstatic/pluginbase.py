@@ -1,10 +1,10 @@
 from watchdog.observers import Observer
 
-from ievv_opensource.utils.ievvbuildstatic.buildloggable import BuildLoggable
+from ievv_opensource.utils.ievvbuildstatic.logmixin import LogMixin
 from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler
 
 
-class Plugin(BuildLoggable):
+class Plugin(LogMixin):
     """
     Base class for all plugins in ``ievvbuildstatic``.
     """
