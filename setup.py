@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'sh',
         'Django',
-        'django_dbdev',
+        'django_dbdev>=1.0.0',
         'watchdog',
         'termcolor',
     ],
