@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+import sys
 from termcolor import colored
 from ievv_opensource.utils import desktopnotifications
 import threading
@@ -51,9 +54,10 @@ class Logger(object):
     def _queue_message(self, message=''):
         # self._messagequeue.append(message)
         # self._flush_message_queue()
-        self._acquire_messagelock()
+        # self._acquire_messagelock()
         print(message)
-        self._slowrelease_messagelock()
+        sys.stdout.flush()
+        # self._slowrelease_messagelock()
 
     # def _flush_message_queue(self):
     #     for message in self._messagequeue:
@@ -104,7 +108,7 @@ class Logger(object):
         of each :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`.
         """
         self._queue_message()
-        self.info(message)
+        self.__colorprint(message, color='blue', attrs=['bold'])
 
     def __command_end(self, message, *args, **kwargs):
         self.__colorprint(message, *args, **kwargs)

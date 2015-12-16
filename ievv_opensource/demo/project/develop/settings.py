@@ -1,5 +1,6 @@
 from ievv_opensource.demo.project.default.settings import *  # noqa
 from ievv_opensource.utils import ievvbuildstatic
+from ievv_opensource.utils import ievvdevrun
 
 THIS_DIR = os.path.dirname(__file__)
 
@@ -38,4 +39,9 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.mediacopy.Plugin(),
         ]
     ),
+)
+
+
+IEVVTASKS_DEVELOPRUN_THREADLIST = ievvdevrun.config.RunnableThreadList(
+    ievvdevrun.runnables.runserver.RunnableThread(),
 )

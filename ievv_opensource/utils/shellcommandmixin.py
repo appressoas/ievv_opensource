@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
+
+import psutil
 import sh
 
 
@@ -45,11 +47,67 @@ class ShellCommandMixin(object):
         args = args or []
         kwargs = kwargs or {}
         try:
-            command(*args,
-                    _out=self.log_shell_command_stdout,
-                    _err=self.log_shell_command_stderr,
-                    **kwargs)
+            return command(*args,
+                           _out=self.log_shell_command_stdout,
+                           _err=self.log_shell_command_stderr,
+                           **kwargs)
         except sh.ErrorReturnCode:
             # We do not need to show any more errors here - they
             # have already been printed by the _out and _err handlers.
             raise ShellCommandError()
+
+    def kill_process(self, pid):
+        """
+        Kill the system process with the given ``pid``, and all
+        its child processes.
+
+        .. warning::
+
+            You should normally use :meth:`.terminate_process` instead of
+            this method since that normally gives the process the chance to
+            cleanup.
+
+        Parameters:
+            pid: The process ID of the process you want to kill.
+
+        Returns:
+            A list of all the killed processes.
+        """
+        process_ids = []
+        try:
+            process = psutil.Process(pid)
+        except psutil.NoSuchProcess:
+            pass
+        else:
+            for childprocess in process.children():
+                process_ids.append(childprocess.pid)
+                childprocess.kill()
+                self.get_logger().debug('Killing PID: {}'.format(childprocess.pid))
+            process_ids.append(process.pid)
+            process.kill()
+        return process_ids
+
+    def terminate_process(self, pid):
+        """
+        Terminate the system process with the given ``pid``, and all
+        its child processes.
+
+        Parameters:
+            pid: The process ID of the process you want to terminate.
+
+        Returns:
+            A list of all the terminated processes.
+        """
+        process_ids = []
+        try:
+            process = psutil.Process(pid)
+        except psutil.NoSuchProcess:
+            pass
+        else:
+            for childprocess in process.children():
+                process_ids.append(childprocess.pid)
+                childprocess.terminate()
+                self.get_logger().debug('Killing PID: {}'.format(childprocess.pid))
+            process_ids.append(process.pid)
+            process.terminate()
+        return process_ids
