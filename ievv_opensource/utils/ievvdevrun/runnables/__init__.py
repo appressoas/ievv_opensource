@@ -1,3 +1,3 @@
-from . import django_runserver
-from . import dbdev_runserver
-from . import base
+from . import django_runserver  # noqa
+from . import dbdev_runserver  # noqa
+from . import base  # noqa

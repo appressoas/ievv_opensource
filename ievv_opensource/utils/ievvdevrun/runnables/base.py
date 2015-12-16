@@ -171,4 +171,4 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         self.is_running = False
         process_ids = self.terminate_process(self.command.pid)
         self.log_successful_stop(
-                '[killed pids: {}]'.format(', '.join(map(str, process_ids))))
+            '[killed pids: {}]'.format(', '.join(map(str, process_ids))))
