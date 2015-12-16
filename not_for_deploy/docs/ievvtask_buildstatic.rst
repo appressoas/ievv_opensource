@@ -14,6 +14,10 @@ and you configure the system using python classes.
 ***************
 Getting started
 ***************
+First of all, make sure you have the following in your ``INSTALLED_APPS`` setting::
+
+    'ievv_opensource.ievvtasks_common',
+
 ``ievv buildstatic`` assumes you have the sources for your
 static files in the ``staticsources/<appname>/`` directory
 within each Django app.
