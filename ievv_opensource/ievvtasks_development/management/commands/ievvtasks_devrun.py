@@ -11,4 +11,4 @@ class Command(BaseCommand):
     #                         help='Starts a blocking process that watches for changes.')
 
     def handle(self, *args, **options):
-        settings.IEVVTASKS_DEVELOPRUN_THREADLIST.start()
+        settings.IEVVTASKS_DEVRUN_RUNNABLES.start()

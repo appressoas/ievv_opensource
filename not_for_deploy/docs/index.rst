@@ -50,6 +50,7 @@ The ievv command
 
    the_ievv_command
    ievvtask_buildstatic
+   ievvtask_devrun
 
 
 *********

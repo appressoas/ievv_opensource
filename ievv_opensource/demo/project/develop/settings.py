@@ -42,6 +42,15 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
 )
 
 
-IEVVTASKS_DEVELOPRUN_THREADLIST = ievvdevrun.config.RunnableThreadList(
-    ievvdevrun.runnables.runserver.RunnableThread(),
+IEVVTASKS_DEVRUN_RUNNABLES = ievvdevrun.config.RunnableThreadList(
+    ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
+    ievvdevrun.runnables.django_runserver.RunnableThread(),
+    # ievvdevrun.runnables.base.ShellCommandRunnableThread(
+    #     autorestart_on_crash=False,
+    #     name='Manually configured Django development server',
+    #     command_config={
+    #         'executable': 'python',
+    #         'args': ['manage.py', 'runserver']
+    #     }
+    # ),
 )
