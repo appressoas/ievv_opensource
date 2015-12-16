@@ -118,7 +118,7 @@ LOGGING = {
         },
         'sh': {
             'handlers': ['stderr'],
-            'level': 'INFO',
+            'level': 'WARNING',
             'propagate': False
         },
         '': {

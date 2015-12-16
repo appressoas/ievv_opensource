@@ -53,11 +53,11 @@ class Logger(object):
 
     def _queue_message(self, message=''):
         # self._messagequeue.append(message)
+        self._acquire_messagelock()
         # self._flush_message_queue()
-        # self._acquire_messagelock()
         print(message)
         sys.stdout.flush()
-        # self._slowrelease_messagelock()
+        self._slowrelease_messagelock()
 
     # def _flush_message_queue(self):
     #     for message in self._messagequeue:

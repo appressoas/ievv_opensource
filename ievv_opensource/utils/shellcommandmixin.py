@@ -82,7 +82,6 @@ class ShellCommandMixin(object):
             for childprocess in process.children():
                 process_ids.append(childprocess.pid)
                 childprocess.kill()
-                self.get_logger().debug('Killing PID: {}'.format(childprocess.pid))
             process_ids.append(process.pid)
             process.kill()
         return process_ids
@@ -107,7 +106,6 @@ class ShellCommandMixin(object):
             for childprocess in process.children():
                 process_ids.append(childprocess.pid)
                 childprocess.terminate()
-                self.get_logger().debug('Killing PID: {}'.format(childprocess.pid))
             process_ids.append(process.pid)
             process.terminate()
         return process_ids
