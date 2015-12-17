@@ -45,7 +45,10 @@ class Logger(object):
 
     def _release_messagelock(self):
         self._messagelocktimer = None
-        self.__class__.messagelock.release()
+        try:
+            self.__class__.messagelock.release()
+        except RuntimeError:
+            pass
         self._has_messagelock = False
 
     def _slowrelease_messagelock(self):
