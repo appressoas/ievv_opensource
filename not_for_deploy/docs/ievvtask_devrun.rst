@@ -58,6 +58,23 @@ For this example, we will add an ``design`` key that also runs
 
 
 
+****************************************
+Adding ievv devrun as PyCharm run config
+****************************************
+If you use PyCharm, you can do the following to add ``ievv devrun``
+as a run target:
+
+- Select ``Run -> Edit configurations ...``.
+- Select ``+ -> Python``.
+    - Give it a name (E.g.: ``ievv devrun default``).
+    - Check *Single instance*.
+    - Check *Share* if you want to share it with your co-workers.
+    - Select your ``manage.py`` as the script.
+    - Set ``ievvtasks_devrun -n default`` as *Script parameters*.
+
+If you want to create a target for the ``design`` config shown above,
+you just create another PyCharm run target with ``ievvtasks_devrun -n design``.
+
 ****************
 Custom runnables
 ****************
