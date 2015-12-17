@@ -42,7 +42,7 @@ class RunnableThreadList(object):
                 runnablethread.start()
 
         def stop_all():
-            for runnablethread in self._runnablethreads:
+            for runnablethread in reversed(self._runnablethreads):
                 runnablethread.stop()
 
         def join_all():
@@ -64,9 +64,9 @@ class RunnableThreadList(object):
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print('', file=sys.stderr)
-            print('*' * 70, file=sys.stderr)
-            print('ievvdevrun KeyboardInterrupt', file=sys.stderr)
-            print('*' * 70, file=sys.stderr)
+            # print('', file=sys.stderr)
+            # print('*' * 70, file=sys.stderr)
+            # print('ievvdevrun KeyboardInterrupt', file=sys.stderr)
+            # print('*' * 70, file=sys.stderr)
             stop_all()
         join_all()

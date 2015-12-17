@@ -106,6 +106,10 @@ class ShellCommandMixin(object):
             for childprocess in process.children():
                 process_ids.append(childprocess.pid)
                 childprocess.terminate()
-            process_ids.append(process.pid)
-            process.terminate()
+            try:
+                process.terminate()
+            except psutil.NoSuchProcess:
+                pass
+            else:
+                process_ids.append(process.pid)
         return process_ids

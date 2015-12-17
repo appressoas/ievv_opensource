@@ -28,5 +28,17 @@ class RunnableThread(base.ShellCommandRunnableThread):
     def get_command_config(self):
         return {
             'executable': sys.executable,
-            'args': ['manage.py', 'dbdev_fgrunserver']
+            'args': ['manage.py', 'dbdev_startserver']
         }
+
+    def dbdev_stopserver(self):
+        self.run_shell_command(sys.executable,
+                               args=['manage.py', 'dbdev_stopserver'])
+
+    def run(self):
+        self.dbdev_stopserver()
+        super(RunnableThread, self).run()
+
+    def stop(self):
+        super(RunnableThread, self).stop()
+        self.dbdev_stopserver()

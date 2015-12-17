@@ -1,6 +1,8 @@
 import threading
 import time
 
+import psutil
+
 from ievv_opensource.utils import logmixin
 from ievv_opensource.utils import shellcommandmixin
 
@@ -128,21 +130,34 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
 
     def _restartloop(self):
         while True:
+            if self.is_running:
+                if self.command.process.is_alive():
+                    try:
+                        process = psutil.Process(self.command.pid)
+                    except psutil.NoSuchProcess:
+                        pass
+                    else:
+                        self.detected_process_ids.add(self.command.pid)
+                        for childprocess in process.children():
+                            self.detected_process_ids.add(childprocess.pid)
+                else:
+                    self.get_logger().command_error('Restarting "{}" because of crash.'.format(
+                        self.get_logger_name()))
+                    self._start_command(restart=True)
+            else:
+                return
+
             # Check if alive every 3 second, but check if we have been stopped
             # every 200ms.
             for x in range(12):
                 time.sleep(0.2)
                 if not self.is_running:
-                    return
-            if self.is_running:
-                if not self.command.process.is_alive():
-                    self.get_logger().command_error('Restarting "{}" because of crash.'.format(
-                        self.get_logger_name()))
-                    self._start_command()
-            else:
-                return
+                    break
 
-    def _start_command(self):
+    def _start_command(self, restart=False):
+        if restart:
+            self.stop()
+        self.detected_process_ids = set()
         commandconfig = self.get_command_config()
         kwargs = commandconfig.get('kwargs', {}).copy()
         kwargs.update({'_bg': True})
@@ -174,6 +189,8 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
 
     def stop(self):
         self.is_running = False
-        process_ids = self.terminate_process(self.command.pid)
+        process_ids = set(self.terminate_process(self.command.pid))
+        for process_id in self.detected_process_ids:
+            process_ids.update(set(self.terminate_process(process_id)))
         self.log_successful_stop(
             '[killed pids: {}]'.format(', '.join(map(str, process_ids))))
