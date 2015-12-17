@@ -21,6 +21,7 @@ setup(
         'django_dbdev',
         'watchdog',
         'termcolor',
+        'psutil',
     ],
     entry_points={
         'console_scripts': [

@@ -90,11 +90,27 @@ class App(LogMixin):
         else:
             return sourcefolder
 
-    def get_destination_path(self, *sourcefolder_relative_path, new_extension=None):
+    def get_destination_path(self, *sourcefolder_relative_path, **kwargs):
         """
         Returns the absolute path to a folder within the destination
         folder.
+
+        Parameters:
+            sourcefolder_relative_path: Path relative to the source folder.
+                Same format as ``os.path.join()``.
+            new_extension: A new extension to give the destination path.
+                See example below.
+
+
+        Examples:
+
+            Get the destination file for a coffeescript file - extension
+            is changed from ``.coffee`` to ``.js``::
+
+                get_destination_path('mylib', 'app.coffee', new_extension='.js')
+
         """
+        new_extension = kwargs.get('new_extension', None)
         destinationfolder = os.path.join(
             self.get_app_path(self.destinationfolder), self.appname, self.version)
         if sourcefolder_relative_path:

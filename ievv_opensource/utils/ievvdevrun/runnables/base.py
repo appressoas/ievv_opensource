@@ -132,7 +132,8 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
                     return
             if self.is_running:
                 if not self.command.process.is_alive():
-                    self.get_logger().warning('Restarting Django server because of crash.')
+                    self.get_logger().command_error('Restarting "{}" because of crash.'.format(
+                        self.get_logger_name()))
                     self._start_command()
             else:
                 return

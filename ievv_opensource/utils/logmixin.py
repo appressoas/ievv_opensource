@@ -1,9 +1,11 @@
 from __future__ import print_function
 
 import sys
-from termcolor import colored
-from ievv_opensource.utils import desktopnotifications
 import threading
+
+from termcolor import colored
+
+from ievv_opensource.utils import desktopnotifications
 
 
 class Logger(object):

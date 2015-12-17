@@ -10,6 +10,7 @@ sh==1.11
 sorl-thumbnail==12.3
 watchdog==0.8.3
 termcolor==1.1.0
+psutil==3.3.0
 
 # Required by sphinx
 Sphinx==1.3.1
