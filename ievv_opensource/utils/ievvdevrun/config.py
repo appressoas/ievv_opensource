@@ -50,10 +50,10 @@ class RunnableThreadList(object):
                 runnablethread.join()
 
         def on_terminate(*args):
-            print('', file=sys.stderr)
-            print('*' * 70, file=sys.stderr)
-            print('ievvdevrun terminated', file=sys.stderr)
-            print('*' * 70, file=sys.stderr)
+            print('')
+            print('*' * 70)
+            print('ievvdevrun terminated')
+            print('*' * 70)
             stop_all()
             join_all()
             sys.exit(0)
