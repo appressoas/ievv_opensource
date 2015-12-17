@@ -20,10 +20,12 @@ Next, you need to configure what to run when you run ``ievv devrun``. You
 do this with the ``IEVVTASKS_DEVRUN_RUNNABLES``-setting. For this
 example, we will setup *Django runserver* and *Django dbdev database server*::
 
-    IEVVTASKS_DEVRUN_RUNNABLES = ievvdevrun.config.RunnableThreadList(
-        ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
-        ievvdevrun.runnables.django_runserver.RunnableThread()
-    )
+    IEVVTASKS_DEVRUN_RUNNABLES = {
+        'default': ievvdevrun.config.RunnableThreadList(
+            ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
+            ievvdevrun.runnables.django_runserver.RunnableThread()
+        )
+    }
 
 With the configured, you can run::
 
@@ -33,6 +35,27 @@ Hit ``CTRL-C`` to stop both the servers.
 
 to start both the Django development server and your
 `Django dbdev <https://github.com/espenak/django_dbdev>`_ database.
+
+
+Multiple run configurations
+===========================
+You may already have guessed that you can add multiple configurations
+since we only add a ``default``-key to ``IEVVTASKS_DEVRUN_RUNNABLES``.
+To add multiple configurations, just add another key to the dict.
+For this example, we will add an ``design`` key that also runs
+``ievv buildstatic --watch``::
+
+    IEVVTASKS_DEVRUN_RUNNABLES = {
+        'default': ievvdevrun.config.RunnableThreadList(
+            # ... same as above ...
+        ),
+        'design': ievvdevrun.config.RunnableThreadList(
+            ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
+            ievvdevrun.runnables.django_runserver.RunnableThread(),
+            ievvdevrun.runnables.ievv_buildstatic.RunnableThread(),
+        )
+    }
+
 
 
 ****************

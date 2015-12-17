@@ -83,15 +83,17 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         sending the command config as a parameter to this class
         in your django settings::
 
-            IEVVTASKS_DEVELOPRUN_THREADLIST = ievvdevrun.config.RunnableThreadList(
-                ievvdevrun.runnables.base.ShellCommandRunnableThread(
-                    name='Django development server',
-                    command_config={
-                        'executable': sys.executable,
-                        'args': ['manage.py', 'runserver']
-                    }
-                ),
-            )
+            IEVVTASKS_DEVELOPRUN_THREADLIST = {
+                'default': ievvdevrun.config.RunnableThreadList(
+                    ievvdevrun.runnables.base.ShellCommandRunnableThread(
+                        name='Django development server',
+                        command_config={
+                            'executable': sys.executable,
+                            'args': ['manage.py', 'runserver']
+                        }
+                    ),
+                )
+            }
 
 
         Making the command automatically restart when it crashes::

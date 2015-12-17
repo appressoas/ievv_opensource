@@ -1,5 +1,7 @@
-from ievv_opensource.utils.logmixin import LogMixin
+from watchdog.observers import Observer
+
 from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler
+from ievv_opensource.utils.logmixin import LogMixin
 
 
 class Plugin(LogMixin):
