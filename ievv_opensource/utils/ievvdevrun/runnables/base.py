@@ -72,7 +72,9 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
 
                 def get_command_config(self):
                     return {
-                        'executable': 'python',
+                        # We use sys.executable instead of "python" to ensure we run the same python executable
+                        # as we are using to start the process.
+                        'executable': sys.executable,
                         'args': ['manage.py', 'runserver']
                     }
 
@@ -85,7 +87,7 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
                 ievvdevrun.runnables.base.ShellCommandRunnableThread(
                     name='Django development server',
                     command_config={
-                        'executable': 'python',
+                        'executable': sys.executable,
                         'args': ['manage.py', 'runserver']
                     }
                 ),

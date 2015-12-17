@@ -1,3 +1,4 @@
+import sys
 from django.conf import settings
 
 from ievv_opensource.utils.ievvdevrun.runnables import base
@@ -24,6 +25,6 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
     def get_command_config(self):
         return {
-            'executable': 'python',
+            'executable': sys.executable,
             'args': ['manage.py', 'dbdev_fgrunserver']
         }

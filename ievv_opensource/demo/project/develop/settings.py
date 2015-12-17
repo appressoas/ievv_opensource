@@ -49,7 +49,7 @@ IEVVTASKS_DEVRUN_RUNNABLES = ievvdevrun.config.RunnableThreadList(
     #     autorestart_on_crash=False,
     #     name='Manually configured Django development server',
     #     command_config={
-    #         'executable': 'python',
+    #         'executable': sys.executable,
     #         'args': ['manage.py', 'runserver']
     #     }
     # ),
