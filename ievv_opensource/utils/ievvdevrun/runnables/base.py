@@ -147,9 +147,9 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
             else:
                 return
 
-            # Check if alive every 3 second, but check if we have been stopped
+            # Check if alive every 5 second, but check if we have been stopped
             # every 200ms.
-            for x in range(12):
+            for x in range(25):
                 time.sleep(0.2)
                 if not self.is_running:
                     break
@@ -157,6 +157,7 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
     def _start_command(self, restart=False):
         if restart:
             self.stop()
+        self.is_running = True
         self.detected_process_ids = set()
         commandconfig = self.get_command_config()
         kwargs = commandconfig.get('kwargs', {}).copy()
@@ -182,7 +183,6 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
                                       'command_config to __init__().')
 
     def run(self):
-        self.is_running = True
         self._start_command()
         if self.autorestart_on_crash:
             self._restartloop()
