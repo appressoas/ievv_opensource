@@ -145,3 +145,13 @@ Example::
         ('', ''),
         ('mytype', 'My tag type'),
     ]
+
+
+.. setting:: IEVVTASKS_DEVRUN_RUNNABLES
+
+IEVVTASKS_DEVRUN_RUNNABLES
+==========================
+Dict mapping ``ievv devrun`` target names to :class:`ievv_opensource.utils.ievvdevrun.config.RunnableThreadList`
+objects. Must contain the ``"default"`` key.
+
+Documented in :doc:`ievvtask_devrun`.
