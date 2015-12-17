@@ -59,5 +59,5 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(),
         ievvdevrun.runnables.ievv_buildstatic.RunnableThread(),
-    )
+    ),
 }
