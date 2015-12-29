@@ -1,4 +1,6 @@
 import sys
+import time
+
 from django.conf import settings
 
 from ievv_opensource.utils.ievvdevrun.runnables import base
@@ -34,6 +36,10 @@ class RunnableThread(base.ShellCommandRunnableThread):
     def dbdev_stopserver(self):
         self.run_shell_command(sys.executable,
                                args=['manage.py', 'dbdev_stopserver'])
+
+    def start(self):
+        super(RunnableThread, self).start()
+        time.sleep(4)  # Block to give the server time to start.
 
     def run(self):
         self.dbdev_stopserver()
