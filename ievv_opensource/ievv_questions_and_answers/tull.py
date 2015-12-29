@@ -30,8 +30,8 @@ Maecenas faucibus mollis interdum. Lorem ipsum dolor sit amet, consectetur adipi
 Select the correct answers (if any)
 [1] Round
 [1] Larger than the moon
-[-1] Flat
-[-1] 6000 years old
+[-3] Flat
+[-2] 6000 years old
 """
 
 
@@ -58,6 +58,9 @@ class AbstractParsedItem(object):
     @classmethod
     def match(cls, rawtext):
         raise NotImplementedError()
+
+    def __str__(self):
+        return self.rawtext
 
 
 class AbstractParsedItemWithChildren(AbstractParsedItem):
@@ -115,25 +118,37 @@ class Question(AbstractParsedItemWithChildren):
 class SingleSelectOption(AbstractParsedQuestionChildItem):
     @classmethod
     def match(cls, rawtext):
-        return re.match(r'^\((-)?\d+\).*$', rawtext)
+        return re.match(r'^\((-?\d+)\)(.*)$', rawtext)
 
     def __init__(self, rawtext, linenumber):
         super(SingleSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
+        match = self.__class__.match(rawtext)
+        self.number = match.group(1)
+        self.text = match.group(2).strip()
 
     def get_typeid(self):
         return 'singleselect'
+
+    def __str__(self):
+        return '[{}]: {!r}'.format(self.number, self.text)
 
 
 class MultiSelectOption(AbstractParsedQuestionChildItem):
     @classmethod
     def match(cls, rawtext):
-        return re.match(r'\[(-)?\d+\].*$', rawtext)
+        return re.match(r'\[(-?\d+)\](.*)$', rawtext)
 
     def __init__(self, rawtext, linenumber):
         super(MultiSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
+        match = self.__class__.match(rawtext)
+        self.number = match.group(1)
+        self.text = match.group(2).strip()
 
     def get_typeid(self):
         return 'multiselect'
+
+    def __str__(self):
+        return '({}): {!r}'.format(self.number, self.text)
 
 
 class Textarea(AbstractParsedQuestionChildItem):
@@ -151,13 +166,20 @@ class Textarea(AbstractParsedQuestionChildItem):
 class Range(AbstractParsedQuestionChildItem):
     @classmethod
     def match(cls, rawtext):
-        return re.match(r'\{\d+-\d+\}.*$', rawtext)
+        return re.match(r'\{(\d+)-(\d+)\}(.*)$', rawtext)
 
     def __init__(self, rawtext, linenumber):
         super(Range, self).__init__(rawtext=rawtext, linenumber=linenumber)
+        match = self.__class__.match(rawtext)
+        self.from_number = match.group(1)
+        self.to_number = match.group(2)
+        self.text = match.group(3).strip()
 
     def get_typeid(self):
         return 'range'
+
+    def __str__(self):
+        return '{{{}-{}}}: {!r}'.format(self.from_number, self.to_number, self.text)
 
 
 class Paragraph(AbstractParsedItem):
@@ -288,4 +310,4 @@ if __name__ == '__main__':
             print('QUESTION: {}'.format(question.heading))
             print('intro: {}'.format(question.introduction_paragraph))
             for item in question.parseditems:
-                print('{}: {}'.format(item.get_typeid(), item.rawtext))
+                print('{}: {}'.format(item.get_typeid(), item))
