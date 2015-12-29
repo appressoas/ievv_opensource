@@ -5,7 +5,7 @@ import threading
 
 from termcolor import colored
 
-from ievv_opensource.utils import desktopnotifications
+from ievv_opensource.utils.desktopnotifications import desktopnotificationapi
 
 
 class Logger(object):
@@ -126,7 +126,7 @@ class Logger(object):
         when the task fails.
         """
         self.__command_end(message, color='red', attrs=['bold'])
-        desktopnotifications.show_message(
+        desktopnotificationapi.show_message(
             title='ERROR - {}'.format(self.name),
             message=message)
 
@@ -137,7 +137,7 @@ class Logger(object):
         when the task succeeds.
         """
         self.__command_end(message, color='green', attrs=['bold'])
-        desktopnotifications.show_message(
+        desktopnotificationapi.show_message(
             title='SUCCESS - {}'.format(self.name),
             message=message)
 
