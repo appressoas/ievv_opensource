@@ -55,6 +55,10 @@ class AbstractParsedItem(object):
         self.rawtext = rawtext
         self.linenumber = linenumber
 
+    @classmethod
+    def match(cls, rawtext):
+        raise NotImplementedError()
+
 
 class AbstractParsedItemWithChildren(AbstractParsedItem):
     def __init__(self, rawtext, linenumber):
@@ -75,12 +79,22 @@ class AbstractParsedQuestionChildItem(AbstractParsedItem):
 
 
 class Section(AbstractParsedItemWithChildren):
+
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'^##.*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(Section, self).__init__(rawtext=rawtext, linenumber=linenumber)
         self.heading = rawtext[2:].strip()
 
 
 class Question(AbstractParsedItemWithChildren):
+
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'^::.*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(Question, self).__init__(rawtext=rawtext, linenumber=linenumber)
         self.heading = rawtext[2:].strip()
@@ -99,6 +113,10 @@ class Question(AbstractParsedItemWithChildren):
 
 
 class SingleSelectOption(AbstractParsedQuestionChildItem):
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'^\((-)?\d+\).*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(SingleSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
 
@@ -107,6 +125,10 @@ class SingleSelectOption(AbstractParsedQuestionChildItem):
 
 
 class MultiSelectOption(AbstractParsedQuestionChildItem):
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'\[(-)?\d+\].*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(MultiSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
 
@@ -115,6 +137,10 @@ class MultiSelectOption(AbstractParsedQuestionChildItem):
 
 
 class Textarea(AbstractParsedQuestionChildItem):
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'\[\.\.\.\].*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(Textarea, self).__init__(rawtext=rawtext, linenumber=linenumber)
 
@@ -123,6 +149,10 @@ class Textarea(AbstractParsedQuestionChildItem):
 
 
 class Range(AbstractParsedQuestionChildItem):
+    @classmethod
+    def match(cls, rawtext):
+        return re.match(r'\{\d+-\d+\}.*$', rawtext)
+
     def __init__(self, rawtext, linenumber):
         super(Range, self).__init__(rawtext=rawtext, linenumber=linenumber)
 
@@ -139,34 +169,49 @@ class Paragraph(AbstractParsedItem):
 
 
 class Parse(object):
-    line_start_tokens = {
-        r'^##.*$': 'heading',
-        r'^::.*$': 'question',
-        r'^\((-)?\d+\).*$': 'singleselect_option',
-        r'\[(-)?\d+\].*$': 'multiselect_option',
-        r'\[\.\.\.\].*$': 'textarea',
-        r'\{\d+-\d+\}.*$': 'range',
-    }
+
+    def get_section_parser_class(self):
+        return Section
+
+    def get_question_parser_class(self):
+        return Question
+
+    def get_sectioning_parsers(self):
+        return [
+            self.get_section_parser_class(),
+            self.get_question_parser_class(),
+        ]
+
+    def get_question_child_parsers(self):
+        return [
+            SingleSelectOption,
+            MultiSelectOption,
+            Textarea,
+            Range,
+        ]
 
     def __init__(self, source):
         self.source = source
         self.sections = []
         self.current_section = None
         self.current_question = None
+        self.parsers = []
+        self.parsers.extend(self.get_sectioning_parsers())
+        self.parsers.extend(self.get_question_child_parsers())
         self.parse()
 
     def parse_line(self, line):
-        for pattern, name in self.line_start_tokens.items():
-            if re.match(pattern, line):
-                return name, line
+        for lineparser in self.parsers:
+            if lineparser.match(line):
+                return lineparser, line
         return 'paragraphline', line
 
     def parse(self):
         consumed_paragraph_lines = []
         consumed_paragraph_first_linenumber = None
         for linenumber, line in enumerate(source.split('\n'), 1):
-            name, line = self.parse_line(line.strip())
-            if name == 'paragraphline':
+            lineparser, line = self.parse_line(line.strip())
+            if lineparser == 'paragraphline':
                 consumed_paragraph_lines.append(line)
                 if consumed_paragraph_first_linenumber is None:
                     consumed_paragraph_first_linenumber = linenumber
@@ -176,38 +221,30 @@ class Parse(object):
                                          linenumber=consumed_paragraph_first_linenumber)
                     consumed_paragraph_lines = []
                     consumed_paragraph_first_linenumber = None
-                getattr(self, 'parse_{}'.format(name))(line, linenumber=linenumber)
+                self.handle_parsable_line(lineparser=lineparser, line=line, linenumber=linenumber)
         if consumed_paragraph_lines:
             self.parse_paragraph(consumed_paragraph_lines,
                                  linenumber=consumed_paragraph_first_linenumber)
 
-    def parse_heading(self, line, linenumber):
+    def handle_parsable_line(self, lineparser, line, linenumber):
+        if issubclass(lineparser, Section):
+            self.parse_section_start(lineparser=lineparser, line=line, linenumber=linenumber)
+        elif issubclass(lineparser, Question):
+            self.parse_question_start(lineparser=lineparser, line=line, linenumber=linenumber)
+        else:
+            self.current_question.append_item(lineparser(rawtext=line, linenumber=linenumber))
+
+    def parse_section_start(self, lineparser, line, linenumber):
         print('heading', repr(line))
-        section = Section(rawtext=line, linenumber=linenumber)
+        section = lineparser(rawtext=line, linenumber=linenumber)
         self.current_section = section
         self.sections.append(section)
 
-    def parse_question(self, line, linenumber):
+    def parse_question_start(self, lineparser, line, linenumber):
         print('question', repr(line))
-        question = Question(rawtext=line, linenumber=linenumber)
+        question = lineparser(rawtext=line, linenumber=linenumber)
         self.current_question = question
         self.current_section.append_item(question)
-
-    def parse_singleselect_option(self, line, linenumber):
-        print('singleselect_option', repr(line))
-        self.current_question.append_item(SingleSelectOption(rawtext=line, linenumber=linenumber))
-
-    def parse_multiselect_option(self, line, linenumber):
-        print('multiselect_option', repr(line))
-        self.current_question.append_item(MultiSelectOption(rawtext=line, linenumber=linenumber))
-
-    def parse_range(self, line, linenumber):
-        print('range', repr(line))
-        self.current_question.append_item(Range(rawtext=line, linenumber=linenumber))
-
-    def parse_textarea(self, line, linenumber):
-        print('textarea', repr(line))
-        self.current_question.append_item(Textarea(rawtext=line, linenumber=linenumber))
 
     def get_paragraph_type(self, linenumber):
         if self.current_section or self.current_question:
