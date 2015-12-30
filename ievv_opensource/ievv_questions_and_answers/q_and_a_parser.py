@@ -1,4 +1,10 @@
-import re
+from ievv_opensource.ievv_questions_and_answers.q_and_a_items.paragraph import Paragraph
+from ievv_opensource.ievv_questions_and_answers.q_and_a_items.question import Question
+from ievv_opensource.ievv_questions_and_answers.q_and_a_items.section import Section
+
+from ievv_opensource.ievv_questions_and_answers.q_and_a_items import option_types
+
+from ievv_opensource.ievv_questions_and_answers import parse_exceptions
 
 source = """## A section heading
 
@@ -35,162 +41,7 @@ Select the correct answers (if any)
 """
 
 
-class ParseError(Exception):
-    def __init__(self, linenumber, errormessage):
-        self.linenumber = linenumber
-        self.errormessage = errormessage
-        super(ParseError, self).__init__(u'{}: {}'.format(linenumber, errormessage))
-
-
-class ParagraphParseError(ParseError):
-    pass
-
-
-class QuestionTypeIdParseError(ParseError):
-    pass
-
-
-class AbstractParsedItem(object):
-    def __init__(self, rawtext, linenumber):
-        self.rawtext = rawtext
-        self.linenumber = linenumber
-
-    @classmethod
-    def match(cls, rawtext):
-        raise NotImplementedError()
-
-    def __str__(self):
-        return self.rawtext
-
-
-class AbstractParsedItemWithChildren(AbstractParsedItem):
-    def __init__(self, rawtext, linenumber):
-        super(AbstractParsedItemWithChildren, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        self.introduction_paragraph = None
-        self.parseditems = []
-
-    def append_item(self, parseditem):
-        self.parseditems.append(parseditem)
-
-    def set_introduction_paragraph(self, paragraph):
-        self.introduction_paragraph = paragraph
-
-
-class AbstractParsedQuestionChildItem(AbstractParsedItem):
-    def get_typeid(self):
-        raise NotImplementedError()
-
-
-class Section(AbstractParsedItemWithChildren):
-
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'^##.*$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(Section, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        self.heading = rawtext[2:].strip()
-
-
-class Question(AbstractParsedItemWithChildren):
-
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'^::.*$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(Question, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        self.heading = rawtext[2:].strip()
-        self.typeid = None
-
-    def append_item(self, parseditem):
-        if self.parseditems:
-            if self.typeid != parseditem.get_typeid():
-                raise QuestionTypeIdParseError(
-                    linenumber=parseditem.linenumber,
-                    errormessage='Can not mix types within a question'
-                )
-        else:
-            self.typeid = parseditem.get_typeid()
-        super(Question, self).append_item(parseditem)
-
-
-class SingleSelectOption(AbstractParsedQuestionChildItem):
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'^\((-?\d+)\)(.*)$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(SingleSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        match = self.__class__.match(rawtext)
-        self.number = match.group(1)
-        self.text = match.group(2).strip()
-
-    def get_typeid(self):
-        return 'singleselect'
-
-    def __str__(self):
-        return '[{}]: {!r}'.format(self.number, self.text)
-
-
-class MultiSelectOption(AbstractParsedQuestionChildItem):
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'\[(-?\d+)\](.*)$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(MultiSelectOption, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        match = self.__class__.match(rawtext)
-        self.number = match.group(1)
-        self.text = match.group(2).strip()
-
-    def get_typeid(self):
-        return 'multiselect'
-
-    def __str__(self):
-        return '({}): {!r}'.format(self.number, self.text)
-
-
-class Textarea(AbstractParsedQuestionChildItem):
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'\[\.\.\.\]$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(Textarea, self).__init__(rawtext=rawtext, linenumber=linenumber)
-
-    def get_typeid(self):
-        return 'textarea'
-
-
-class Range(AbstractParsedQuestionChildItem):
-    @classmethod
-    def match(cls, rawtext):
-        return re.match(r'\{(\d+)-(\d+)\}$', rawtext)
-
-    def __init__(self, rawtext, linenumber):
-        super(Range, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        match = self.__class__.match(rawtext)
-        self.from_number = match.group(1)
-        self.to_number = match.group(2)
-
-    def get_typeid(self):
-        return 'range'
-
-    def __str__(self):
-        return '{{{}-{}}}'.format(self.from_number, self.to_number)
-
-
-class Paragraph(AbstractParsedItem):
-    def __init__(self, rawtext, linenumber):
-        super(Paragraph, self).__init__(rawtext=rawtext, linenumber=linenumber)
-
-    def __str__(self):
-        return repr(self.rawtext)
-
-
 class Parse(object):
-
     @classmethod
     def from_rawtext(cls, rawtext):
         parser = cls()
@@ -219,10 +70,10 @@ class Parse(object):
 
     def get_question_child_parsers(self):
         return [
-            SingleSelectOption,
-            MultiSelectOption,
-            Textarea,
-            Range,
+            option_types.SingleSelectOption,
+            option_types.MultiSelectOption,
+            option_types.Textarea,
+            option_types.Range,
         ]
 
     def parse_line(self, line):
@@ -260,13 +111,13 @@ class Parse(object):
             self.current_question.append_item(lineparser(rawtext=line, linenumber=linenumber))
 
     def parse_section_start(self, lineparser, line, linenumber):
-        print('heading', repr(line))
+        # print('heading', repr(line))
         section = lineparser(rawtext=line, linenumber=linenumber)
         self.current_section = section
         self.sections.append(section)
 
     def parse_question_start(self, lineparser, line, linenumber):
-        print('question', repr(line))
+        # print('question', repr(line))
         question = lineparser(rawtext=line, linenumber=linenumber)
         self.current_question = question
         self.current_section.append_item(question)
@@ -285,18 +136,19 @@ class Parse(object):
         if paragraphtext:
             paragraphtype = self.get_paragraph_type(linenumber=linenumber)
             if paragraphtype is None:
-                raise ParagraphParseError(
+                raise parse_exceptions.ParagraphParseError(
                     linenumber=linenumber,
                     errormessage='Misplaced paragraph: {!r}'.format(lines)
                 )
-            print('paragraph', repr(paragraphtext))
+            # print('paragraph', repr(paragraphtext))
             paragraph = Paragraph(rawtext=paragraphtext, linenumber=linenumber)
             if paragraphtype == 'sectionintro':
                 self.current_section.set_introduction_paragraph(paragraph)
             else:
                 self.current_question.set_introduction_paragraph(paragraph)
         else:
-            print('EMPTY paragraph')
+            pass
+            # print('EMPTY paragraph')
 
 
 if __name__ == '__main__':
