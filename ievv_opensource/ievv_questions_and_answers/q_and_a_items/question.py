@@ -12,7 +12,6 @@ class Question(AbstractParsedItemWithChildren):
 
     def __init__(self, rawtext, linenumber):
         super(Question, self).__init__(rawtext=rawtext, linenumber=linenumber)
-        self.heading = rawtext[2:].strip()
         self.typeid = None
 
     def append_item(self, parseditem):
@@ -25,3 +24,9 @@ class Question(AbstractParsedItemWithChildren):
         else:
             self.typeid = parseditem.get_typeid()
         super(Question, self).append_item(parseditem)
+
+    def to_dict(self):
+        dict = super(Question, self).to_dict()
+        dict['options'] = []
+
+        return dict

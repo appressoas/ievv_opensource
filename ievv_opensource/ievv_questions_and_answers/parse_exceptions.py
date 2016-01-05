@@ -1,4 +1,7 @@
 class ParseError(Exception):
+    """
+
+    """
     def __init__(self, linenumber, errormessage):
         self.linenumber = linenumber
         self.errormessage = errormessage
