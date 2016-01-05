@@ -38,11 +38,21 @@ INSTALLED_APPS = [
     'django_dbdev',
     'crispy_forms',
     'ievv_opensource.ievv_tagframework',
+    'ievv_opensource.demo.project.default',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
     'ievv_opensource.ievvtasks_common',
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
+
+    'django_cradmin',
+    'django_cradmin.apps.cradmin_temporaryfileuploadstore',
+    'django_cradmin.apps.cradmin_generic_token_with_metadata',
+    'django_cradmin.apps.cradmin_authenticate',
+    'django_cradmin.apps.cradmin_resetpassword',
+    'django_cradmin.apps.cradmin_activate_account',
+    'django_cradmin.apps.cradmin_register_account',
+    'django_cradmin.apps.cradmin_email',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -65,7 +75,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
+ROOT_URLCONF = 'ievv_opensource.demo.project.default.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
