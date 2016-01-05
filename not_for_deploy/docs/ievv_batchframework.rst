@@ -33,14 +33,14 @@ that is handled (E.g.: completed) by some kind of asyncronous
 service such as a cron job or a Celery task.
 
 Lets say you have want to send an email 15 minutes after
-a blog post has been created unless the user edits the
-blog post within 15 minutes. You would then need to:
+a blog post has been created unless the user cancels the email
+sending within within 15 minutes. You would then need to:
 
 - Create a BatchOperation object each time a blog post
   is created.
 - Use some kind of batching service, like Celery, to poll
   for BatchOperation objects that asks it to send out email.
-- Delete the BatchOperation if a user edits the blog post
+- Delete the BatchOperation if a user clicks "cancel"
   within 15 minutes of the creation timestamp.
 
 The code for this would look something like this::
@@ -49,12 +49,12 @@ The code for this would look something like this::
 
     myblogpost = Blog.objects.get(...)
     BatchOperation.objects.create_asyncronous(
-        context_object_id=myblogpost,
+        context_object=myblogpost,
         operationtype='new-blogpost-email')
     # code to send the batch operation to the batching service (like celery)
     # with a 15 minute delay, or just a service that polls for
     # BatchOperation.objects.filter(operationtype='new-blogpost-email',
-    #                               started_datetime__lt=timezone.now() - timedelta(minutes=15))
+    #                               created_datetime__lt=timezone.now() - timedelta(minutes=15))
 
 
     # The batching service code
@@ -63,6 +63,13 @@ The code for this would look something like this::
         batchoperation.mark_as_running()
         # ... send out the emails ...
         batchoperation.finish()
+
+
+    # In the view for cancelling email sending
+    BatchOperation.objects\
+        .filter(operationtype='new-blogpost-email',
+                context_object=myblogpost)\
+        .remove()
 
 
 Syncronous operations
