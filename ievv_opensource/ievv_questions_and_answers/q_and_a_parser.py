@@ -41,7 +41,11 @@ Select the correct answers (if any)
 """
 
 
-class Parse(object):
+
+class QuestionAndAnswer(object):
+    """
+
+    """
     @classmethod
     def from_rawtext(cls, rawtext):
         parser = cls()
@@ -152,7 +156,7 @@ class Parse(object):
 
 
 if __name__ == '__main__':
-    parser = Parse.from_rawtext(source)
+    parser = QuestionAndAnswer.from_rawtext(source)
     for section in parser.sections:
         print()
         print("*" * 70)
@@ -166,3 +170,4 @@ if __name__ == '__main__':
             print('intro: {}'.format(question.introduction_paragraph))
             for item in question.parseditems:
                 print('{}: {}'.format(item.get_typeid(), item))
+
