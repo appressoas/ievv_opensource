@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-from django.conf import settings
 import django.utils.timezone
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -19,14 +19,15 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
                 ('started_datetime', models.DateTimeField(default=django.utils.timezone.now)),
-                ('context_object_id', models.PositiveIntegerField(null=True)),
-                ('operationtype', models.CharField(blank=True, db_index=True, default='', max_length=255)),
-                ('status', models.CharField(choices=[('unprocessed', 'unprocessed'), ('running', 'running'), ('finished', 'finished')], default='unprocessed', max_length=12)),
-                ('result', models.CharField(choices=[('not-available', 'not available yet (processing not finished)'), ('successful', 'successful'), ('failed', 'failed')], default='not-available', max_length=12)),
+                ('finished_datetime', models.DateTimeField(null=True, blank=True)),
+                ('context_object_id', models.PositiveIntegerField(null=True, blank=True)),
+                ('operationtype', models.CharField(default='', blank=True, db_index=True, max_length=255)),
+                ('status', models.CharField(default='unprocessed', choices=[('unprocessed', 'unprocessed'), ('running', 'running'), ('finished', 'finished')], max_length=12)),
+                ('result', models.CharField(default='not-available', choices=[('not-available', 'not available yet (processing not finished)'), ('successful', 'successful'), ('failed', 'failed')], max_length=13)),
                 ('input_data_json', models.TextField(default='', blank=True)),
                 ('output_data_json', models.TextField(default='', blank=True)),
-                ('context_content_type', models.ForeignKey(null=True, to='contenttypes.ContentType')),
-                ('started_by', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL)),
+                ('context_content_type', models.ForeignKey(to='contenttypes.ContentType', blank=True, null=True)),
+                ('started_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True, null=True)),
             ],
         ),
     ]

@@ -8,6 +8,59 @@ from django.db import models
 from django.utils import timezone
 
 
+class BatchOperationManager(models.Manager):
+    """
+    Manager for :class:`.BatchOperation`.
+    """
+    def __create(self, input_data, **kwargs):
+        batchoperation = BatchOperation(**kwargs)
+        if input_data:
+            batchoperation.input_data = input_data
+        batchoperation.full_clean()
+        batchoperation.save()
+        return batchoperation
+
+    def create_syncronous(self, input_data=None, **kwargs):
+        """
+        Create a syncronous :class:`.BatchOperation`. An syncronous
+        batch operation starts with :obj:`.BatchOperation.status` set
+        to :obj:`.BatchOperation.STATUS_RUNNING`.
+
+        The :class:`.BatchOperation` is cleaned before it is saved.
+
+        Args:
+            input_data: The input data.
+                A python object to set as the input data using the
+                :meth:`.BatchOperation.input_data` property.
+            **kwargs: Forwarded to the constructor for :class:`.BatchOperation`.
+
+        Returns:
+            BatchOperation: The created BatchOperation object.
+        """
+        return self.__create(input_data=input_data,
+                             status=BatchOperation.STATUS_RUNNING,
+                             **kwargs)
+
+    def create_asyncronous(self, input_data=None, **kwargs):
+        """
+        Create an asyncronous :class:`.BatchOperation`. An asyncronous
+        batch operation starts with :obj:`.BatchOperation.status` set
+        to :obj:`.BatchOperation.STATUS_UNPROCESSED`.
+
+        The :class:`.BatchOperation` is cleaned before it is saved.
+
+        Args:
+            input_data: The input data.
+                A python object to set as the input data using the
+                :meth:`.BatchOperation.input_data` property.
+            **kwargs: Forwarded to the constructor for :class:`.BatchOperation`.
+
+        Returns:
+            BatchOperation: The created BatchOperation object.
+        """
+        return self.__create(input_data=input_data, **kwargs)
+
+
 class BatchOperation(models.Model):
     """
     Defines a batch operation.
@@ -32,6 +85,8 @@ class BatchOperation(models.Model):
        Player objects, and create a list of Card objects for your batch create operation
        for the cards.
     """
+
+    objects = BatchOperationManager()
 
     #: One of the possible values for :obj:`~.BatchOperation.status`.
     #: Defines the BatchOperation as uprocessed (not yet started).
@@ -93,12 +148,16 @@ class BatchOperation(models.Model):
     #: Optional, but it is good metadata to add for debugging.
     started_by = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
-        null=True)
+        null=True, blank=True)
 
     #: The datetime when this batch operation was started.
     #: Defaults to ``timezone.now()``.
     started_datetime = models.DateTimeField(
         default=timezone.now)
+
+    #: The datetime when this batch operation was finished.
+    finished_datetime = models.DateTimeField(
+        null=True, blank=True)
 
     # #: Is this an asyncronous operation? Set this to ``True`` for
     # #: background tasks (such as Celery tasks).
@@ -109,11 +168,12 @@ class BatchOperation(models.Model):
     context_content_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.CASCADE,
-        null=True)
+        null=True,
+        blank=True)
 
     #: The id field for :obj:`~.BatchOperation.context_object`.
     context_object_id = models.PositiveIntegerField(
-        null=True)
+        null=True, blank=True)
 
     #: Generic foreign key that identifies the context this operation
     #: runs in. This is optional.
@@ -141,7 +201,7 @@ class BatchOperation(models.Model):
     #: :obj:`~.BatchOperation.RESULT_CHOICES`.
     #: Defaults to :obj:`~.BatchOperation.RESULT_NOT_AVAILABLE`.
     result = models.CharField(
-        max_length=12,
+        max_length=13,
         choices=RESULT_CHOICES,
         default=RESULT_NOT_AVAILABLE)
 
@@ -214,6 +274,33 @@ class BatchOperation(models.Model):
         self.output_data_json = json.dumps(output_data)
         if hasattr(self, '_output_data'):
             delattr(self, '_output_data')
+
+    def finish(self, failed=False, output_data=None):
+        """
+        Mark the bulk operation as finished.
+
+        Sets :obj:`.result` as documented in the ``failed`` parameter below.
+        Sets :obj:`.finished_datetime` to the current datetime.
+        Sets :obj:`.output_data_json` as documented in the ``output_data``
+        parameter below.
+
+        Args:
+            failed (boolean): Set this to ``False`` to set :obj:`.result` to
+                :obj:`.RESULT_FAILED`. The default is ``True``, which means that
+                :obj:`.result` is set to :obj:`.RESULT_SUCCESSFUL`
+            output_data: The output data.
+                A python object to set as the output data using the
+                :meth:`.BatchOperation.output_data` property.
+        """
+        if failed:
+            self.result = self.RESULT_FAILED
+        else:
+            self.result = self.RESULT_SUCCESSFUL
+        if output_data:
+            self.output_data = output_data
+        self.finished_datetime = timezone.now()
+        self.full_clean()
+        self.save()
 
     def clean(self):
         if self.status == self.STATUS_FINISHED and self.result == self.RESULT_NOT_AVAILABLE:
