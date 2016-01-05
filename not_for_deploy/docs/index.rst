@@ -29,6 +29,7 @@ Apps
    :maxdepth: 1
 
    ievv_tagframework
+   ievv_batchframework
 
 
 ********

@@ -64,26 +64,6 @@ class BatchOperationManager(models.Manager):
 class BatchOperation(models.Model):
     """
     Defines a batch operation.
-
-    This solves two challenges:
-
-    1. A way to keep track of asyncronous operations. Typically used when you
-       need to send a task to Celery or some other background/batch processing
-       service, or even to a cronjob.
-    2. When you need to do batch create with multiple models.
-       Lets say you have Game objects with a one-to-many relationship to Player
-       objects with a one-to-many relationship to Card objects. You want to start all
-       players in a game with a card. How to you batch create all the players with a single card?
-       You can easily batch create players with ``bulk_create``, but you can not
-       batch create the cards because they require a Player. So you need to a way
-       of retrieving the players you just batch created. If you create a BatchOperation
-       with :obj:`~.BatchOperation.context_object` set to the Game, you will get a unique
-       identifier for the operation (the id of the BatchOperation). Then you can set
-       that identifier as an attribute on all the batch-created Player objects (preferrably
-       as a foreign-key), and retrieve the batch created objects by filtering on the
-       id of the BatchOperation. After this, you can iterate through all the created
-       Player objects, and create a list of Card objects for your batch create operation
-       for the cards.
     """
 
     objects = BatchOperationManager()
