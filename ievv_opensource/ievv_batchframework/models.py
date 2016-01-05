@@ -22,9 +22,14 @@ class BatchOperationManager(models.Manager):
 
     def create_syncronous(self, input_data=None, **kwargs):
         """
-        Create a syncronous :class:`.BatchOperation`. An syncronous
-        batch operation starts with :obj:`.BatchOperation.status` set
-        to :obj:`.BatchOperation.STATUS_RUNNING`.
+        Create a syncronous :class:`.BatchOperation`.
+
+        An syncronous batch operation starts with :obj:`.BatchOperation.status` set
+        to :obj:`.BatchOperation.STATUS_RUNNING` and ``started_running_datetime``
+        set just as if :meth:`.BatchOperation.mark_as_running` was called. So
+        calling this would have the same result as calling :meth:`.create_asyncronous`
+        and then calling :meth:`.BatchOperation.mark_as_running`, but this will
+        just use one database query instead of two.
 
         The :class:`.BatchOperation` is cleaned before it is saved.
 
@@ -39,6 +44,7 @@ class BatchOperationManager(models.Manager):
         """
         return self.__create(input_data=input_data,
                              status=BatchOperation.STATUS_RUNNING,
+                             started_running_datetime=timezone.now(),
                              **kwargs)
 
     def create_asyncronous(self, input_data=None, **kwargs):
@@ -130,10 +136,16 @@ class BatchOperation(models.Model):
         to=settings.AUTH_USER_MODEL,
         null=True, blank=True)
 
-    #: The datetime when this batch operation was started.
+    #: The datetime when this batch operation was created.
     #: Defaults to ``timezone.now()``.
-    started_datetime = models.DateTimeField(
+    created_datetime = models.DateTimeField(
         default=timezone.now)
+
+    #: The datetime when this batch operation started running.
+    #: This is not the same as :obj:`~.BatchOperation.created_datetime`,
+    #: this is the time when the operation started processing.
+    started_running_datetime = models.DateTimeField(
+        null=True, blank=True)
 
     #: The datetime when this batch operation was finished.
     finished_datetime = models.DateTimeField(
@@ -255,6 +267,19 @@ class BatchOperation(models.Model):
         if hasattr(self, '_output_data'):
             delattr(self, '_output_data')
 
+    def mark_as_running(self):
+        """
+        Mark the batch operation as running.
+
+        Sets the :obj:`.status` to :obj:`.STATUS_RUNNING`,
+        :obj:`.started_running_datetime` to the current datetime,
+        clean and save.
+        """
+        self.status = self.STATUS_RUNNING
+        self.started_running_datetime = timezone.now()
+        self.full_clean()
+        self.save()
+
     def finish(self, failed=False, output_data=None):
         """
         Mark the bulk operation as finished.
@@ -286,4 +311,8 @@ class BatchOperation(models.Model):
         if self.status == self.STATUS_FINISHED and self.result == self.RESULT_NOT_AVAILABLE:
             raise ValidationError({
                 'result': 'Must be "successful" or "failed" when status is "finished".'
+            })
+        if self.status != self.STATUS_UNPROCESSED and self.started_running_datetime is None:
+            raise ValidationError({
+                'started_running_datetime': 'Can not be None when status is "running" or "finished".'
             })

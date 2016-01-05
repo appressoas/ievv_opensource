@@ -60,8 +60,7 @@ The code for this would look something like this::
     # The batching service code
     def my_batching_service(...):
         batchoperation = BatchOperation.objects.get(...)
-        batchoperation.status = BatchOperation.STATUS_RUNNING
-        batchoperation.save()
+        batchoperation.mark_as_running()
         # ... send out the emails ...
         batchoperation.finish()
 

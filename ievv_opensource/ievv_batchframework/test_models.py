@@ -17,6 +17,23 @@ class TestBatchOperationModel(test.TestCase):
                                       'Must be "successful" or "failed" when status is "finished".'):
             batchoperation.clean()
 
+    def test_clean_status_running_no_started_running_datetime(self):
+        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+                                       status=BatchOperation.STATUS_RUNNING,
+                                       started_running_datetime=None)
+        with self.assertRaisesMessage(ValidationError,
+                                      'Can not be None when status is "running" or "finished".'):
+            batchoperation.clean()
+
+    def test_clean_status_finished_no_started_running_datetime(self):
+        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+                                       status=BatchOperation.STATUS_FINISHED,
+                                       result=BatchOperation.RESULT_SUCCESSFUL,
+                                       started_running_datetime=None)
+        with self.assertRaisesMessage(ValidationError,
+                                      'Can not be None when status is "running" or "finished".'):
+            batchoperation.clean()
+
     def test_input_data_setter(self):
         batchoperation = mommy.prepare('ievv_batchframework.BatchOperation')
         batchoperation.input_data = {'hello': 'world'}
@@ -80,6 +97,17 @@ class TestBatchOperationModel(test.TestCase):
         self.assertEqual(
             '{"hello": "world"}',
             batchoperation.output_data_json)
+
+    def test_mark_as_running(self):
+        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+                                       status=BatchOperation.STATUS_UNPROCESSED,
+                                       started_running_datetime=None)
+        mocknow = datetimeutils.default_timezone_datetime(2016, 1, 1)
+        with mock.patch('ievv_opensource.ievv_batchframework.models.timezone.now', lambda: mocknow):
+            batchoperation.mark_as_running()
+        self.assertEqual(BatchOperation.STATUS_RUNNING,
+                         batchoperation.status)
+        self.assertEqual(batchoperation.started_running_datetime, mocknow)
 
 
 class TestBatchOperationManager(test.TestCase):
