@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_dbdev',
     'crispy_forms',
     'ievv_opensource.ievv_tagframework',
+    'ievv_opensource.ievv_bulkoperation',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
     'ievv_opensource.ievvtasks_common',
