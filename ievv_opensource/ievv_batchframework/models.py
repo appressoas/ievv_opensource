@@ -277,7 +277,7 @@ class BatchOperation(models.Model):
         """
         self.status = self.STATUS_RUNNING
         self.started_running_datetime = timezone.now()
-        self.full_clean()
+        self.clean()
         self.save()
 
     def finish(self, failed=False, output_data=None):
@@ -304,7 +304,7 @@ class BatchOperation(models.Model):
         if output_data:
             self.output_data = output_data
         self.finished_datetime = timezone.now()
-        self.full_clean()
+        self.clean()
         self.save()
 
     def clean(self):
