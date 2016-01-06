@@ -16,7 +16,7 @@ class BatchOperationManager(models.Manager):
         batchoperation = BatchOperation(**kwargs)
         if input_data:
             batchoperation.input_data = input_data
-        batchoperation.full_clean()
+        batchoperation.clean()
         batchoperation.save()
         return batchoperation
 
