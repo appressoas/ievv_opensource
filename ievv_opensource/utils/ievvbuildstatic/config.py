@@ -1,9 +1,10 @@
 import logging
 import os
-import time
 
+import time
 from django.apps import apps
 
+from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin
 
 
@@ -128,12 +129,12 @@ class App(LogMixin):
         """
         Start a watcher thread for each plugin.
         """
-        observers = []
+        watchconfigs = []
         for plugin in self.plugins:
-            observer = plugin.watch()
-            if observer:
-                observers.append(observer)
-        return observers
+            watchconfig = plugin.watch()
+            if watchconfig:
+                watchconfigs.append(watchconfig)
+        return watchconfigs
 
     def get_installer(self, installerclass):
         """
@@ -188,19 +189,40 @@ class Apps(LogMixin):
         for app in self.apps:
             app.run()
 
+    # def watch(self):
+    #     """
+    #     Start watcher threads for all
+    #     :class:`plugins <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
+    #     for all plugins within all :class:`apps <.App>`.
+    #
+    #     Blocks until ``CTRL-c`` is pressed.
+    #     """
+    #     all_observers = []
+    #     for app in self.apps:
+    #         app_observers = app.watch()
+    #         all_observers.extend(app_observers)
+    #
+    #     try:
+    #         while True:
+    #             time.sleep(1)
+    #     except KeyboardInterrupt:
+    #         for observer in all_observers:
+    #             observer.stop()
+    #
+    #     for observer in all_observers:
+    #         observer.join()
     def watch(self):
         """
-        Start watcher threads for all
-        :class:`plugins <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
-        for all plugins within all :class:`apps <.App>`.
+        Start watcher threads for all folders that at least one
+        :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
+        within any of the :class:`apps <.App>` has configured to be watched for changes.
 
         Blocks until ``CTRL-c`` is pressed.
         """
-        all_observers = []
+        watchconfigpool = WatchConfigPool()
         for app in self.apps:
-            app_observers = app.watch()
-            all_observers.extend(app_observers)
-
+            watchconfigpool.extend(app.watch())
+        all_observers = watchconfigpool.watch()
         try:
             while True:
                 time.sleep(1)

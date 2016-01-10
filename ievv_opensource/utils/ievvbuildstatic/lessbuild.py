@@ -131,3 +131,6 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def get_watch_regexes(self):
         return ['^.+[.]less$']
+
+    def __str__(self):
+        return '{}({})'.format(super(Plugin, self).__str__(), self.sourcefile)

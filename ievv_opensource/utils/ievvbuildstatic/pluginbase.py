@@ -1,9 +1,12 @@
+from future.utils import python_2_unicode_compatible
 from watchdog.observers import Observer
+# from watchdog.observers.polling import PollingObserver as Observer
 
-from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler
+from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler, WatchConfig
 from ievv_opensource.utils.logmixin import LogMixin
 
 
+@python_2_unicode_compatible
 class Plugin(LogMixin):
     """
     Base class for all plugins in ``ievvbuildstatic``.
@@ -41,27 +44,25 @@ class Plugin(LogMixin):
 
     def watch(self):
         """
-        Start a watching thread and return the thread.
+        Configure watching for this plugin.
 
-        You should not need to override this --- override
-        :meth:`.get_watch_folders` and :meth:`.get_watch_regexes`
-        instead.
+        You normally do not override this method, instead you override
+        :meth:`.get_watch_folders` and :meth:`.get_watch_regexes`.
+
+        Returns:
+            WatchConfig: A :class:`ievv_opensource.utils.ievvbuildstatic.watcher.WatchConfig`
+                object if you want to watch for changes in this plugin, or ``None`` if you do not
+                want to watch for changes.
         """
         watchfolders = self.get_watch_folders()
-        if not watchfolders:
-            return
-        watchregexes = self.get_watch_regexes()
-        event_handler = EventHandler(
-            plugin=self,
-            regexes=watchregexes
-        )
-        observer = Observer()
-        for watchfolder in watchfolders:
-            observer.schedule(event_handler, watchfolder, recursive=True)
-        self.get_logger().info('Starting watcher for folders {!r} with regexes {!r}.'.format(
-            watchfolders, watchregexes))
-        observer.start()
-        return observer
+        if watchfolders:
+            watchregexes = self.get_watch_regexes()
+            return WatchConfig(
+                watchfolders=watchfolders,
+                watchregexes=watchregexes,
+                runnable=self)
+        else:
+            return None
 
     def get_watch_regexes(self):
         """
@@ -87,3 +88,6 @@ class Plugin(LogMixin):
 
     def get_logger_name(self):
         return '{}.{}'.format(self.app.get_logger_name(), self.name)
+
+    def __str__(self):
+        return self.get_logger_name()

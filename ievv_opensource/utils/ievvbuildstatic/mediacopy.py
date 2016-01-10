@@ -78,3 +78,6 @@ class Plugin(pluginbase.Plugin):
         so this returns the absolute path of the ``sourcefolder``.
         """
         return [self.app.get_source_path(self.sourcefolder)]
+
+    def __str__(self):
+        return '{}({})'.format(super(Plugin, self).__str__(), self.sourcefolder)

@@ -36,6 +36,16 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                     'bower_components',
                 ]
             ),
+            ievvbuildstatic.lessbuild.Plugin(
+                sourcefolder='styles/theme2',
+                sourcefile='theme2.less',
+                other_sourcefolders=[
+                    'styles/base',
+                ],
+                less_include_paths=[
+                    'bower_components',
+                ]
+            ),
             ievvbuildstatic.mediacopy.Plugin(),
         ]
     ),
