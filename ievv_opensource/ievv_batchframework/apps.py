@@ -8,5 +8,5 @@ class BatchOperationAppConfig(AppConfig):
 
     def ready(self):
         appconfig = superuserui_registry.default.add_djangoapp(
-                superuserui_registry.DjangoAppConfig(app_label='ievv_batchframework'))
+            superuserui_registry.DjangoAppConfig(app_label='ievv_batchframework'))
         appconfig.add_all_models()

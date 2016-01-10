@@ -1,8 +1,6 @@
 from future.utils import python_2_unicode_compatible
-from watchdog.observers import Observer
-# from watchdog.observers.polling import PollingObserver as Observer
 
-from ievv_opensource.utils.ievvbuildstatic.watcher import EventHandler, WatchConfig
+from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfig
 from ievv_opensource.utils.logmixin import LogMixin
 
 

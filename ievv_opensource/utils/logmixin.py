@@ -186,7 +186,6 @@ if __name__ == '__main__':
             for x in range(10):
                 self.logger.warning(self.text)
 
-
     threads = [
         DemoThread(text='Hello world'),
         DemoThread(text='A test'),

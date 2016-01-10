@@ -64,9 +64,5 @@ class RunnableThreadList(object):
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            # print('', file=sys.stderr)
-            # print('*' * 70, file=sys.stderr)
-            # print('ievvdevrun KeyboardInterrupt', file=sys.stderr)
-            # print('*' * 70, file=sys.stderr)
             stop_all()
         join_all()
