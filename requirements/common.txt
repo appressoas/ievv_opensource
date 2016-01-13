@@ -44,6 +44,9 @@ model-mommy==1.2.4
 # For translations
 transifex-client==0.11b3
 
+# For building Dash docs
+doc2dash==2.0.2
+
 # Pull inn development packages from GIT
 -r common.gitpackages.txt
 

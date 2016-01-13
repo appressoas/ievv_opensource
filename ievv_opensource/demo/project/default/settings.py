@@ -152,3 +152,5 @@ IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
     ('example-tagtype1', 'Example tagtype 1'),
     ('example-tagtype2', 'Example tagtype 2'),
 ]
+
+IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
