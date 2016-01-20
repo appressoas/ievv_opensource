@@ -47,4 +47,7 @@ transifex-client==0.11b3
 # Pull inn development packages from GIT
 -r common.gitpackages.txt
 
+# django cradmin
+django-cradmin==1.0.1b56
+
 -e .
