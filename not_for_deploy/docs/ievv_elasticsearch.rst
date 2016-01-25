@@ -57,6 +57,34 @@ Then you can start using the :class:`ievv_opensource.ievv_elasticsearch.search.C
 API.
 
 
+Setup for unit-testing and development
+======================================
+First, copy ``not_for_deploy/elasticsearch.develop.yml`` and ``not_for_deploy/elasticsearch.unittest.yml``
+into your own project.
+
+In your **test settings**, add::
+
+    IEVV_ELASTICSEARCH_TESTURL = 'http://localhost:9251'
+    IEVV_ELASTICSEARCH_TESTMODE = True
+
+In your **develop settings**, add::
+
+    IEVV_ELASTICSEARCH_URL = 'http://localhost:9252'
+
+When this is configured, you can run elasticsearch with :doc:`ievvtask_devrun` if
+you add the following to :setting:`IEVVTASKS_DEVRUN_RUNNABLES`::
+
+    IEVVTASKS_DEVRUN_RUNNABLES = {
+        'default': ievvdevrun.config.RunnableThreadList(
+            # ...
+            ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest.yml'),
+            ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop.yml'),
+        ),
+    ]
+
+(the paths assumes you put the configfiles in the ``not_for_deploy/`` directory in your project).
+
+
 ***************************************
 Automatically update the search indexes
 ***************************************
