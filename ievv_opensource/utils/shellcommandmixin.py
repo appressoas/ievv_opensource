@@ -46,11 +46,13 @@ class ShellCommandMixin(object):
         command = sh.Command(executable)
         args = args or []
         kwargs = kwargs or {}
+        baked_command = command.bake(*args,
+                                     _out=self.log_shell_command_stdout,
+                                     _err=self.log_shell_command_stderr,
+                                     **kwargs)
+        # print(baked_command)  # Print the baked command
         try:
-            return command(*args,
-                           _out=self.log_shell_command_stdout,
-                           _err=self.log_shell_command_stderr,
-                           **kwargs)
+            return baked_command()
         except sh.ErrorReturnCode:
             # We do not need to show any more errors here - they
             # have already been printed by the _out and _err handlers.

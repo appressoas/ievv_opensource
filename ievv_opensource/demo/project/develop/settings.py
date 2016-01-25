@@ -12,43 +12,48 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='demoapp',
         version='1.0.0',
         plugins=[
-            ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
-            ievvbuildstatic.mediacopy.Plugin(),
-            # CoffeeBuild(sourcefolder='scripts'),
+            # ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
+            ievvbuildstatic.coffeebuild.Plugin(
+                # external_libraries=[
+                #     'bower_components/bootstrap/something.js'
+                # ],
+                sourcefile='app.coffee',
+            ),
+            # ievvbuildstatic.mediacopy.Plugin(),
         ]
     ),
-    ievvbuildstatic.config.App(
-        appname='demoapp2',
-        version='2.0.1',
-        plugins=[
-            ievvbuildstatic.bowerinstall.Plugin(
-                packages={
-                    'bootstrap': '~3.1.1'
-                }
-            ),
-            ievvbuildstatic.lessbuild.Plugin(
-                sourcefolder='styles/theme',
-                sourcefile='theme.less',
-                other_sourcefolders=[
-                    'styles/base',
-                ],
-                less_include_paths=[
-                    'bower_components',
-                ]
-            ),
-            ievvbuildstatic.lessbuild.Plugin(
-                sourcefolder='styles/theme2',
-                sourcefile='theme2.less',
-                other_sourcefolders=[
-                    'styles/base',
-                ],
-                less_include_paths=[
-                    'bower_components',
-                ]
-            ),
-            ievvbuildstatic.mediacopy.Plugin(),
-        ]
-    ),
+    # ievvbuildstatic.config.App(
+    #     appname='demoapp2',
+    #     version='2.0.1',
+    #     plugins=[
+    #         ievvbuildstatic.bowerinstall.Plugin(
+    #             packages={
+    #                 'bootstrap': '~3.1.1'
+    #             }
+    #         ),
+    #         ievvbuildstatic.lessbuild.Plugin(
+    #             sourcefolder='styles/theme',
+    #             sourcefile='theme.less',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ],
+    #             less_include_paths=[
+    #                 'bower_components',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.lessbuild.Plugin(
+    #             sourcefolder='styles/theme2',
+    #             sourcefile='theme2.less',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ],
+    #             less_include_paths=[
+    #                 'bower_components',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.mediacopy.Plugin(),
+    #     ]
+    # ),
 )
 
 
