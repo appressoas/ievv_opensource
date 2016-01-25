@@ -56,14 +56,14 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
     'default': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(),
-        # ievvdevrun.runnables.base.ShellCommandRunnableThread(
-        #     autorestart_on_crash=False,
-        #     name='Manually configured Django development server',
-        #     command_config={
-        #         'executable': sys.executable,
-        #         'args': ['manage.py', 'runserver']
-        #     }
-        # ),
+        ievvdevrun.runnables.base.ShellCommandRunnableThread(
+            autorestart_on_crash=False,
+            name='ElasticSearch unittest server',
+            command_config={
+                'executable': 'elasticsearch',
+                'args': ['--config=not_for_deploy/elasticsearch.unittest.yml']
+            }
+        ),
     ),
     'design': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),

@@ -30,6 +30,7 @@ Apps
 
    ievv_tagframework
    ievv_batchframework
+   ievv_elasticsearch
 
 
 ********
@@ -65,6 +66,7 @@ Utilities
    utils.desktopnotifications
    utils.logmixin
    utils.shellcommandmixin
+   utils.singleton
 
 
 ******************

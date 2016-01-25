@@ -155,3 +155,69 @@ Dict mapping ``ievv devrun`` target names to :class:`ievv_opensource.utils.ievvd
 objects. Must contain the ``"default"`` key.
 
 Documented in :doc:`ievvtask_devrun`.
+
+
+
+.. setting:: IEVV_ELASTICSEARCH_URL
+
+IEVV_ELASTICSEARCH_URL
+======================
+The URL of the elasticsearch instance.
+
+
+
+.. setting:: IEVV_ELASTICSEARCH_TESTURL
+
+IEVV_ELASTICSEARCH_TESTURL
+==========================
+The URL where we run elasticsearch for UnitTests.
+We provide a config file in ``not_for_deploy/elasticsearch.unittest.yml`` used with::
+
+    $ elasticsearch --config=path/to/elasticsearch.unittest.yml
+
+to configure elasticsearch in a manner suitable for Unit testing as long as this setting
+is set to::
+
+    IEVV_ELASTICSEARCH_TESTURL = 'http://localhost:9251'
+
+
+.. setting:: IEVV_ELASTICSEARCH_TESTMODE
+
+IEVV_ELASTICSEARCH_TESTMODE
+===========================
+
+Set this to True to make ElasticSearch behave in a manner that
+makes writing Unit tests a bit easier:
+
+- Automatically refresh the indexes after any index update.
+- Use ``IEVV_ELASTICSEARCH_TESTURL`` instead of ``IEVV_ELASTICSEARCH_URL``.
+
+Add the following to you test settings to enable testmode::
+
+    IEVV_ELASTICSEARCH_TESTMODE = True
+
+
+.. setting:: IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING
+
+IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING
+=============================================
+Automatically refresh after indexing with
+meth:`ievv.ievv_elasticsearch.searchindex.AbstractIndex.index_items`.
+Useful for unit tests, but not much else.
+
+You **should not** add this to your test settings, but use it in your
+tests where appropriate like this::
+
+    class MyTestCase(TestCase):
+        def test_something(self):
+            with self.settings(IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING=False):
+                # test something here
+
+
+
+.. setting:: IEVV_ELASTICSEARCH_DO_NOT_REGISTER_INDEX_UPDATE_TRIGGERS
+
+IEVV_ELASTICSEARCH_DO_NOT_REGISTER_INDEX_UPDATE_TRIGGERS
+========================================================
+Do not register index update triggers on Django startup? Defaults to ``False``.
+Mostly useful during development.
