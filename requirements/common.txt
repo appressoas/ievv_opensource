@@ -50,4 +50,7 @@ doc2dash==2.0.2
 # Pull inn development packages from GIT
 -r common.gitpackages.txt
 
+# django cradmin
+django-cradmin==1.0.1b56
+
 -e .
