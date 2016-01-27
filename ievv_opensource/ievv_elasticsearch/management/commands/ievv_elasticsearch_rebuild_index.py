@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from pyelasticsearch import ElasticHttpNotFoundError
 
-from ievv.ievv_elasticsearch import autoindex
+from ievv_opensource.ievv_elasticsearch import autoindex
 
 
 class Command(BaseCommand):

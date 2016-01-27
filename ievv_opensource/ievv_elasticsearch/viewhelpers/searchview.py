@@ -185,7 +185,7 @@ class ViewMixin:
 
     def get_paginated_search_kwargs(self):
         """
-        Get the kwargs for :meth:`ievv.ievv_elasticsearch.search.Connection#paginated_search`.
+        Get the kwargs for :meth:`ievv_opensource.ievv_elasticsearch.search.Connection#paginated_search`.
         """
         kwargs = {
             'query': self.get_search_full_query(),
@@ -200,13 +200,13 @@ class ViewMixin:
     def get_resultitemwrapper(self):
         """
         See the ``resultitemwrapper`` argument for
-        :class:`ievv.ievv_elasticsearch.search.Paginator`.
+        :class:`ievv_opensource.ievv_elasticsearch.search.Paginator`.
         """
         return None
 
     def get_paginator(self):
         """
-        Performs the search and wraps it in a :class:`ievv.ievv_elasticsearch.search.Paginator`.
+        Performs the search and wraps it in a :class:`ievv_opensource.ievv_elasticsearch.search.Paginator`.
 
         Raises:
             :class:`django.http.response.Http404` if the search does not match

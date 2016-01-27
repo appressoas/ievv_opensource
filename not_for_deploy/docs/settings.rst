@@ -202,7 +202,7 @@ Add the following to you test settings to enable testmode::
 IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING
 =============================================
 Automatically refresh after indexing with
-meth:`ievv.ievv_elasticsearch.searchindex.AbstractIndex.index_items`.
+meth:`ievv_opensource.ievv_elasticsearch.searchindex.AbstractIndex.index_items`.
 Useful for unit tests, but not much else.
 
 You **should not** add this to your test settings, but use it in your
