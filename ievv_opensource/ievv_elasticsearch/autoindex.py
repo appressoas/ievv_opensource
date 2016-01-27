@@ -123,7 +123,8 @@ class AbstractIndex(object):
     To register an index:
 
     1. Create a subclass of ``AbstractIndex`` and implement
-       :meth:`.iterate_all_documents`.
+       :meth:`~.AbstractIndex.iterate_all_documents` and override
+       :obj:`~.AbstractIndex.document_classes`.
     2. Register the index with :class:`.Registry`.
 
 
@@ -138,6 +139,9 @@ class AbstractIndex(object):
 
             class ProductIndex(searchindex.AbstractIndex):
                 name = 'products'
+                document_classes = [
+                    ProductDocument
+                ]
 
                 def iterate_all_documents(self):
                     for product in Product.objects.iterator():
