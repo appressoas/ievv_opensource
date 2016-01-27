@@ -221,3 +221,14 @@ IEVV_ELASTICSEARCH_DO_NOT_REGISTER_INDEX_UPDATE_TRIGGERS
 ========================================================
 Do not register index update triggers on Django startup? Defaults to ``False``.
 Mostly useful during development.
+
+*****
+utils
+*****
+
+.. setting:: IEVV_SLUGIFY_CHARACTER_REPLACE_MAP
+
+IEVV_SLUGIFY_CHARACTER_REPLACE_MAP
+==================================
+Custom character replacement map for the ``ievv_slugify`` function
+
