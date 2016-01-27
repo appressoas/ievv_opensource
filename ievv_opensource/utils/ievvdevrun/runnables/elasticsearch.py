@@ -1,5 +1,3 @@
-import sys
-
 from ievv_opensource.utils.ievvdevrun.runnables import base
 
 
