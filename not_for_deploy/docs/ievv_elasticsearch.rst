@@ -66,6 +66,7 @@ In your **test settings**, add::
 
     IEVV_ELASTICSEARCH_TESTURL = 'http://localhost:9251'
     IEVV_ELASTICSEARCH_TESTMODE = True
+    IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING = True
 
 In your **develop settings**, add::
 
