@@ -229,3 +229,15 @@ IEVV_ELASTICSEARCH_MAJOR_VERSION
 ================================
 The major version of elasticsearch you are using. Defaults to ``1``, but we also
 support ``2``.
+
+
+*****
+utils
+*****
+
+.. setting:: IEVV_SLUGIFY_CHARACTER_REPLACE_MAP
+
+IEVV_SLUGIFY_CHARACTER_REPLACE_MAP
+==================================
+Custom character replacement map for the ``ievv_slugify`` function
+

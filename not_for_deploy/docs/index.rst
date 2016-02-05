@@ -67,6 +67,7 @@ Utilities
    utils.logmixin
    utils.shellcommandmixin
    utils.singleton
+   utils.text
 
 
 ******************
