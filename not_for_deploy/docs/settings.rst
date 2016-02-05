@@ -221,3 +221,11 @@ IEVV_ELASTICSEARCH_DO_NOT_REGISTER_INDEX_UPDATE_TRIGGERS
 ========================================================
 Do not register index update triggers on Django startup? Defaults to ``False``.
 Mostly useful during development.
+
+
+.. setting:: IEVV_ELASTICSEARCH_MAJOR_VERSION
+
+IEVV_ELASTICSEARCH_MAJOR_VERSION
+================================
+The major version of elasticsearch you are using. Defaults to ``1``, but we also
+support ``2``.

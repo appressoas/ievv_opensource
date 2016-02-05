@@ -16,4 +16,4 @@ path.logs: elasticsearch_unittest/logs/
 path.plugins: elasticsearch_unittest/plugins/
 
 # Store data in memory
-index.store.type: memory
+index.store.type: mmapfs

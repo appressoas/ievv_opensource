@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from ievv_opensource.utils.ievvdevrun.runnables import base
 
 
@@ -28,7 +30,13 @@ class RunnableThread(base.ShellCommandRunnableThread):
         return 'ElasticSearch {}'.format(self.configpath)
 
     def get_command_config(self):
+        elasticsearch_version = getattr(settings, 'IEVV_ELASTICSEARCH_MAJOR_VERSION', 1)
+        if elasticsearch_version == 1:
+            args = ['--config={}'.format(self.configpath)]
+        else:
+            args = ['--path.conf={}'.format(self.configpath)]
+
         return {
             'executable': self.elasticsearch_executable,
-            'args': ['--config={}'.format(self.configpath)]
+            'args': args
         }

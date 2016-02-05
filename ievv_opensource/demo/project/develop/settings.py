@@ -56,14 +56,16 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
     'default': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest.yml'),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop.yml'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
     ),
     'design': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(),
         ievvdevrun.runnables.ievv_buildstatic.RunnableThread(),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest.yml'),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop.yml'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
     ),
 }
+
+IEVV_ELASTICSEARCH_MAJOR_VERSION = 2
