@@ -76,6 +76,25 @@ The patterns to ignore when making translations. Defaults to::
     ]
 
 
+.. setting:: IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
+
+IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
+====================================================
+Set this to ``True`` if you want to built translations for javascript code. Defaults to ``False``.
+
+
+.. setting:: IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE
+
+IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE
+========================================
+The patterns to ignore when making javascript translations. Defaults to::
+
+    IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE = [
+        'node_modules/*',
+        'bower_components/*'
+    ]
+
+
 
 **************
 ievvtasks_docs
