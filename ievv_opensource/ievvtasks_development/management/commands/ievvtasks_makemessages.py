@@ -19,6 +19,7 @@ class Command(BaseCommand):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
             'node_modules/*',
             'bower_components/*'
+            'not_for_deploy/*',
         ])
         management.call_command('makemessages',
                                 domain='djangojs',

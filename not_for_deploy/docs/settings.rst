@@ -91,7 +91,8 @@ The patterns to ignore when making javascript translations. Defaults to::
 
     IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE = [
         'node_modules/*',
-        'bower_components/*'
+        'bower_components/*',
+        'not_for_deploy/*',
     ]
 
 
