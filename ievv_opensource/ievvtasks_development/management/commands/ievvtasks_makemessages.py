@@ -21,6 +21,7 @@ class Command(BaseCommand):
             'bower_components/*'
         ])
         management.call_command('makemessages',
+                                domain='djangojs',
                                 locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
                                 ignore=ignore)
 
