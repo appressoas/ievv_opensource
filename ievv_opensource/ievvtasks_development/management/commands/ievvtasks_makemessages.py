@@ -18,7 +18,7 @@ class Command(BaseCommand):
     def __build_javascript_translations(self):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
             'node_modules/*',
-            'bower_components/*'
+            'bower_components/*',
             'not_for_deploy/*',
         ])
         management.call_command('makemessages',
