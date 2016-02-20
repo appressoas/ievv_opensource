@@ -288,3 +288,11 @@ IEVV_SLUGIFY_CHARACTER_REPLACE_MAP
 ==================================
 Custom character replacement map for the ``ievv_slugify`` function
 
+
+
+.. setting:: IEVV_COLORIZE_USE_COLORS
+
+IEVV_COLORIZE_USE_COLORS
+========================
+Colorize output from :func:`ievv_opensource.utils.ievv_colorize.colorize`? Defaults
+to ``True``.

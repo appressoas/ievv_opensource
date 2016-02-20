@@ -68,6 +68,7 @@ Utilities
    utils.shellcommandmixin
    utils.singleton
    utils.text
+   utils.ievv_colorize
 
 
 ******************

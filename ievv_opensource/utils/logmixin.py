@@ -3,8 +3,7 @@ from __future__ import print_function
 import sys
 import threading
 
-from termcolor import colored
-
+from ievv_opensource.utils import ievv_colorize
 from ievv_opensource.utils.desktopnotifications import desktopnotificationapi
 
 
@@ -33,7 +32,6 @@ class Logger(object):
             name: The name of the logger.
         """
         self.name = name
-        self.colors_enabled = True
         self._has_messagelock = False
         self._messagelocktimer = None
         # self._messagequeue = []
@@ -80,32 +78,29 @@ class Logger(object):
         """
         self._queue_message(line.rstrip())
 
-    def __colorize(self, message, *args, **kwargs):
-        if self.colors_enabled:
-            return colored(message, *args, **kwargs)
-        else:
-            return message
+    def __colorize(self, message, **kwargs):
+        return ievv_colorize.colorize(message, **kwargs)
 
-    def __colorprint(self, message, *args, **kwargs):
-        self._queue_message(self.__colorize(message, *args, **kwargs))
+    def __colorprint(self, message, **kwargs):
+        self._queue_message(self.__colorize(message, **kwargs))
 
     def info(self, message):
         """
         Log an info message.
         """
-        self.__colorprint(message, 'blue')
+        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
 
     def warning(self, message):
         """
         Log a warning message.
         """
-        self.__colorprint(message, 'yellow')
+        self.__colorprint(message, color=ievv_colorize.COLOR_YELLOW)
 
     def debug(self, message):
         """
         Log a debug message.
         """
-        self.__colorprint(message, 'grey')
+        self.__colorprint(message, color=ievv_colorize.COLOR_GREY)
 
     def command_start(self, message):
         """
@@ -113,10 +108,10 @@ class Logger(object):
         of each :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`.
         """
         self._queue_message()
-        self.__colorprint(message, color='blue', attrs=['bold'])
+        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE, bold=True)
 
-    def __command_end(self, message, *args, **kwargs):
-        self.__colorprint(message, *args, **kwargs)
+    def __command_end(self, message, **kwargs):
+        self.__colorprint(message, **kwargs)
         self._queue_message()
 
     def command_error(self, message):
@@ -125,7 +120,7 @@ class Logger(object):
         :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         when the task fails.
         """
-        self.__command_end(message, color='red', attrs=['bold'])
+        self.__command_end(message, color=ievv_colorize.COLOR_RED, bold=True)
         desktopnotificationapi.show_message(
             title='ERROR - {}'.format(self.name),
             message=message)
@@ -136,7 +131,7 @@ class Logger(object):
         :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         when the task succeeds.
         """
-        self.__command_end(message, color='green', attrs=['bold'])
+        self.__command_end(message, color=ievv_colorize.COLOR_GREEN, bold=True)
         desktopnotificationapi.show_message(
             title='SUCCESS - {}'.format(self.name),
             message=message)
