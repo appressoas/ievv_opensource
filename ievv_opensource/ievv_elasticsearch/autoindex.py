@@ -9,7 +9,7 @@ API.
 """
 import itertools
 from django.conf import settings
-from pyelasticsearch import bulk_chunks
+from pyelasticsearch import bulk_chunks, ElasticHttpNotFoundError
 
 from ievv_opensource.ievv_elasticsearch import search
 from ievv_opensource.utils.singleton import Singleton
@@ -343,8 +343,38 @@ class AbstractIndex(object):
         """
 
     def delete_index(self):
+        """
+        Delete this index.
+        """
         searchapi = search.Connection.get_instance()
         searchapi.delete_index(self.name)
+
+    @classmethod
+    def get_instance(cls):
+        """
+        Get an instance of this class.
+
+        Use this instead of instanciating the class directly.
+        """
+        return Registry.get_instance().get(cls.name)
+
+    def rebuild_index(self):
+        """
+        Rebuild this index completely.
+
+        Very useful when writing tests, but probably a bit less
+        than optimal in production code/batch tasks unless you
+        have a really small index. In production you should
+        most likely want to create a management command to rebuild
+        the index with the most recent/most important documents
+        beeing indexed first.
+        """
+        try:
+            self.delete_index()
+        except ElasticHttpNotFoundError:
+            pass
+        self.create()
+        self.index_items(self.iterate_all_documents())
 
 
 class Registry(Singleton):
