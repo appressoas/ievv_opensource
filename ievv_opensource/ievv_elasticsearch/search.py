@@ -12,27 +12,33 @@ from future.utils import python_2_unicode_compatible
 from pyelasticsearch import ElasticSearch, ElasticHttpError, ElasticHttpNotFoundError
 import elasticsearch_dsl
 
+from ievv_opensource.utils import ievv_colorize
 from ievv_opensource.utils.singleton import Singleton
 
 
-def _instant_print(text=''):
-    print(text)
+def _instant_print(text='', color=None, bold=False):
+    print(ievv_colorize.colorize(text, color=color, bold=bold))
     sys.stdout.flush()
 
 
-def _instant_prettyjson(data):
-    try:
-        pretty = json.dumps(data, indent=4)
-    except TypeError:
-        pretty = pformat(data)
-    print(pretty)
-    sys.stdout.flush()
+def _instant_prettyjson(data, is_newline_list=False, color=None, bold=False):
+    if is_newline_list:
+        for line in data.split('\n'):
+            _instant_print(line)
+    else:
+        try:
+            pretty = json.dumps(data, indent=4)
+        except TypeError:
+            pretty = pformat(data)
+        print(ievv_colorize.colorize(pretty, color=color, bold=bold))
+        sys.stdout.flush()
 
 
 class IevvElasticSearch(ElasticSearch):
     def __prettyprint_request(self, method, path_components, body, query_params):
         _instant_print()
-        _instant_print('>>>>>> prettyprint ElasticSearch request input >>>>>>')
+        _instant_print('>>>>>> prettyprint ElasticSearch request input >>>>>>',
+                       color=ievv_colorize.COLOR_BLUE)
         querystring = ''
         if query_params:
             querydict = QueryDict(mutable=True)
@@ -44,20 +50,25 @@ class IevvElasticSearch(ElasticSearch):
             querystring=querystring)
         _instant_print(prettyformatted_requestheader)
         if body:
-            _instant_prettyjson(body)
-        _instant_print('<<<<<< prettyprint ElasticSearch request input <<<<<<')
+            _instant_prettyjson(body,
+                                is_newline_list=len(path_components) > 0 and path_components[-1] == '_bulk')
+        _instant_print('<<<<<< prettyprint ElasticSearch request input <<<<<<',
+                       color=ievv_colorize.COLOR_BLUE)
         return prettyformatted_requestheader
 
     def __prettyprint_successful_response(self, response, prettyformatted_requestheader):
         _instant_print()
-        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader))
+        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader),
+                       color=ievv_colorize.COLOR_GREEN)
         _instant_prettyjson(response)
-        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader))
+        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader),
+                       color=ievv_colorize.COLOR_GREEN)
         _instant_print()
 
     def __prettyprint_error_response(self, error, prettyformatted_requestheader):
         _instant_print()
-        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader))
+        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader),
+                       color=ievv_colorize.COLOR_RED, bold=True)
         _instant_print('HTTP error code: {}'.format(error.status_code))
         try:
             errormessage = json.loads(error.error)
@@ -65,7 +76,8 @@ class IevvElasticSearch(ElasticSearch):
             _instant_print(error.error)
         else:
             _instant_prettyjson(errormessage)
-        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader))
+        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader),
+                       ievv_colorize.COLOR_RED, bold=True)
         _instant_print()
 
     def send_request(self,
@@ -241,9 +253,11 @@ class Connection(Singleton):
         if prettyprint_query or getattr(
                 settings, 'IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_SEARCH_QUERIES', False):
             _instant_print()
-            _instant_print('>>> prettyprinted query >>>')
+            _instant_print('>>> prettyprinted query >>>',
+                           color=ievv_colorize.COLOR_BLUE, bold=True)
             _instant_prettyjson(query)
-            _instant_print('<<< prettyprinted query <<<')
+            _instant_print('<<< prettyprinted query <<<',
+                           color=ievv_colorize.COLOR_BLUE, bold=True)
         return self.elasticsearch.search(query, **kwargs)
 
     def refresh(self, *args, **kwargs):
