@@ -1,11 +1,109 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from pprint import pformat
+from __future__ import print_function
+
+import json
+from pprint import pformat, pprint
+
+import sys
 from django.conf import settings
+from django.http import QueryDict
 from future.utils import python_2_unicode_compatible
-from pyelasticsearch import ElasticSearch
+from pyelasticsearch import ElasticSearch, ElasticHttpError
+import elasticsearch_dsl
 
 from ievv_opensource.utils.singleton import Singleton
+
+
+def _instant_print(text=''):
+    print(text)
+    sys.stdout.flush()
+
+
+def _instant_prettyjson(data):
+    try:
+        pretty = json.dumps(data, indent=4)
+    except TypeError:
+        pretty = pformat(data)
+    print(pretty)
+    sys.stdout.flush()
+
+
+class IevvElasticSearch(ElasticSearch):
+    def __prettyprint_request(self, method, path_components, body, query_params):
+        _instant_print()
+        _instant_print('>>>>>> prettyprint ElasticSearch request input >>>>>>')
+        querystring = ''
+        if query_params:
+            querydict = QueryDict(mutable=True)
+            querydict.update(query_params)
+            querystring = '?' + querydict.urlencode()
+        prettyformatted_requestheader = '{method} {path}{querystring}'.format(
+            method=method,
+            path=self._join_path(path_components),
+            querystring=querystring)
+        _instant_print(prettyformatted_requestheader)
+        if body:
+            _instant_prettyjson(body)
+        _instant_print('<<<<<< prettyprint ElasticSearch request input <<<<<<')
+        return prettyformatted_requestheader
+
+    def __prettyprint_successful_response(self, response, prettyformatted_requestheader):
+        _instant_print()
+        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader))
+        _instant_prettyjson(response)
+        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader))
+        _instant_print()
+
+    def __prettyprint_error_response(self, error, prettyformatted_requestheader):
+        _instant_print()
+        _instant_print('>>>>>> {} response >>>>>>'.format(prettyformatted_requestheader))
+        _instant_print('HTTP error code: {}'.format(error.status_code))
+        try:
+            errormessage = json.loads(error.error)
+        except ValueError:
+            _instant_print(error.error)
+        else:
+            _instant_prettyjson(errormessage)
+        _instant_print('<<<<<< {} response <<<<<<'.format(prettyformatted_requestheader))
+        _instant_print()
+
+    def send_request(self,
+                     method,
+                     path_components,
+                     body='',
+                     query_params=None):
+        """
+        Does exactly the same as the method from the superclass,
+        but also prettyprints the request and response if
+        the :setting:`IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_REQUESTS` setting
+        is ``True``.
+        """
+        print_all_requests = getattr(settings, 'IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_REQUESTS', False)
+        prettyformatted_requestheader = None
+        if print_all_requests:
+            prettyformatted_requestheader = self.__prettyprint_request(
+                method=method,
+                path_components=path_components,
+                body=body,
+                query_params=query_params)
+        try:
+            response = super(IevvElasticSearch, self).send_request(
+                method=method, path_components=path_components,
+                body=body, query_params=query_params)
+        except ElasticHttpError as error:
+            if print_all_requests:
+                self.__prettyprint_error_response(
+                    error=error,
+                    prettyformatted_requestheader=prettyformatted_requestheader)
+            raise
+
+        if print_all_requests:
+            self.__prettyprint_successful_response(
+                response=response,
+                prettyformatted_requestheader=prettyformatted_requestheader)
+
+        return response
 
 
 class Connection(Singleton):
@@ -28,8 +126,8 @@ class Connection(Singleton):
             doc_type='person',
             docs=[{'name': 'Joe Tester'},
                   {'name': 'Peter The Super Tester'}])
-        searchresult1 = searchapi.wrapped_search('name:joe OR name:freddy', index='contacts')
-        searchresult2 = searchapi.wrapped_search({
+        searchresult1 = searchapi.wrapped_search(query='name:joe OR name:freddy', index='contacts')
+        searchresult2 = searchapi.wrapped_search(query={
             'query': {
                 'match': {
                     'name': {
@@ -58,7 +156,7 @@ class Connection(Singleton):
             else:
                 raise ValueError('ievv_opensource.ievv_elasticsearch.search.Connection '
                                  'requires the IEVV_ELASTICSEARCH_URL setting')
-        self.elasticsearch = ElasticSearch(self._connectionurl)
+        self.elasticsearch = IevvElasticSearch(self._connectionurl)
 
     def clear_all_data(self):
         """
@@ -121,13 +219,32 @@ class Connection(Singleton):
             self.refresh()
         return result
 
-    def search(self, *args, **kwargs):
+    def search(self, query, prettyprint_query=False, **kwargs):
         """
         Wrapper around :meth:`pyelasticsearch.ElasticSearch.search`.
 
-        Works exactly like the wrapped function.
+        Works just like the wrapped function, except that ``query`` can also
+        be an ``elasticsearch_dsl.Search`` object, and you can only specify
+        arguments as kwargs (no positional arguments).
+
+        If ``query`` is an ``elasticsearch_dsl.Search`` object, we
+        convert it to a dict with ``query.to_dict`` before forwaring
+        it to the underling pyelasticsearch API.
+
+        Args:
+            query: A string, dict or ``elasticsearch_dsl.Search`` object.
+            prettyprint_query: If this is ``True``, we prettyprint the query
+                before executing it. Good for debugging.
         """
-        return self.elasticsearch.search(*args, **kwargs)
+        if isinstance(query, elasticsearch_dsl.Search):
+            query = query.to_dict()
+        if prettyprint_query or getattr(
+                settings, 'IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_SEARCH_QUERIES', False):
+            _instant_print()
+            _instant_print('>>> prettyprinted query >>>')
+            _instant_prettyjson(query)
+            _instant_print('<<< prettyprinted query <<<')
+        return self.elasticsearch.search(query, **kwargs)
 
     def refresh(self, *args, **kwargs):
         """
@@ -166,14 +283,6 @@ class Connection(Singleton):
         Just like :meth:`.get`, but we return a :class:`.SearchResultItem`
         instead of the raw search response.
         """
-        print()
-        print("*" * 70)
-        print()
-        print(args, kwargs)
-        print()
-        print("*" * 70)
-        print()
-
         return SearchResultItem(self.get(*args, **kwargs))
 
     def wrapped_search(self, *args, **kwargs):

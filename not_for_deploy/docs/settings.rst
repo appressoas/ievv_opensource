@@ -167,6 +167,10 @@ Example::
     ]
 
 
+***********
+ievv devrun
+***********
+
 .. setting:: IEVVTASKS_DEVRUN_RUNNABLES
 
 IEVVTASKS_DEVRUN_RUNNABLES
@@ -176,6 +180,11 @@ objects. Must contain the ``"default"`` key.
 
 Documented in :doc:`ievvtask_devrun`.
 
+
+
+******************
+ievv_elasticsearch
+******************
 
 
 .. setting:: IEVV_ELASTICSEARCH_URL
@@ -215,6 +224,24 @@ makes writing Unit tests a bit easier:
 Add the following to you test settings to enable testmode::
 
     IEVV_ELASTICSEARCH_TESTMODE = True
+
+
+.. setting:: IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_SEARCH_QUERIES
+
+IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_SEARCH_QUERIES
+=================================================
+
+Set this to True to prettyprint all ElasticSearch search queries. Defaults to ``False``.
+Good for debugging.
+
+
+.. setting:: IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_REQUESTS
+
+IEVV_ELASTICSEARCH_PRETTYPRINT_ALL_REQUESTS
+===========================================
+
+Set this to True to prettyprint all ElasticSearch requests (both input and output).
+Defaults to ``False``. Good for debugging.
 
 
 .. setting:: IEVV_ELASTICSEARCH_AUTOREFRESH_AFTER_INDEXING
