@@ -1,11 +1,14 @@
 import os
 import shutil
+import unittest
+
 from django.conf import settings
 
 from django.core import management
 from django.test import TestCase
 
 
+@unittest.skip('This does not work as intended')
 class TestMakemessages(TestCase):
     def __remove_locale_directory(self):
         if os.path.exists(self.locale_directory):

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from pprint import pformat
 from django.conf import settings
+from future.utils import python_2_unicode_compatible
 from pyelasticsearch import ElasticSearch
 
 from ievv_opensource.utils.singleton import Singleton
@@ -165,6 +166,14 @@ class Connection(Singleton):
         Just like :meth:`.get`, but we return a :class:`.SearchResultItem`
         instead of the raw search response.
         """
+        print()
+        print("*" * 70)
+        print()
+        print(args, kwargs)
+        print()
+        print("*" * 70)
+        print()
+
         return SearchResultItem(self.get(*args, **kwargs))
 
     def wrapped_search(self, *args, **kwargs):
@@ -200,25 +209,32 @@ class Connection(Singleton):
                          page_size=page_size,
                          resultitemwrapper=resultitemwrapper)
 
-    def search_all(self):
+    def search_all(self, **kwargs):
         """
         Get all documents in the index. Nice for testing
         and debugging of small datasets. Useless in production.
-        """
-        return self.search({
-            'query': {
-                'match_all': {}
-            }
-        })
 
-    def wrapped_search_all(self):
+        ``**kwargs`` are forwarded to :meth:`.search`, but the
+        query argument is added automatically.
+        """
+        return self.search(
+            query={
+                'query': {
+                    'match_all': {}
+                }
+            },
+            **kwargs
+        )
+
+    def wrapped_search_all(self, **kwargs):
         """
         Just like :meth:`.search_all`, but wraps the results in
         a :class:`.SearchResultWrapper`.
         """
-        return SearchResultWrapper(self.search_all())
+        return SearchResultWrapper(self.search_all(**kwargs))
 
 
+@python_2_unicode_compatible
 class SearchResultItem(object):
     """
     Wrapper around a single dictionary in the ``hits.hits`` list of
@@ -269,6 +285,7 @@ class SearchResultItem(object):
         return 'SearchResultItem({!r})'.format(self.search_hit)
 
 
+@python_2_unicode_compatible
 class SearchResultWrapper(object):
     """
     An efficient wrapper around the data returned by :meth:`pyelasticsearch.ElasticSearch.search`.

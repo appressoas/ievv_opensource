@@ -22,6 +22,7 @@ setup(
         'watchdog',
         'termcolor',
         'psutil',
+        'future',
     ],
     entry_points={
         'console_scripts': [

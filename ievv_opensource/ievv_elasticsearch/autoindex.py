@@ -9,21 +9,43 @@ This is completely decoupled from the :mod:`ievv_opensource.ievv_elasticsearch.s
 API.
 """
 from __future__ import unicode_literals
+
 import itertools
+
 from django.conf import settings
+from future.utils import with_metaclass
 from pyelasticsearch import bulk_chunks, ElasticHttpNotFoundError
 
 from ievv_opensource.ievv_elasticsearch import search
+from ievv_opensource.ievv_elasticsearch.documentquery import DocumentQuery
 from ievv_opensource.utils.singleton import Singleton
 
 
-class AbstractDocument(object):
+class AbstractDocumentMeta(type):
+    """
+    Metaclass for :class:`.AbstractDocument`.
+    """
+    def __new__(cls, name, parents, dct):
+        if dct.get('objects', None) is None:
+            dct['objects'] = DocumentQuery()
+        new_class = super(AbstractDocumentMeta, cls).__new__(cls, name, parents, dct)
+        new_class.objects.initialize(documentclass=new_class)
+        return new_class
+
+
+class AbstractDocument(with_metaclass(AbstractDocumentMeta, object)):
     """
     Base class for indexable documents for :class:`AbstractIndex`.
     """
 
     #: The document type to store this as in the index.
     doc_type = None
+
+    #: The name of the index this document belongs to.
+    #: This is set by :class:`.AbstractIndex` __init__ using :meth:`.set_index_name_for_all_document_classes`.
+    index_name = None
+
+    objects = None
 
     def get_document(self):
         """
@@ -220,6 +242,17 @@ class AbstractIndex(object):
     #: The :class:`.AbstractDocument` classes used in this index.
     #: Can also be overridden via :meth:`.get_document_classes`.
     document_classes = []
+
+    def __init__(self):
+        self.set_index_name_for_all_document_classes()
+
+    def set_index_name_for_all_document_classes(self):
+        """
+        Called by __init__ to set the :obj:`.AbstractDocument.index_name` of
+        all documents in :obj:`~.AbstractIndex.document_classes`.
+        """
+        for document_class in self.document_classes:
+            document_class.index_name = self.name
 
     def create(self):
         """
