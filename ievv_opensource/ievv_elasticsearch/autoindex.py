@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This module defines a :class:`.Registry` of objects that takes care of automatically
 updating the search index when we detect changes to the data in a
@@ -7,6 +8,7 @@ MongoDB, ...) - our examples use Django ORM.
 This is completely decoupled from the :mod:`ievv_opensource.ievv_elasticsearch.search`
 API.
 """
+from __future__ import unicode_literals
 import itertools
 from django.conf import settings
 from pyelasticsearch import bulk_chunks, ElasticHttpNotFoundError

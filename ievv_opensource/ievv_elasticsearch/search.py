@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from pprint import pformat
 from django.conf import settings
 from pyelasticsearch import ElasticSearch
