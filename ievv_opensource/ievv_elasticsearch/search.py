@@ -44,7 +44,7 @@ class Connection(Singleton):
         The :class:`pyelasticsearch.ElasticSearch` object.
     """
     def __init__(self):
-        super().__init__()
+        super(Connection, self).__init__()
         self._testmode = getattr(settings, 'IEVV_ELASTICSEARCH_TESTMODE', False)
         self._autorefresh_after_index_changes = self._testmode
         if self._testmode:

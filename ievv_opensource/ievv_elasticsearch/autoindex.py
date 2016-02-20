@@ -402,7 +402,7 @@ class Registry(Singleton):
     """
 
     def __init__(self):
-        super().__init__()
+        super(Registry, self).__init__()
         self._indexes = {}
 
     def add(self, searchindex_class):
@@ -459,4 +459,4 @@ class MockableRegistry(Registry):
 
     def __init__(self):
         self._instance = None  # Ensure the singleton-check is not triggered
-        super().__init__()
+        super(MockableRegistry, self).__init__()
