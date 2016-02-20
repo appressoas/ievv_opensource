@@ -107,6 +107,22 @@ class DocumentQuery(object):
         """
         return self.__wrap_searchapi_method('wrapped_get', *args, **kwargs)
 
+    def get_or_none(self, *args, **kwargs):
+        """
+        Works just like :meth:`ievv_opensource.ievv_elasticsearch.search.Connection.get_or_none`
+        except that you do not have to specify ``index`` or ``doc_type`` (they are
+        added automatically before calling the low level API).
+        """
+        return self.__wrap_searchapi_method('get_or_none', *args, **kwargs)
+
+    def wrapped_get_or_none(self, *args, **kwargs):
+        """
+        Works just like :meth:`ievv_opensource.ievv_elasticsearch.search.Connection.wrapped_get_or_none`
+        except that you do not have to specify ``index`` or ``doc_type`` (they are
+        added automatically before calling the low level API).
+        """
+        return self.__wrap_searchapi_method('wrapped_get_or_none', *args, **kwargs)
+
     def wrapped_search(self, *args, **kwargs):
         """
         Works just like :meth:`ievv_opensource.ievv_elasticsearch.search.Connection.wrapped_search`

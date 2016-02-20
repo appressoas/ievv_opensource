@@ -9,7 +9,7 @@ import sys
 from django.conf import settings
 from django.http import QueryDict
 from future.utils import python_2_unicode_compatible
-from pyelasticsearch import ElasticSearch, ElasticHttpError
+from pyelasticsearch import ElasticSearch, ElasticHttpError, ElasticHttpNotFoundError
 import elasticsearch_dsl
 
 from ievv_opensource.utils.singleton import Singleton
@@ -284,6 +284,26 @@ class Connection(Singleton):
         instead of the raw search response.
         """
         return SearchResultItem(self.get(*args, **kwargs))
+
+    def get_or_none(self, *args, **kwargs):
+        """
+        Works like :meth:`.get`, but instead of raising an exception, we return
+        ``None`` if the requested object does not exist.
+        """
+        try:
+            return self.get(*args, **kwargs)
+        except ElasticHttpNotFoundError:
+            return None
+
+    def wrapped_get_or_none(self, *args, **kwargs):
+        """
+        Works like :meth:`.wrapped_get`, but instead of raising an exception, we return
+        ``None`` if the requested object does not exist.
+        """
+        try:
+            return self.wrapped_get(*args, **kwargs)
+        except ElasticHttpNotFoundError:
+            return None
 
     def wrapped_search(self, *args, **kwargs):
         """
