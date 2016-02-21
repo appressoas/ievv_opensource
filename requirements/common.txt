@@ -53,6 +53,6 @@ doc2dash==2.0.2
 -r common.gitpackages.txt
 
 # django cradmin
-django-cradmin==1.0.1b59
+django-cradmin==1.0.1b66
 
 -e .
