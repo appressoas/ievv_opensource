@@ -29,11 +29,16 @@ class RunnableThread(base.ShellCommandRunnableThread):
     """
     default_autorestart_on_crash = True
 
+    def __init__(self, host='127.0.0.1', port='8000'):
+        self.host = host
+        self.port = port
+        super(RunnableThread, self).__init__()
+
     def get_logger_name(self):
         return 'Django development server'
 
     def get_command_config(self):
         return {
             'executable': sys.executable,
-            'args': ['manage.py', 'runserver']
+            'args': ['manage.py', 'runserver', '{}:{}'.format(self.host, self.port)]
         }
