@@ -60,9 +60,13 @@ class AbstractDocument(with_metaclass(AbstractDocumentMeta, object)):
         """
         return None
 
-    def get_meta(self):
+    def get_parent_id(self):
         """
-        Get metadata for the ``meta`` argument of :meth:`pyelasticsearch.ElasticSearch.index_op`.
+        Get the parent-child mapping parent ID document to use for the indexed document.
+        This should only be overridden if you have a parent specified
+
+        Defaults to ``None``, which means that no ``parent`` will be sent
+        during indexing operations.
         """
         return None
 
@@ -76,13 +80,14 @@ class AbstractDocument(with_metaclass(AbstractDocumentMeta, object)):
         kwargs = {
             'doc': self.get_document(),
         }
-        meta = self.get_meta()
-        if meta:
-            kwargs['meta'] = meta
 
         identifier = self.get_id()
-        if identifier:
+        if identifier is not None:
             kwargs['id'] = identifier
+
+        parent_id = self.get_parent_id()
+        if parent_id is not None:
+            kwargs['parent'] = parent_id
 
         return kwargs
 
@@ -116,6 +121,35 @@ class AbstractDocument(with_metaclass(AbstractDocumentMeta, object)):
                         }
         """
         return None
+
+    @classmethod
+    def get_mapping_parent_type(cls):
+        """
+        Get the type of the parent document for parent-child mapping.
+
+        Lets say you have a Movie document, and want to create a
+        parent-child relationship from the Category document with doc_type ``category``
+        to the Movie. In the Movie document class, you would have to:
+
+        - Override this method and return ``"category"``.
+        - :meth:`.get_parent_id` and return the ID of the category.
+        """
+        return None
+
+    @classmethod
+    def get_mapping(cls):
+        mappingdict = {}
+
+        properties = cls.get_mapping_properties()
+        if properties is not None:
+            mappingdict['properties'] = properties
+
+        parent_type = cls.get_mapping_parent_type()
+        if parent_type is not None:
+            mappingdict['_parent'] = {
+                'type': parent_type
+            }
+        return mappingdict
 
 
 class AbstractDictDocument(AbstractDocument):
@@ -283,6 +317,16 @@ class AbstractIndex(object):
         """
         return self.document_classes
 
+    def get_document_classes_for_mapping(self):
+        """
+        Get the document classes for mapping. You normally do not
+        have to override this - it only return :meth:`.get_document_classes`
+        reversed. It is reversed because parent-child mappings have to be
+        created in the child before the parent mapping can be created, but you
+        normally want to index parents before children.
+        """
+        return reversed(self.get_document_classes())
+
     def create_mappings(self):
         """
         Create mappings.
@@ -292,13 +336,11 @@ class AbstractIndex(object):
         :meth:`.AbstractDocument.get_mapping_properties`).
         """
         searchapi = search.Connection.get_instance()
-        for document_class in self.get_document_classes():
-            mapping_properties = document_class.get_mapping_properties()
-            if mapping_properties:
+        for document_class in self.get_document_classes_for_mapping():
+            mappingdict = document_class.get_mapping()
+            if mappingdict:
                 searchapi.elasticsearch.put_mapping(self.name, document_class.doc_type, {
-                    document_class.doc_type: {
-                        'properties': mapping_properties
-                    }
+                    document_class.doc_type: mappingdict
                 })
 
     def iterate_all_documents(self):
