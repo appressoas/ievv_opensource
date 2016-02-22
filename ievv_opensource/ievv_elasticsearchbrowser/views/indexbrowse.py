@@ -35,15 +35,6 @@ class SearchFilter(AbstractSearch):
     def __get_all_string_fields(self):
         searchapi = search.Connection.get_instance()
         searchresponse = searchapi.elasticsearch.get_mapping(index=self.indexname)
-        from pprint import pprint
-        print()
-        print("*" * 70)
-        print()
-        pprint(searchresponse)
-        print()
-        print("*" * 70)
-        print()
-
         stringfields = ['_id']
         nestedfields = {}
         for indexname, indexdict in searchresponse.items():
