@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',
+    # 'kombu.transport.django',
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',

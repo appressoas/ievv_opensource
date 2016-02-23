@@ -56,4 +56,9 @@ doc2dash==2.0.2
 # django cradmin
 django-cradmin==1.0.1b66
 
+# For Celery
+celery==3.1.20
+django-celery==3.1.17
+redis==2.10.5
+
 -e .
