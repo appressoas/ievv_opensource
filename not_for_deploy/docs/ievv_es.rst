@@ -1,5 +1,5 @@
 ###################################################
-`ievv_es` --- Makes working with ElasticSearch easy
+`ievv_elasticsearch2` --- Makes working with ElasticSearch easy
 ###################################################
 Extends `elasticsearch-py`_ and `elasticsearch-dsl`_ with some very
 useful utilities that makes it easier to use ElasticSearch with
@@ -9,12 +9,12 @@ Django.
 *******
 Install
 *******
-Add ``"ievv_opensource.ievv_es.apps.IevvEsAppConfig"`` to ``INSTALLED_APPS``.
+Add ``"ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig"`` to ``INSTALLED_APPS``.
 
 *****
 Goals
 *****
-The goal of ``ievv_es`` is to extend elasticsearch-dsl
+The goal of ``ievv_elasticsearch2`` is to extend elasticsearch-dsl
 with::
 
 - Django settings based configuration.
@@ -30,19 +30,21 @@ with::
 - ... in short - DRY with elasticsearch-dsl in Django projects ...
 
 
-
-
 **********
 Search API
 **********
 
 Usage example::
 
-    import ievv_es
+    import ievv_elasticsearch2
 
-    search = ievv_es.Search()\
+    search = ievv_elasticsearch2.Search()\
         .query('match', title='python')
     print(search.ievv_execute())
+
+
+
+
 
 
 .. _`elasticsearch-dsl`: http://elasticsearch-dsl.readthedocs.org/

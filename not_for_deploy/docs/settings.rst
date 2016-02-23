@@ -280,16 +280,16 @@ support ``2``.
 
 
 *******
-ievv_es
+ievv_elasticsearch2
 *******
 
-.. setting:: IEVV_ES_CONNECTION_ALIASES
+.. setting:: IEVV_ELASTICSEARCH2_CONNECTION_ALIASES
 
-IEVV_ES_CONNECTION_ALIASES
+IEVV_ELASTICSEARCH2_CONNECTION_ALIASES
 ==========================
 Setup elasticsearch connections (almost exactly like setting up Django databases). Example::
 
-    IEVV_ES_CONNECTION_ALIASES = {
+    IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
         'default': {
             'host': '127.0.0.1',
             'port': '9251'
@@ -314,41 +314,41 @@ settings::
 
 Elasticsearch-dsl also uses :class:`elasticsearch_dsl.connections.Connections`, so this
 means that you can use these aliases with :meth:`elasticsearch_dsl.search.Search.using`
-and :meth:`ievv_opensource.ievv_es.search.Search.using`::
+and :meth:`ievv_opensource.ievv_elasticsearch2.search.Search.using`::
 
-    from ievv_opensource import ievv_es
+    from ievv_opensource import ievv_elasticsearch2
 
-    result = ievv_es.Search()\
+    result = ievv_elasticsearch2.Search()\
         .query('match', name='Peter')\
         .using('theother')
         .execute()
 
-.. note:: The ``IEVV_ES_CONNECTION_ALIASES`` setting only works if you add
-    ``ievv_es`` to ``INSTALLED_APPS`` with the AppConfig::
+.. note:: The ``IEVV_ELASTICSEARCH2_CONNECTION_ALIASES`` setting only works if you add
+    ``ievv_elasticsearch2`` to ``INSTALLED_APPS`` with the AppConfig::
 
         INSTALLED_APPS = [
             # .. Other apps ...
-            "ievv_opensource.ievv_es.apps.IevvEsAppConfig",
+            "ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig",
         ]
 
 
-.. setting:: IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
+.. setting:: IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
 
-IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
+IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
 ===============================================
-If this is ``True``, it makes :class:`ievv_opensource.ievv_es.transport.debug.DebugTransport`
+If this is ``True``, it makes :class:`ievv_opensource.ievv_elasticsearch2.transport.debug.DebugTransport`
 prettyprint all requests performed by any :class:`elasticsearch.client.Elasticsearch`
 object it is configured as the ``transport_class`` for.
 
-This does not work unless you use :class:`ievv_opensource.ievv_es.transport.debug.DebugTransport`
+This does not work unless you use :class:`ievv_opensource.ievv_elasticsearch2.transport.debug.DebugTransport`
 as the transport class. This is easiest to achieve by just adding it to your
-:setting:`IEVV_ES_CONNECTION_ALIASES` setting::
+:setting:`IEVV_ELASTICSEARCH2_CONNECTION_ALIASES` setting::
 
-    IEVV_ES_CONNECTION_ALIASES = {
+    IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
         'default': {
             'host': '<somehost>',
             'port': '<someport>',
-            'transport_class': 'ievv_opensource.ievv_es.transport.debug.DebugTransport'
+            'transport_class': 'ievv_opensource.ievv_elasticsearch2.transport.debug.DebugTransport'
         }
     }
 
@@ -358,7 +358,7 @@ but you can also use this in tests to debug just some requests::
     class MyTest(TestCase):
         def test_something(self):
             # ... some code here ...
-            with self.settings(IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS=True):
+            with self.settings(IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS=True):
                 # ... some elasticsearch queries here ...
             # ... more code here ...
 

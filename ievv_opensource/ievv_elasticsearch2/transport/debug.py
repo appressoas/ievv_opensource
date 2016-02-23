@@ -47,7 +47,7 @@ class DebugTransport(elasticsearch.Transport):
 
     If this is defined as the transport_class for
     :class:`elasticsearch.client.Elasticsearch`, and the
-    :setting:`IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS` setting
+    :setting:`IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS` setting
     is set to ``True``, we prettyprint all requests and responses from
     ElasticSearch.
     """
@@ -97,7 +97,7 @@ class DebugTransport(elasticsearch.Transport):
         _instant_print()
 
     def perform_request(self, method, url, params=None, body=None):
-        print_all_requests = getattr(settings, 'IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS', False)
+        print_all_requests = getattr(settings, 'IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS', False)
         prettyformatted_requestheader = None
         if print_all_requests:
             prettyformatted_requestheader = self.__prettyprint_request(
