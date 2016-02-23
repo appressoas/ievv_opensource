@@ -71,7 +71,7 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
 IEVV_ELASTICSEARCH_MAJOR_VERSION = 2
 
 
-IEVV_ES_CONNECTIONS = {
+IEVV_ES_CONNECTION_ALIASES = {
     'default': {
         'host': '127.0.0.1',
         'port': '9252'

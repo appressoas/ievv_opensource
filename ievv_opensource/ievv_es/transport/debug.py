@@ -42,6 +42,15 @@ def _instant_prettyjson(data, is_newline_list=False, color=None, bold=False):
 
 
 class DebugTransport(elasticsearch.Transport):
+    """
+    An ElasticSearch transport class for debugging.
+
+    If this is defined as the transport_class for
+    :class:`elasticsearch.client.Elasticsearch`, and the
+    :setting:`IEVV_ES_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS` setting
+    is set to ``True``, we prettyprint all requests and responses from
+    ElasticSearch.
+    """
     def __prettyprint_request(self, method, url, params, body):
         _instant_print()
         _instant_print('>>>>>> prettyprint ElasticSearch request input >>>>>>',

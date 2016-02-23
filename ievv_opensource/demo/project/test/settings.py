@@ -8,7 +8,7 @@ IEVV_ELASTICSEARCH_TESTURL = 'http://localhost:9251'
 IEVV_ELASTICSEARCH_TESTMODE = True
 
 
-IEVV_ES_CONNECTIONS = {
+IEVV_ES_CONNECTION_ALIASES = {
     'default': {
         'host': '127.0.0.1',
         'port': '9251',

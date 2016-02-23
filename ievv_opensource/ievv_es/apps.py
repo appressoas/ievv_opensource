@@ -10,7 +10,7 @@ class IevvEsAppConfig(AppConfig):
 
     def ready(self):
         kwargs = {}
-        for name, configdict in settings.IEVV_ES_CONNECTIONS.items():
+        for name, configdict in settings.IEVV_ES_CONNECTION_ALIASES.items():
             configdict = configdict.copy()
             transport_class_path = configdict.pop('transport_class', None)
             if transport_class_path:
