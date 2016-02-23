@@ -41,6 +41,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.napoleon',
     'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
     "appresso_sphinx_extensions.settings",
 ]
 
@@ -49,6 +50,13 @@ extlinks = {
     'wikipage': ('https://github.com/appressoas/ievv_opensource/wiki/%s', 'Wiki page: '),
 }
 
+
+intersphinx_mapping = {
+    'python': ('http://python.readthedocs.org/en/latest/', None),
+    'django': ('http://django.readthedocs.org/en/latest/', None),
+    'elasticsearch-dsl': ('http://elasticsearch-dsl.readthedocs.org/en/latest/', None),
+    'elasticsearch-py': ('https://elasticsearch-py.readthedocs.org/en/latest/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

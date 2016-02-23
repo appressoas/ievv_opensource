@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_elasticsearch',
+    'ievv_opensource.ievv_es.apps.IevvEsAppConfig',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -116,6 +117,16 @@ LOGGING = {
         'django.db': {
             'handlers': ['stderr'],
             'level': 'INFO',  # Do not set to debug - logs all queries
+            'propagate': False
+        },
+        'elasticsearch': {
+            'handlers': ['stderr'],
+            'level': 'WARNING',
+            'propagate': False
+        },
+        'urllib3': {
+            'handlers': ['stderr'],
+            'level': 'WARNING',
             'propagate': False
         },
         'sh': {
