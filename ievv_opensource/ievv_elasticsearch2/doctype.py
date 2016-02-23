@@ -1,4 +1,3 @@
-import inspect
 import logging
 
 import elasticsearch_dsl
@@ -6,7 +5,6 @@ from elasticsearch_dsl.document import DocTypeMeta as ElasticSearchDocTypeMeta
 from future.utils import with_metaclass
 
 from .search import Search
-from .indexupdater import IndexUpdater
 
 logger = logging.getLogger()
 
