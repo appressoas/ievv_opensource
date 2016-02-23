@@ -1,6 +1,6 @@
-###################################################
+###############################################################
 `ievv_elasticsearch2` --- Makes working with ElasticSearch easy
-###################################################
+###############################################################
 Extends `elasticsearch-py`_ and `elasticsearch-dsl`_ with some very
 useful utilities that makes it easier to use ElasticSearch with
 Django.

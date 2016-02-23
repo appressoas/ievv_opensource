@@ -58,17 +58,17 @@ class TestSearch(test.TestCase):
         #
         # result = search.execute()
 
-        search = PersonDocType.objects.query_name(name='Peter')
-        result = search.execute()
-        pprint(result)
+        # search = PersonDocType.objects.query_name(name='Peter')
+        # result = search.execute()
+        # pprint(result)
 
-        search = PersonDocType.fancysearch.query_all(text='Pan')
-        result = search.execute()
-        pprint(result)
+        # search = PersonDocType.fancysearch.query_all(text='Pan')
+        # result = search.execute()
+        # pprint(result)
 
         search = PersonDocType.search().query('match', name='Peter')
-        result = search.execute()
-        pprint(result)
+        # result = search.execute()
+        # pprint(result)
 
         # search = ievv_elasticsearch2.Search().query('match', name='Peter')
         # pprint(search.to_dict())

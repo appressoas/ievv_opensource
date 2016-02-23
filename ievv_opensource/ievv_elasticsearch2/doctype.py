@@ -6,6 +6,7 @@ from elasticsearch_dsl.document import DocTypeMeta as ElasticSearchDocTypeMeta
 from future.utils import with_metaclass
 
 from .search import Search
+from .indexupdater import IndexUpdater
 
 logger = logging.getLogger()
 
@@ -34,9 +35,15 @@ class DocTypeMeta(ElasticSearchDocTypeMeta):
                                              attributename='objects')
         for key, value in dct.items():
             if isinstance(value, Search):
-                value.params()
+                # value.params()
                 _update_searchobject_for_doctype(doctype_class=doctype_class,
                                                  attributename=key)
+        if hasattr(doctype_class, 'indexupdater'):
+            indexupdater_class = doctype_class.indexupdater.__class__
+            doctype_class.indexupdater = indexupdater_class(
+                doctype_class=doctype_class
+            )
+
         return doctype_class
 
 
