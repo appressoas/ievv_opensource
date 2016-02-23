@@ -1,7 +1,6 @@
 import elasticsearch
 
 from ievv_opensource.demo.project.default.settings import *  # noqa
-from ievv_opensource.ievv_es.transport.debug import DebugTransport
 
 LOCALE_PATHS = ['test_locale']
 
