@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import Signal, receiver
 
+from ievv_opensource import ievv_elasticsearch2
+
 
 class Company(models.Model):
     name = models.CharField(max_length=255)
@@ -39,3 +41,7 @@ def on_employee_post_save(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Employee)
 def on_employee_post_delete(sender, instance, **kwargs):
     employee_deleted.send(sender=sender, employee=instance)
+    registry = ievv_elasticsearch2.indexingmanager.Registry.get_instance()
+    # result = registry.index('devilry_assignment_namechange',
+    #                         assignment=instance)
+    # if result.has_background_tasks():

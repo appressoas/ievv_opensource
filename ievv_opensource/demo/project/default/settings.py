@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_elasticsearch',
-    'ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig',
+    'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
 ]
 
 MIDDLEWARE_CLASSES = (

@@ -60,3 +60,11 @@ ievv_elasticsearch2.indexingmanager.Registry.get_instance().add(
         ]
     )
 )
+
+"""
+Trigger a change (devilry_update_assignment_name)
+    - Triggers one or more actions (some may be realtime, and some background, with different priorities)
+    - For each action
+        - Wait if we have overlapping actions
+        - Execute action
+"""
