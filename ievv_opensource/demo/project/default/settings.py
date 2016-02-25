@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
+    'ievv_opensource.demo.elasticsearch2demo.apps.ElasticSearch2DemoAppConfig',
     'ievv_opensource.ievvtasks_common',
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',

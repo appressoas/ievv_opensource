@@ -54,7 +54,9 @@ ievv_elasticsearch2.indexingmanager.Registry.get_instance().add(
                 signalpath='ievv_opensource.demo.elasticsearch2.models.on_change_company_name',
                 actions=[
                     ievv_elasticsearch2.indexingmanager.Action(action='reindex'),
-                    ievv_elasticsearch2.indexingmanager.Action(action='reindex_employee_count'),
+                    ievv_elasticsearch2.indexingmanager.Action(action='reindex_employee_count',
+                                                               mode='background',
+                                                               worker='highpriority'),
                 ]
             )
         ]

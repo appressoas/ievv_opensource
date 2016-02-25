@@ -87,5 +87,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Oslo'
 CELERY_IMPORTS = [
-    'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks'
+    # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
+    'ievv_opensource.ievv_batchframework.celery_tasks',
 ]
