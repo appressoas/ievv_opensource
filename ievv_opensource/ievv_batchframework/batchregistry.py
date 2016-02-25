@@ -61,6 +61,8 @@ class ActionGroup(object):
             'actiongroup_name': self.name
         }
         full_kwargs.update(kwargs)
+        # batchoperation = BatchOperation.objects.create_asyncronous(....)
+        # full_kwargs['batchoperation_id'] = batchoperation.id
         celeryapp.send_task(
             name=self.__get_route_to_callable(),
             actiongroup_name=self.name,
@@ -85,12 +87,16 @@ class Registry(Singleton):
         super(Registry, self).__init__()
 
     def add_default_route_to_receivers(self):
-        self.add_route_to_receiver(
+        self.add_route_to_alias(
             route_to_alias=self.ROUTE_TO_ALIAS_DEFAULT,
             route_to_callable='ievv_opensource.ievv_batchframework.celery_tasks.default',
         )
+        self.add_route_to_alias(
+            route_to_alias=self.ROUTE_TO_ALIAS_HIGHPRIORITY,
+            route_to_callable='ievv_opensource.ievv_batchframework.celery_tasks.highpriority',
+        )
 
-    def add_route_to_receiver(self, route_to_alias, route_to_callable):
+    def add_route_to_alias(self, route_to_alias, route_to_callable):
         self.route_to_map[route_to_alias] = route_to_callable
 
     def add_actiongroup(self, actiongroup):
