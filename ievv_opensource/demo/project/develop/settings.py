@@ -57,6 +57,7 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(port=9001),
         ievvdevrun.runnables.redis_server.RunnableThread(port='6381'),
+        ievvdevrun.runnables.celery_worker.RunnableThread(app='ievv_opensource.demo'),
         ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
         ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
     ),
@@ -78,19 +79,3 @@ IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
         'port': '9252'
     }
 }
-
-
-BROKER_URL = 'redis://localhost:6381'
-CELERY_RESULT_BACKEND = 'redis://localhost:6381'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Europe/Oslo'
-CELERY_IMPORTS = [
-    # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
-    'ievv_opensource.ievv_batchframework.celery_tasks',
-]
-CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
-                          '[%(name)s] ' \
-                          '[%(task_name)s(%(task_id)s)] ' \
-                          '%(message)s'

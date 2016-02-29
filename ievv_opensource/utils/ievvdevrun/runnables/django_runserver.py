@@ -30,6 +30,11 @@ class RunnableThread(base.ShellCommandRunnableThread):
     default_autorestart_on_crash = True
 
     def __init__(self, host='127.0.0.1', port='8000'):
+        """
+        Args:
+            host: The host to run the Django server on. Defaults to ``"127.0.0.1"``.
+            port: The port to run the Django server on. Defaults to ``"8000"``.
+        """
         self.host = host
         self.port = port
         super(RunnableThread, self).__init__()

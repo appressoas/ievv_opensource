@@ -5,7 +5,7 @@ from ievv_opensource.utils.ievvdevrun.runnables import base
 
 class RunnableThread(base.ShellCommandRunnableThread):
     """
-    redis-server runnable thread.
+    Celery worker runnable thread.
 
     Examples:
 
@@ -13,7 +13,8 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
             IEVVTASKS_DEVELOPRUN_THREADLIST = {
                 'default': ievvdevrun.config.RunnableThreadList(
-                    ievvdevrun.runnables.redis_server.RunnableThread()
+                    ievvdevrun.runnables.celery_worker.RunnableThread(
+                        app='myproject')
                 )
             }
 
@@ -21,7 +22,8 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
             IEVVTASKS_DEVELOPRUN_THREADLIST = {
                 'default': ievvdevrun.config.RunnableThreadList(
-                    ievvdevrun.runnables.redis_server.RunnableThread(
+                    ievvdevrun.runnables.celery_worker.RunnableThread(
+                        app='myproject',
                         autorestart_on_crash=False)
                 )
             }
@@ -29,19 +31,22 @@ class RunnableThread(base.ShellCommandRunnableThread):
     """
     default_autorestart_on_crash = True
 
-    def __init__(self, port='6379'):
+    def __init__(self, app, loglevel='debug'):
         """
         Args:
-            port: The port to run the Redis server on. Defaults to ``"6379"``.
+            app: The Celery app to start - the python path to the module where you
+                import your celery app in ``__init__.py``.
+            loglevel: The Celery loglevel (``-l`` command line argument). Defaults to ``"debug"``.
         """
-        self.port = port
+        self.app = app
+        self.loglevel = loglevel
         super(RunnableThread, self).__init__()
 
     def get_logger_name(self):
-        return 'Redis server'
+        return 'Celery worker'
 
     def get_command_config(self):
         return {
-            'executable': 'redis-server',
-            'args': ['--port', self.port]
+            'executable': 'celery',
+            'args': ['-A', self.app, 'worker', '-l', self.loglevel]
         }
