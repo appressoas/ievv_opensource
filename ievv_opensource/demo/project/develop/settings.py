@@ -90,3 +90,7 @@ CELERY_IMPORTS = [
     # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
     'ievv_opensource.ievv_batchframework.celery_tasks',
 ]
+CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
+                          '[%(name)s] ' \
+                          '[%(task_name)s(%(task_id)s)] ' \
+                          '%(message)s'

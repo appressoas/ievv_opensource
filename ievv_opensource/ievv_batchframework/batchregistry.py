@@ -1,23 +1,40 @@
+import logging
 from collections import OrderedDict
 
-from ievv_opensource.ievv_batchframework import celery_tasks
+from celery.utils.log import get_task_logger
+from django.conf import settings
+from django.utils.module_loading import import_string
+
 from ievv_opensource.utils.singleton import Singleton
 
-from ievv_opensource.demo.project.celery import app as celeryapp
+
+# def make_action(actionclass, name='UnnamedAction'):
+#     return type(name, (actionclass,))
 
 
 class Action(object):
-    def __init__(self, name='unnamed action'):
-        self.name = name
+    @classmethod
+    def run(cls, kwargs, executed_by_celery):
+        action = cls(kwargs=kwargs, executed_by_celery=executed_by_celery)
+        action.execute()
 
-    def run(self, **kwargs):
-        print()
-        print("*" * 70)
-        print()
-        print(kwargs)
-        print()
-        print("*" * 70)
-        print()
+    def __init__(self, kwargs, executed_by_celery=False):
+        self.kwargs = kwargs
+        self.executed_by_celery = executed_by_celery
+        # self.logger = kwargs['logger']
+
+    @property
+    def logger(self):
+        logname = '{}.{}'.format(
+            self.__class__.__module__,
+            self.__class__.__name__)
+        if self.executed_by_celery:
+            return get_task_logger(logname)
+        else:
+            return logging.getLogger(logname)
+
+    def execute(self):
+        self.logger.info('HEI, %r', self.kwargs)
 
 
 class ActionGroup(object):
@@ -48,14 +65,14 @@ class ActionGroup(object):
     def get_mode(self, **kwargs):
         return self.mode
 
-    def run_syncronous(self, **kwargs):
+    def run_syncronous(self, kwargs, executed_by_celery=False):
         for action in self.actions:
-            action.run(**kwargs)
+            action.run(kwargs=kwargs, executed_by_celery=executed_by_celery)
 
     def __get_route_to_callable(self):
         return self.registry.route_to_map[self.route_to_alias]
 
-    def run_asyncronous(self, **kwargs):
+    def run_asyncronous(self, kwargs):
         # celery_tasks.default.delay(actiongroup_name=self.name)
         full_kwargs = {
             'actiongroup_name': self.name
@@ -63,6 +80,7 @@ class ActionGroup(object):
         full_kwargs.update(kwargs)
         # batchoperation = BatchOperation.objects.create_asyncronous(....)
         # full_kwargs['batchoperation_id'] = batchoperation.id
+        celeryapp = Registry.get_instance()._celery_app
         celeryapp.send_task(
             name=self.__get_route_to_callable(),
             actiongroup_name=self.name,
@@ -71,9 +89,9 @@ class ActionGroup(object):
     def run(self, **kwargs):
         mode = self.get_mode(**kwargs)
         if mode == self.MODE_ASYNCRONOUS:
-            self.run_asyncronous(**kwargs)
+            self.run_asyncronous(kwargs=kwargs)
         else:
-            self.run_syncronous(**kwargs)
+            self.run_syncronous(kwargs=kwargs)
 
 
 class Registry(Singleton):
@@ -83,6 +101,7 @@ class Registry(Singleton):
     def __init__(self):
         self.actiongroups = OrderedDict()
         self.route_to_map = {}
+        self.__celery_app = None
         self.add_default_route_to_receivers()
         super(Registry, self).__init__()
 
@@ -108,3 +127,9 @@ class Registry(Singleton):
 
     def run(self, actiongroup_name, **kwargs):
         self.get_actiongroup(actiongroup_name=actiongroup_name).run(**kwargs)
+
+    @property
+    def _celery_app(self):
+        if self.__celery_app is None:
+            self.__celery_app = import_string(settings.IEVV_BATCHFRAMEWORK_CELERY_APP)
+        return self.__celery_app

@@ -11,7 +11,8 @@ class BatchActionGroupTask(celery.Task):
         # batchoperation.mark_as_running(....)
         from ievv_opensource.ievv_batchframework import batchregistry
         registry = batchregistry.Registry.get_instance()
-        registry.get_actiongroup(actiongroup_name).run_syncronous(**kwargs)
+        registry.get_actiongroup(actiongroup_name).run_syncronous(kwargs=kwargs,
+                                                                  executed_by_celery=True)
         # batchoperation.mark_as_finished(success=True|False)
 
 

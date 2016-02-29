@@ -169,3 +169,6 @@ IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
 ]
 
 IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
+
+
+IEVV_BATCHFRAMEWORK_CELERY_APP = 'ievv_opensource.demo.project.celery.app'
