@@ -20,14 +20,14 @@ class BatchOperationManager(models.Manager):
         batchoperation.save()
         return batchoperation
 
-    def create_syncronous(self, input_data=None, **kwargs):
+    def create_synchronous(self, input_data=None, **kwargs):
         """
-        Create a syncronous :class:`.BatchOperation`.
+        Create a synchronous :class:`.BatchOperation`.
 
-        An syncronous batch operation starts with :obj:`.BatchOperation.status` set
+        An synchronous batch operation starts with :obj:`.BatchOperation.status` set
         to :obj:`.BatchOperation.STATUS_RUNNING` and ``started_running_datetime``
         set just as if :meth:`.BatchOperation.mark_as_running` was called. So
-        calling this would have the same result as calling :meth:`.create_asyncronous`
+        calling this would have the same result as calling :meth:`.create_asynchronous`
         and then calling :meth:`.BatchOperation.mark_as_running`, but this will
         just use one database query instead of two.
 
@@ -47,9 +47,9 @@ class BatchOperationManager(models.Manager):
                              started_running_datetime=timezone.now(),
                              **kwargs)
 
-    def create_asyncronous(self, input_data=None, **kwargs):
+    def create_asynchronous(self, input_data=None, **kwargs):
         """
-        Create an asyncronous :class:`.BatchOperation`. An asyncronous
+        Create an asynchronous :class:`.BatchOperation`. An asynchronous
         batch operation starts with :obj:`.BatchOperation.status` set
         to :obj:`.BatchOperation.STATUS_UNPROCESSED`.
 
@@ -151,9 +151,9 @@ class BatchOperation(models.Model):
     finished_datetime = models.DateTimeField(
         null=True, blank=True)
 
-    # #: Is this an asyncronous operation? Set this to ``True`` for
+    # #: Is this an asynchronous operation? Set this to ``True`` for
     # #: background tasks (such as Celery tasks).
-    # asyncronous = models.BooleanField(
+    # asynchronous = models.BooleanField(
     #     default=False)
 
     #: The content type for :obj:`~.BatchOperation.context_object`.

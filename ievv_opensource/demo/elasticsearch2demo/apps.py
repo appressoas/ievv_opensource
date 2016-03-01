@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+
 from ievv_opensource.ievv_batchframework import batchregistry
 
 
@@ -10,7 +11,8 @@ class ElasticSearch2DemoAppConfig(AppConfig):
         batchregistry.Registry.get_instance().add_actiongroup(
             batchregistry.ActionGroup(
                 name='elasticsearch2demo_company_update',
+                # mode=ActionGroup.MODE_SYNCHRONOUS,
+                # route_to_alias=batchregistry.Registry.ROUTE_TO_ALIAS_HIGHPRIORITY,
                 actions=[
-                    batchregistry.action_factory(batchregistry.Action, name='FirstAction'),
-                    batchregistry.action_factory(batchregistry.Action, name='SecondAction'),
+                    batchregistry.Action
                 ]))

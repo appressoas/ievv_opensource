@@ -175,11 +175,11 @@ and use that to communicate the status, success/error data and
 other metadata about the batch operation.
 
 
-Asyncronous operations
-======================
-An asyncronous operation is the most common use case for
+Asynchronous operations
+=======================
+An asynchronous operation is the most common use case for
 the BatchOperation model. It is used to track a task
-that is handled (E.g.: completed) by some kind of asyncronous
+that is handled (E.g.: completed) by some kind of asynchronous
 service such as a cron job or a Celery task.
 
 Lets say you have want to send an email 15 minutes after
@@ -198,7 +198,7 @@ The code for this would look something like this::
     from ievv_opensource.ievv_batchframework.models import BatchOperation
 
     myblogpost = Blog.objects.get(...)
-    BatchOperation.objects.create_asyncronous(
+    BatchOperation.objects.create_asynchronous(
         context_object=myblogpost,
         operationtype='new-blogpost-email')
     # code to send the batch operation to the batching service (like celery)
@@ -222,9 +222,9 @@ The code for this would look something like this::
         .remove()
 
 
-Syncronous operations
-=====================
-You may also want to use BatchOperation for syncronous operations.
+Synchronous operations
+======================
+You may also want to use BatchOperation for synchronous operations.
 This is mainly useful for complex bulk create and bulk update operations.
 
 Lets say you have Game objects with a one-to-many relationship to Player
@@ -248,7 +248,7 @@ list of Card objects for your batch create operation for the cards.
 Example::
 
     game = Game.objects.get(...)
-    batchoperation = BatchOperation.objects.create_syncronous(
+    batchoperation = BatchOperation.objects.create_synchronous(
         context_object=game)
 
     players = []

@@ -111,23 +111,23 @@ class TestBatchOperationModel(test.TestCase):
 
 
 class TestBatchOperationManager(test.TestCase):
-    def test_create_syncronous(self):
-        batchoperation = BatchOperation.objects.create_syncronous()
+    def test_create_synchronous(self):
+        batchoperation = BatchOperation.objects.create_synchronous()
         self.assertEqual(BatchOperation.STATUS_RUNNING, batchoperation.status)
 
-    def test_create_syncronous_with_inputdata(self):
-        batchoperation = BatchOperation.objects.create_syncronous(
+    def test_create_synchronous_with_inputdata(self):
+        batchoperation = BatchOperation.objects.create_synchronous(
             input_data={'hello': 'world'})
         self.assertEqual(
             '{"hello": "world"}',
             batchoperation.input_data_json)
 
-    def test_create_asyncronous(self):
-        batchoperation = BatchOperation.objects.create_asyncronous()
+    def test_create_asynchronous(self):
+        batchoperation = BatchOperation.objects.create_asynchronous()
         self.assertEqual(BatchOperation.STATUS_UNPROCESSED, batchoperation.status)
 
-    def test_create_asyncronous_with_inputdata(self):
-        batchoperation = BatchOperation.objects.create_asyncronous(
+    def test_create_asynchronous_with_inputdata(self):
+        batchoperation = BatchOperation.objects.create_asynchronous(
             input_data={'hello': 'world'})
         self.assertEqual(
             '{"hello": "world"}',

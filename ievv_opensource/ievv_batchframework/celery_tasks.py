@@ -12,7 +12,7 @@ logger = get_task_logger(__name__)
 class BatchActionGroupTask(celery.Task):
     abstract = True
 
-    def syncronously_run_actiongroup(self, actiongroup_name, batchoperation_id, **kwargs):
+    def run_actiongroup(self, actiongroup_name, batchoperation_id, **kwargs):
         try:
             batchoperation = BatchOperation.objects.get(id=batchoperation_id,
                                                         status=BatchOperation.STATUS_UNPROCESSED)
@@ -23,7 +23,7 @@ class BatchActionGroupTask(celery.Task):
             batchoperation.mark_as_running()
 
             registry = batchregistry.Registry.get_instance()
-            registry.get_actiongroup(actiongroup_name).run_blocking(action_kwargs=kwargs,
+            registry.get_actiongroup(actiongroup_name).run_blocking(kwargs=kwargs,
                                                                     executed_by_celery=True)
             batchoperation.finish(failed=False,
                                   output_data=None)
@@ -31,9 +31,9 @@ class BatchActionGroupTask(celery.Task):
 
 @celery.shared_task(base=BatchActionGroupTask)
 def default(**kwargs):
-    default.syncronously_run_actiongroup(**kwargs)
+    default.run_actiongroup(**kwargs)
 
 
 @celery.shared_task(base=BatchActionGroupTask)
 def highpriority(**kwargs):
-    highpriority.syncronously_run_actiongroup(**kwargs)
+    highpriority.run_actiongroup(**kwargs)

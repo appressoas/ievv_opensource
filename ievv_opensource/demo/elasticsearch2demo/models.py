@@ -21,12 +21,21 @@ def on_company_post_save(sender, instance, created, **kwargs):
     if created:
         pass
     else:
-        batchregistry.Registry.get_instance().run(
+        executioninfo = batchregistry.Registry.get_instance().run(
             actiongroup_name='elasticsearch2demo_company_update',
-            action_kwargs={'company_id': company.id},
+            kwargs={'company_id': company.id},
             batchoperation_options={
                 'context_object': company
             })
+        print()
+        print("*" * 70)
+        print()
+        print(executioninfo)
+        print()
+        print("*" * 70)
+        print()
+
+
 
 
 # @receiver(post_save, sender=Employee)
