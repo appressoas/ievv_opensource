@@ -11,7 +11,7 @@ class ElasticSearch2DemoAppConfig(AppConfig):
         batchregistry.Registry.get_instance().add_actiongroup(
             batchregistry.ActionGroup(
                 name='elasticsearch2demo_company_update',
-                # mode=ActionGroup.MODE_SYNCHRONOUS,
+                # mode=batchregistry.ActionGroup.MODE_SYNCHRONOUS,
                 # route_to_alias=batchregistry.Registry.ROUTE_TO_ALIAS_HIGHPRIORITY,
                 actions=[
                     batchregistry.Action

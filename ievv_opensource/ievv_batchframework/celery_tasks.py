@@ -23,10 +23,17 @@ class BatchActionGroupTask(celery.Task):
             batchoperation.mark_as_running()
 
             registry = batchregistry.Registry.get_instance()
-            registry.get_actiongroup(actiongroup_name).run_blocking(kwargs=kwargs,
-                                                                    executed_by_celery=True)
-            batchoperation.finish(failed=False,
-                                  output_data=None)
+            full_kwargs = {
+                'started_by': batchoperation.started_by,
+                'context_object': batchoperation.context_object,
+                'executed_by_celery': True
+            }
+            full_kwargs.update(kwargs)
+
+            actiongroupresult = registry.get_actiongroup(actiongroup_name)\
+                .run_blocking(**full_kwargs)
+            batchoperation.finish(failed=actiongroupresult.failed,
+                                  output_data=actiongroupresult.to_dict())
 
 
 @celery.shared_task(base=BatchActionGroupTask)

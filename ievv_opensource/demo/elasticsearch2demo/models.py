@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -23,10 +24,9 @@ def on_company_post_save(sender, instance, created, **kwargs):
     else:
         executioninfo = batchregistry.Registry.get_instance().run(
             actiongroup_name='elasticsearch2demo_company_update',
-            kwargs={'company_id': company.id},
-            batchoperation_options={
-                'context_object': company
-            })
+            context_object=company,
+            started_by=get_user_model().objects.first(),
+        )
         print()
         print("*" * 70)
         print()
@@ -34,7 +34,6 @@ def on_company_post_save(sender, instance, created, **kwargs):
         print()
         print("*" * 70)
         print()
-
 
 
 

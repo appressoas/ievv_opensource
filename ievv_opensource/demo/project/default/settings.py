@@ -24,6 +24,9 @@ DATABASES = {
 }
 DATABASES['default']['PORT'] = 23653
 
+LOGIN_URL = '/cradmin_authenticate/login'
+LOGIN_REDIRECT_URL = '/superuser/'
+
 
 # Application definition
 
@@ -35,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
+    'django_cradmin',
+    'django_cradmin.apps.cradmin_authenticate',
     # 'kombu.transport.django',
     'sorl.thumbnail',
     'django_dbdev',
@@ -71,7 +76,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
+ROOT_URLCONF = 'ievv_opensource.demo.project.develop.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'

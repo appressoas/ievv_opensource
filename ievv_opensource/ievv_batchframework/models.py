@@ -209,6 +209,9 @@ class BatchOperation(models.Model):
     output_data_json = models.TextField(
         null=False, blank=True, default='')
 
+    class Meta:
+        ordering = ['-created_datetime']
+
     @property
     def input_data(self):
         """
@@ -303,6 +306,7 @@ class BatchOperation(models.Model):
             self.result = self.RESULT_SUCCESSFUL
         if output_data:
             self.output_data = output_data
+        self.status = self.STATUS_FINISHED
         self.finished_datetime = timezone.now()
         self.clean()
         self.save()
@@ -316,3 +320,16 @@ class BatchOperation(models.Model):
             raise ValidationError({
                 'started_running_datetime': 'Can not be None when status is "running" or "finished".'
             })
+
+    def __str__(self):
+        return \
+            '#{id}-{operationtype}({created_datetime})[{status}, {result}]' \
+            ' - {context_content_type}#{context_object_id}'.format(
+                id=self.id,
+                operationtype=self.operationtype,
+                created_datetime=self.created_datetime,
+                status=self.status,
+                result=self.result,
+                context_content_type=self.context_content_type,
+                context_object_id=self.context_object_id
+            )
