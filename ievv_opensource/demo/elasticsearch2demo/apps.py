@@ -11,5 +11,6 @@ class ElasticSearch2DemoAppConfig(AppConfig):
             batchregistry.ActionGroup(
                 name='elasticsearch2demo_company_update',
                 actions=[
-                    batchregistry.Action
+                    batchregistry.action_factory(batchregistry.Action, name='FirstAction'),
+                    batchregistry.action_factory(batchregistry.Action, name='SecondAction'),
                 ]))

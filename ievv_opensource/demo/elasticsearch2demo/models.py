@@ -1,8 +1,7 @@
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from ievv_opensource.demo.elasticsearch2demo import elasticsearch2demo_signals
 from ievv_opensource.ievv_batchframework import batchregistry
 
 
@@ -18,12 +17,16 @@ class Employee(models.Model):
 
 @receiver(post_save, sender=Company)
 def on_company_post_save(sender, instance, created, **kwargs):
+    company = instance
     if created:
         pass
     else:
         batchregistry.Registry.get_instance().run(
             actiongroup_name='elasticsearch2demo_company_update',
-            company_id=instance.id)
+            action_kwargs={'company_id': company.id},
+            batchoperation_options={
+                'context_object': company
+            })
 
 
 # @receiver(post_save, sender=Employee)

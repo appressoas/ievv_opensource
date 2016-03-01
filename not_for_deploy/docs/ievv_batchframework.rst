@@ -156,6 +156,15 @@ to start the Django server, redis and the celery worker. To test that everything
    If this works, Celery is configured correctly.
 
 
+*****************
+Batchregistry API
+*****************
+
+.. currentmodule:: ievv_opensource.ievv_batchframework.batchregistry
+
+.. automodule:: ievv_opensource.ievv_batchframework.batchregistry
+
+
 ************************
 The BatchOperation model
 ************************
@@ -269,7 +278,6 @@ no matter how many players we have (or a few more on database servers that can
 not bulk create 1000 items at a time).
 
 
-
 **************
 Data model API
 **************
@@ -277,4 +285,3 @@ Data model API
 .. currentmodule:: ievv_opensource.ievv_batchframework.models
 
 .. automodule:: ievv_opensource.ievv_batchframework.models
-    :members:

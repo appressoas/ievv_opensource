@@ -279,14 +279,14 @@ support ``2``.
 
 
 
-*******
+*******************
 ievv_elasticsearch2
-*******
+*******************
 
 .. setting:: IEVV_ELASTICSEARCH2_CONNECTION_ALIASES
 
 IEVV_ELASTICSEARCH2_CONNECTION_ALIASES
-==========================
+======================================
 Setup elasticsearch connections (almost exactly like setting up Django databases). Example::
 
     IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
@@ -335,7 +335,7 @@ and :meth:`ievv_opensource.ievv_elasticsearch2.search.Search.using`::
 .. setting:: IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
 
 IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS
-===============================================
+===========================================================
 If this is ``True``, it makes :class:`ievv_opensource.ievv_elasticsearch2.transport.debug.DebugTransport`
 prettyprint all requests performed by any :class:`elasticsearch.client.Elasticsearch`
 object it is configured as the ``transport_class`` for.

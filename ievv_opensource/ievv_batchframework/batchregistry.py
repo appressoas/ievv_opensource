@@ -5,6 +5,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.utils.module_loading import import_string
 
+from ievv_opensource.ievv_batchframework.models import BatchOperation
 from ievv_opensource.utils.singleton import Singleton
 
 
@@ -12,11 +13,64 @@ from ievv_opensource.utils.singleton import Singleton
 #     return type(name, (actionclass,))
 
 
+class ActionGroupResult(object):
+    def __init__(self, actiongroup):
+        self.actiongroup = actiongroup
+        self._actionresults = []
+
+
+def action_factory(baseclass, name):
+    """
+    Factory for creating :class:`.Action` classes. This is simply
+    a thin wrapper around ``type`` to dynamically create a subclass
+    of the given ``baseclass`` with a different name.
+
+    There are two use cases for using this:
+
+    - Give re-usable action classes a better name.
+    - Use the same :class:`.Action` subclass multiple times in the same
+      :class:`.ActionGroup`.
+
+    Both of these cases can also be solved with subclasses, and that
+    is normally a better solution.
+
+    Args:
+        baseclass: The class to create a subclass of.
+        name: The name of the subclass.
+    """
+    return type(name, (baseclass,), {})
+
+
 class Action(object):
+    """
+    An action is the subclass for code that can be executed as
+    part of an :class:`.ActionGroup`.
+
+    You create a subclass of this class, and override :meth:`.exectute`
+    to implement an action, and you add your subclass to an
+    :class:`.ActionGroup` to use your action class.
+    """
     @classmethod
     def run(cls, kwargs, executed_by_celery):
+        """
+        Run the action - used internally.
+
+        Args:
+            kwargs: Kwargs for the action.
+            executed_by_celery: Must be ``True`` if the action is executed by a celery task.
+                This is required to configure the correct logger.
+        """
         action = cls(kwargs=kwargs, executed_by_celery=executed_by_celery)
         action.execute()
+
+    @classmethod
+    def get_name(cls):
+        """
+        Get the name of this action.
+        """
+        return '{}.{}'.format(
+            cls.__module__,
+            cls.__name__)
 
     def __init__(self, kwargs, executed_by_celery=False):
         self.kwargs = kwargs
@@ -25,76 +79,245 @@ class Action(object):
 
     @property
     def logger(self):
-        logname = '{}.{}'.format(
-            self.__class__.__module__,
-            self.__class__.__name__)
+        """
+        Get the logger for this action.
+        """
+        logname = self.__class__.get_name()
         if self.executed_by_celery:
             return get_task_logger(logname)
         else:
             return logging.getLogger(logname)
 
     def execute(self):
-        self.logger.info('HEI, %r', self.kwargs)
+        """
+        Exectute the action. Must be overridden in subclasses.
+        """
+        self.logger.info('Testing, %r', self.kwargs)
 
 
 class ActionGroup(object):
+    """
+    An ActionGroup is a list of :class:`actions <.Action>` that can be
+    executed both syncronously and asyncronously.
+    """
+
+    #: Constant for asyncronous (background/Celery) mode of execution.
     MODE_ASYNCRONOUS = 'asyncronous'
+
+    #: Constant for syncronous (blocking) mode of execution.
     MODE_SYNCRONOUS = 'syncronous'
 
     def __init__(self, name, actions=None, mode=None, route_to_alias=None):
+        """
+        Args:
+            name: The name of the ActionGroup.
+            actions: A list of actions.
+            mode: The default mode of the ActionGroup.
+                Defaults to :obj:`~.ActionGroup.MODE_ASYNCRONOUS`.
+                You will often want to determine this from the input
+                (I.E.: Use asyncronous if sending more than 500 newsletters),
+                and this can be done by extending this class and overriding
+                :meth:`.get_mode`.
+            route_to_alias: Defines where to route this ActionGroup when
+                is is executed in asyncronous mode. Defaults to
+                :obj:`.Registry.ROUTE_TO_ALIAS_DEFAULT`.
+                You can determine the route dynamically each time the ActionGroup
+                is executed by overriding :meth:`.get_route_to_alias`.
+        """
         self.name = name
         self.mode = mode or self.MODE_ASYNCRONOUS
         self.route_to_alias = route_to_alias or Registry.ROUTE_TO_ALIAS_DEFAULT
-
-        if self.mode == self.MODE_SYNCRONOUS and route_to_alias is None:
-            raise ValueError('Can not specify a route_to_alias unless mode is {!r}'.format(
-                self.MODE_ASYNCRONOUS))
-
-        self.actions = []
+        self.actions = OrderedDict()
         self.registry = None  # Set when the ActionGroup is added to the Registry
         if actions:
             self.add_actions(actions=actions)
 
     def add_action(self, action):
-        self.actions.append(action)
+        """
+        Add a action.
+
+        Args:
+            action: A subclass of :class:`.Action` (not an object, but a class).
+        """
+        name = action.get_name()
+        if name in self.actions:
+            raise ValueError(
+                'Duplicate action class in one ActionGroup: {name}. '
+                'You can not register more than one action of the same class in the same '
+                'ActionGroup. Create multiple subclasses of {name}, or use batchregistry.action_factory: '
+                'actions=[batchregistry.action_factory({classname}, name="FirstAction"), '
+                'batchregistry.action_factory({classname}, name="SecondAction")].'.format(
+                    name=name, classname=action.__name__))
+        self.actions[name] = action
 
     def add_actions(self, actions):
+        """
+        Add actions.
+
+        Args:
+            actions: A list of :class:`.Action` subclasses (classes not actions).
+        """
         for action in actions:
             self.add_action(action=action)
 
-    def get_mode(self, **kwargs):
+    def get_mode(self, action_kwargs):
+        """
+        Get the mode to run the ActionGroup in.
+        Must return one of :obj:`~.ActionGroup.MODE_ASYNCRONOUS` or :obj:`~.ActionGroup.MODE_SYNCRONOUS`.
+
+        The use-case for overriding this method is optimization. Lets say
+        you have to re-index your blogposts in a search engine each time they
+        are updated. If you update just a few blogpost, you may want to do
+        that in syncronous mode, but if you update 500 blogposts, you will
+        probably want to re-index in syncronous mode (I.E. in Celery).
+
+        Args:
+            action_kwargs: The ``action_kwargs`` the user provided to :meth:`.run`.
+        """
         return self.mode
 
-    def run_syncronous(self, kwargs, executed_by_celery=False):
-        for action in self.actions:
-            action.run(kwargs=kwargs, executed_by_celery=executed_by_celery)
+    def get_route_to_alias(self, action_kwargs):
+        """
+        Define where to route this ActionGroup when is is executed in asyncronous mode.
+
+        This is the method you want to override to handle priority of your
+        asyncronously executed ActionGroups.
+
+        Lets say you have a huge blog, with lots of
+        traffic. After updating a blogpost, you need to do some heavy postprocessing
+        (image optimization, video transcoding, etc.). If you update a newly posted blogpost
+        this postprocessing should be placed in a high-priority queue, and if you update an old
+        blogpost, this postprocessing should be placed in a low-priority queue. To achieve this,
+        you simply need to create a subclass of ActionGroup, and override this method
+        to return :obj:`.Registry.ROUTE_TO_ALIAS_HIGHPRIORITY` for recently created blogpost, and
+        :obj:`.Registry.ROUTE_TO_ALIAS_DEFAULT` for old blogposts.
+
+        Args:
+            action_kwargs: The ``action_kwargs`` the user provided to :meth:`.run_asyncronous`.
+
+        Returns:
+            str: One of the route-to aliases added to the :class:`.Registry`
+            using :meth:`.Registry.add_route_to_alias`. This will always include
+            :obj:`.Registry.ROUTE_TO_ALIAS_DEFAULT` and :obj:`.Registry.ROUTE_TO_ALIAS_HIGHPRIORITY`.
+        """
+        return self.route_to_alias
+
+    def run_blocking(self, action_kwargs, executed_by_celery=False):
+        # This method is for internal use only.
+        for action in self.actions.values():
+            action.run(kwargs=action_kwargs, executed_by_celery=executed_by_celery)
+
+    def run_syncronous(self, action_kwargs):
+        """
+        Run the ActionGroup in blocking/syncronous mode.
+
+        Args:
+            action_kwargs: Kwargs for :class:`.Action`.
+        """
+        self.run_blocking(action_kwargs=action_kwargs)
 
     def __get_route_to_callable(self):
         return self.registry.route_to_map[self.route_to_alias]
 
-    def run_asyncronous(self, kwargs):
-        # celery_tasks.default.delay(actiongroup_name=self.name)
+    def get_batchoperation_options(self, action_kwargs, batchoperation_options):
+        """
+        You can override this if you create a re-usable ActionGroup subclass that
+        sets options for the :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`
+        based on ``action_kwargs``.
+
+        Called by :meth:`.run_asyncronous` to get the kwargs for
+        :meth:`ievv_opensource.ievv_batchframework.models.BatchOperationManager.create_asyncronous`.
+
+        If you override this, you should normally call ``super()``, and update the kwargs
+        returned by super.
+
+        Args:
+            action_kwargs: The ``action_kwargs`` the user provided to :meth:`.run_asyncronous`.
+            batchoperation_options: The ``batchoperation_options`` the user provided to
+                :meth:`.run_asyncronous`.
+
+        Returns:
+            dict: Kwargs for
+            :meth:`ievv_opensource.ievv_batchframework.models.BatchOperationManager.create_asyncronous`
+        """
+        batchoperation_options = batchoperation_options or {}
+        return batchoperation_options
+
+    def create_batchoperation(self, action_kwargs, batchoperation_options):
+        """
+        Used by :meth:`.run_asyncronous` to create the
+        :class:`ievv_opensource.ievv_batchframework.models.BatchOperation` object.
+
+        You normally do not need to override this - override :meth:`.get_batchoperation_options`
+        instead. Overriding this may lead to breaking code if the inner workings of this framework
+        is changed/optimized in the future.
+
+        Args:
+            action_kwargs: See :meth:`.run_asyncronous`.
+            batchoperation_options: See :meth:`.run_asyncronous`.
+
+        Returns:
+            BatchOperation: The created :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`.
+        """
+        batchoperation_options = self.get_batchoperation_options(action_kwargs=action_kwargs,
+                                                                 batchoperation_options=batchoperation_options)
+        batchoperation = BatchOperation.objects.create_asyncronous(**batchoperation_options)
+        return batchoperation
+
+    def run_asyncronous(self, action_kwargs, batchoperation_options=None):
+        """
+        Args:
+            action_kwargs: Kwargs for :class:`.Action`.
+            batchoperation_options: Kwargs for
+                :meth:`ievv_opensource.ievv_batchframework.models.BatchOperationManager.create_asyncronous`.
+                These are processes by :meth:`.get_batchoperation_options` before they are used
+                with ``create_asyncronous()``. The default implementation of :meth:`.get_batchoperation_options`
+                does nothing with any provided ``batchoperation_options``, but if you use a custom
+                :class:`.ActionGroup` you need to know that your provided ``batchoperation_options``
+                may be overridden.
+        """
+        batchoperation = self.create_batchoperation(action_kwargs=action_kwargs,
+                                                    batchoperation_options=batchoperation_options)
         full_kwargs = {
-            'actiongroup_name': self.name
+            'actiongroup_name': self.name,
+            'batchoperation_id': batchoperation.id
         }
-        full_kwargs.update(kwargs)
-        # batchoperation = BatchOperation.objects.create_asyncronous(....)
-        # full_kwargs['batchoperation_id'] = batchoperation.id
-        celeryapp = Registry.get_instance()._celery_app
+        full_kwargs.update(action_kwargs)
+
+        celeryapp = Registry.get_instance().celery_app
         celeryapp.send_task(
             name=self.__get_route_to_callable(),
             actiongroup_name=self.name,
             kwargs=full_kwargs)
 
-    def run(self, **kwargs):
-        mode = self.get_mode(**kwargs)
+    def run(self, action_kwargs, batchoperation_options=None):
+        """
+        Runs one of :meth:`.run_asyncronous` and :meth:`.run_syncronous`. The method to
+        run is determined by the return-value of :meth:`.get_mode`:
+
+        - If :meth:`.get_mode` returns :obj:`~.ActionGroup.MODE_ASYNCRONOUS`, :meth:`.run_asyncronous`
+          is called.
+        - If :meth:`.get_mode` returns :obj:`~.ActionGroup.MODE_SYNCRONOUS`, :meth:`.run_syncronous`
+          is called.
+
+        Args:
+            action_kwargs: Kwargs for :class:`.Action`. Forwarded to :meth:`.run_asyncronous` and
+                :meth:`.run_syncronous`.
+            batchoperation_options: Only used by :meth:`.run_asyncronous` - refer to its docs
+                for more details.
+        """
+        mode = self.get_mode(action_kwargs=action_kwargs)
         if mode == self.MODE_ASYNCRONOUS:
-            self.run_asyncronous(kwargs=kwargs)
+            self.run_asyncronous(action_kwargs=action_kwargs,
+                                 batchoperation_options=batchoperation_options)
         else:
-            self.run_syncronous(kwargs=kwargs)
+            self.run_syncronous(action_kwargs=action_kwargs)
 
 
 class Registry(Singleton):
+    """
+    The registry of :class:`.ActionGroup` objects.
+    """
     ROUTE_TO_ALIAS_DEFAULT = 'default'
     ROUTE_TO_ALIAS_HIGHPRIORITY = 'highpriority'
 
@@ -102,10 +325,10 @@ class Registry(Singleton):
         self.actiongroups = OrderedDict()
         self.route_to_map = {}
         self.__celery_app = None
-        self.add_default_route_to_receivers()
+        self.__add_default_route_to_aliases()
         super(Registry, self).__init__()
 
-    def add_default_route_to_receivers(self):
+    def __add_default_route_to_aliases(self):
         self.add_route_to_alias(
             route_to_alias=self.ROUTE_TO_ALIAS_DEFAULT,
             route_to_callable='ievv_opensource.ievv_batchframework.celery_tasks.default',
@@ -116,20 +339,72 @@ class Registry(Singleton):
         )
 
     def add_route_to_alias(self, route_to_alias, route_to_callable):
+        """
+        Add a route-to alias.
+
+        Args:
+            route_to_alias (str): The alias.
+            route_to_callable (str): The pythonpath of a Celery task as a string.
+        """
         self.route_to_map[route_to_alias] = route_to_callable
 
     def add_actiongroup(self, actiongroup):
+        """
+        Add an :class:`.ActionGroup` to the registry.
+
+        Args:
+            actiongroup: The :class:`.ActionGroup` object to add.
+        """
         actiongroup.registry = self
         self.actiongroups[actiongroup.name] = actiongroup
 
+    def remove_actiongroup(self, actiongroup_name):
+        """
+        Remove an :class:`ActionGroup` from the registry.
+
+        Args:
+            actiongroup_name: The name of the actiongroup.
+
+        Raises:
+            KeyError: If no :class:`.ActionGroup` with the provided
+                ``actiongroup_name`` exists in the registry.
+        """
+        del self.actiongroups[actiongroup_name]
+
     def get_actiongroup(self, actiongroup_name):
+        """
+        Get an :class:`.ActionGroup` object from the registry.
+
+        Args:
+            actiongroup_name: The name of the actiongroup.
+
+        Returns:
+            ActionGroup: An :class:`.ActionGroup` object.
+
+        Raises:
+            KeyError: If no :class:`.ActionGroup` with the provided
+                ``actiongroup_name`` exists in the registry.
+        """
         return self.actiongroups[actiongroup_name]
 
-    def run(self, actiongroup_name, **kwargs):
-        self.get_actiongroup(actiongroup_name=actiongroup_name).run(**kwargs)
+    def run(self, actiongroup_name, action_kwargs, batchoperation_options):
+        r"""
+        Shortcut for::
+
+            Registry.get_instance().get_actiongroup(actiongroup_name)\
+                .run(action_kwargs, batchoperation_options)
+
+        .. seealso:: :meth:`.get_actiongroup` and :meth:`.ActionGroup.run`.
+        """
+        self.get_actiongroup(actiongroup_name=actiongroup_name).run(
+            action_kwargs=action_kwargs,
+            batchoperation_options=batchoperation_options)
 
     @property
-    def _celery_app(self):
+    def celery_app(self):
+        """
+        Property that gets the Celery app used by the registry to execute asyncronous tasks.
+        """
         if self.__celery_app is None:
             self.__celery_app = import_string(settings.IEVV_BATCHFRAMEWORK_CELERY_APP)
         return self.__celery_app

@@ -54,8 +54,8 @@ extlinks = {
 intersphinx_mapping = {
     'python': ('http://python.readthedocs.org/en/latest/', None),
     'django': ('http://django.readthedocs.org/en/latest/', None),
-    'elasticsearch-dsl': ('http://elasticsearch-dsl.readthedocs.org/en/latest/', None),
-    'elasticsearch-py': ('https://elasticsearch-py.readthedocs.org/en/latest/', None),
+    'elasticsearchdsl': ('http://elasticsearch-dsl.readthedocs.org/en/latest/', None),
+    'elasticsearchpy': ('https://elasticsearch-py.readthedocs.org/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
