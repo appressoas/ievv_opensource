@@ -37,10 +37,9 @@ class DocTypeMeta(ElasticSearchDocTypeMeta):
                 _update_searchobject_for_doctype(doctype_class=doctype_class,
                                                  attributename=key)
         if hasattr(doctype_class, 'indexupdater'):
-            indexupdater_class = doctype_class.indexupdater.__class__
-            doctype_class.indexupdater = indexupdater_class(
-                doctype_class=doctype_class
-            )
+            doctype_class.indexupdater.doctype_class = doctype_class
+        if hasattr(doctype_class, 'modelmapper'):
+            doctype_class.modelmapper.set_doctype_class(doctype_class=doctype_class)
 
         return doctype_class
 
