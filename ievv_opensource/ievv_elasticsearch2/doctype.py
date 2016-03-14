@@ -51,3 +51,23 @@ class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
         logger.warning('You should use {classname}.objects instead of {classname}.search().'.format(
             classname=cls.__name__))
         return super(DocType, cls).search(*args, **kwargs)
+
+    def get_from_index(self):
+        """
+        Get this document from the search index. Simply performs a GET on the
+        ID of this document and returns the result.
+        """
+        return self.__class__.get(id=self.meta.id)
+
+    def flush_index(self, using=None):
+        """
+        Flush the index this document belongs to.
+
+        Useful if you need to retrieve data that was updated in the index, but
+        may not be avaiable right away.
+
+        .. warning:: You should be very careful when using
+            this since it can impact performance. It is mostly useful
+            for debugging and in tests.
+        """
+        self._get_connection(using=using).flush()

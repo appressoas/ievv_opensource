@@ -66,7 +66,7 @@ class TestSearch(test.TestCase):
         # result = search.execute()
         # pprint(result)
 
-        search = PersonDocType.search().query('match', name='Peter')
+        # search = PersonDocType.search().query('match', name='Peter')
         # result = search.execute()
         # pprint(result)
 

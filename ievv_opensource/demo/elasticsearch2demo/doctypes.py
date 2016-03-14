@@ -4,7 +4,7 @@ from ievv_opensource import ievv_elasticsearch2
 
 
 class CompanyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
-    def reindex(self, company, **kwargs):
+    def index_one(self, company, **kwargs):
         company_doctype = self.doctype_class(
             id=company.id,
             name=company.name,
@@ -13,7 +13,7 @@ class CompanyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
         return company_doctype.save()
 
     def reindex_employee_count(self, company, **kwargs):
-        self.reindex(company)
+        self.index(company)
 
 
 class CompanyDocType(ievv_elasticsearch2.DocType):
@@ -31,8 +31,7 @@ class CompanyDocType(ievv_elasticsearch2.DocType):
 
 
 class EmployeeIndexUpdater(ievv_elasticsearch2.IndexUpdater):
-
-    def reindex(self, employee, **kwargs):
+    def index(self, employee):
         employee_doctype = self.doctype_class(
             id=employee.id,
             name=employee.name,
