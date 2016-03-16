@@ -32,6 +32,22 @@ class Mapping(object):
             modelfield_pretty = self.modelfieldname
         return '{}({} <-> {})'.format(self.__class__.__name__, modelfield_pretty, self.doctypefieldname)
 
+    def get_doctype_fieldnames_list(self):
+        return [self.doctypefieldname]
+
+    def validate_mapping(self, doctype_class, doctype_fieldnames):
+        for doctypefieldname in self.get_doctype_fieldnames_list():
+            if doctypefieldname not in doctype_fieldnames:
+                raise AttributeError(
+                    '{mappingfield} is mapped to '
+                    '{doctype_class_module}.{doctype_class_name}.{doctypefieldname} which does not exist.'.format(
+                        mappingfield=self,
+                        doctype_class_module=doctype_class.__module__,
+                        doctype_class_name=doctype_class.__name__,
+                        doctypefieldname=doctypefieldname
+                    )
+                )
+
     def __str__(self):
         return self.prettyformat()
 
@@ -121,16 +137,25 @@ class ForeignKeyPrefixMapping(Mapping):
         self.modelmapper = modelmapper
         self.prefix = prefix
 
-    def to_doctype_value(self, modelvalue):
+    def get_prefix(self):
         if self.prefix is None:
             prefix = '{}__'.format(self.doctypefieldname)
         else:
             prefix = self.prefix
+        return prefix
+
+    def to_doctype_value(self, modelvalue):
+        prefix = self.get_prefix()
         raw_output = self.modelmapper.to_dict(modelvalue)
         prefixed_output = {}
         for key, value in raw_output.items():
             prefixed_output['{}{}'.format(prefix, key)] = value
         return prefixed_output
+
+    def get_doctype_fieldnames_list(self):
+        prefix = self.get_prefix()
+        return ['{}{}'.format(prefix, mappingfield.doctypefieldname)
+                for mappingfield in self.modelmapper]
 
 
 class ModelmapperMeta(type):
@@ -165,6 +190,10 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             self.automap_fields()
 
     def set_doctype_class(self, doctype_class):
+        doctype_fieldnames = {fieldname for fieldname in doctype_class._doc_type.mapping}
+        for mappingfield in self.mappingfields.values():
+            mappingfield.validate_mapping(doctype_class=doctype_class,
+                                          doctype_fieldnames=doctype_fieldnames)
         self.doctype_class = doctype_class
 
     def modelfield_to_mappingfieldclass(self, modelfield):
@@ -285,5 +314,21 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
     def __str__(self):
         return self.prettyformat(separator=', ', prefix='')
 
-    def __getitem__(self, modelfieldname):
-        return self.mappingfields[modelfieldname]
+    def get_mappingfield_by_modelfieldname(self, modelfieldname, fallback=None):
+        """
+        Get mappingfield by model field name.
+
+        Args:
+            modelfieldname: Name of a model field.
+            fallback: Fallback value if the model field does not exist. Defaults to ``None``.
+
+        Returns:
+            Mapping: A :class:`.Mapping` object.
+        """
+        return self.mappingfields.get(modelfieldname, fallback)
+
+    def __iter__(self):
+        """
+        Iterate over mappingfields in this Modelmapper.
+        """
+        return iter(self.mappingfields.values())
