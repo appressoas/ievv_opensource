@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import elasticsearch_dsl
 from django import test
 from django_cradmin import datetimeutils
@@ -122,8 +120,6 @@ class TestModelmapperAutomap(test.TestCase):
     def test_automap_datetimefield(self):
         self.assertIsInstance(AutomappedDocType.modelmapper.get_mappingfield_by_modelfieldname('datetime'),
                               ievv_elasticsearch2.DateTimeMapping)
-
-    # def test_attribute_not_
 
 
 class TestModelmapperToDict(test.TestCase):

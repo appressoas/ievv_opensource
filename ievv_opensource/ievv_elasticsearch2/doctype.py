@@ -4,6 +4,7 @@ import elasticsearch_dsl
 from elasticsearch_dsl.document import DocTypeMeta as ElasticSearchDocTypeMeta
 from future.utils import with_metaclass
 
+from .modelmapper import Modelmapper
 from .search import Search
 
 logger = logging.getLogger()
@@ -70,3 +71,26 @@ class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
             for debugging and in tests.
         """
         self._get_connection(using=using).flush()
+
+
+class ModelDocTypeMeta(DocTypeMeta):
+    def __new__(cls, name, parents, dct):
+        model_class = dct['model_class']
+        modelmapper = None
+        if model_class is not None:
+            if 'modelmapper' in dct:
+                modelmapper = dct['modelmapper']
+            else:
+                modelmapper = Modelmapper(model_class=model_class, automap_fields=True)
+                dct['modelmapper'] = modelmapper
+            for doctypefieldname, doctypefield in modelmapper.automake_doctype_fields().items():
+                if doctypefieldname not in dct:
+                    dct[doctypefieldname] = doctypefield
+        doctype_class = super(ModelDocTypeMeta, cls).__new__(cls, name, parents, dct)
+        if modelmapper:
+            modelmapper.set_doctype_class(doctype_class=doctype_class)
+        return doctype_class
+
+
+class ModelDocType(with_metaclass(ModelDocTypeMeta, DocType)):
+    model_class = None

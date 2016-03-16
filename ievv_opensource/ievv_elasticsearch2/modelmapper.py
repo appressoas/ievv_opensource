@@ -1,3 +1,4 @@
+import elasticsearch_dsl
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from future.utils import with_metaclass
@@ -40,6 +41,11 @@ class FieldMapping(object):
     #: a dict, and that dict is merged into the document instead of added as a single key, value pair.
     merge_into_document = False
 
+    #: The appropriate elasticearch-dsl field class to use when
+    #: autocreating DocType fields from this FieldMapping.
+    #: Used by :meth:`.automake_doctype_fields`.
+    elasticsearchdsl_fieldclass = None
+
     def __init__(self, modelfieldname=None):
         self.modelfieldname = modelfieldname
         # Automatically set to the attribute name by ModelmapperMeta and Modelmapper.automap_field()
@@ -49,6 +55,27 @@ class FieldMapping(object):
         self.doctypefieldname = doctypefieldname
         if not self.modelfieldname:
             self.modelfieldname = doctypefieldname
+
+    def automake_doctype_fields(self, model_class):
+        """
+        Create elasticsearch-dsl :class:`elasticsearch_dsl.field.Field` objects from
+        this FieldMapping.
+
+        For simple cases you do not have to override this, but instead you
+        can just set :obj:`~.FieldMapping.elasticsearchdsl_fieldclass`.
+
+        Used by :class:`ievv_opensource.ievv_elasticsearch2.doctype.ModelDocType`.
+
+        Args:
+            model_class: The Django model class.
+
+        Returns:
+            dict: A dict where the keys is the doctype field name and the values is
+                :class:`elasticsearch_dsl.field.Field` objects.
+        """
+        return {
+            self.doctypefieldname: self.elasticsearchdsl_fieldclass()
+        }
 
     def to_doctype_value(self, modelvalue):
         """
@@ -140,54 +167,63 @@ class StringMapping(FieldMapping):
     """
     FieldMapping suitable to string fields (CharField, TextField).
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.String
 
 
 class IntegerMapping(FieldMapping):
     """
     FieldMapping suitable for integer fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Integer
 
 
 class SmallIntegerMapping(IntegerMapping):
     """
     FieldMapping suitable for small integer fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Short
 
 
 class BigIntegerMapping(IntegerMapping):
     """
     FieldMapping suitable for big integer fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Long
 
 
 class BooleanMapping(FieldMapping):
     """
     FieldMapping suitable for boolean fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Boolean
 
 
 class FloatMapping(FieldMapping):
     """
     FieldMapping suitable for float fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Float
 
 
 class DoubleMapping(FieldMapping):
     """
     FieldMapping suitable for double fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Double
 
 
 class DateMapping(FieldMapping):
     """
     FieldMapping suitable for date fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Date
 
 
 class DateTimeMapping(FieldMapping):
     """
     FieldMapping suitable for datetime fields.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Date
 
 
 class ForeignKeyObjectMapping(FieldMapping):
@@ -195,6 +231,8 @@ class ForeignKeyObjectMapping(FieldMapping):
     FieldMapping suitable for ForeignKey fields that you want to
     map as a nested object in the DocType.
     """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Object
+
     def __init__(self, modelmapper, modelfieldname=None):
         super(ForeignKeyObjectMapping, self).__init__(modelfieldname=modelfieldname)
         self.modelmapper = modelmapper
@@ -221,6 +259,17 @@ class ForeignKeyPrefixMapping(FieldMapping):
         self.modelmapper = modelmapper
         self.prefix = prefix
 
+    def __prefix_dict_keys(self, dct):
+        output_dict = {}
+        prefix = self.get_prefix()
+        for key, value in dct.items():
+            output_dict['{}{}'.format(prefix, key)] = value
+        return output_dict
+
+    def automake_doctype_fields(self, model_class):
+        foreignkey_doctype_fields = self.modelmapper.automake_doctype_fields()
+        return self.__prefix_dict_keys(foreignkey_doctype_fields)
+
     def get_prefix(self):
         if self.prefix is None:
             prefix = '{}__'.format(self.doctypefieldname)
@@ -229,12 +278,8 @@ class ForeignKeyPrefixMapping(FieldMapping):
         return prefix
 
     def to_doctype_value(self, modelvalue):
-        prefix = self.get_prefix()
         raw_output = self.modelmapper.to_dict(modelvalue)
-        prefixed_output = {}
-        for key, value in raw_output.items():
-            prefixed_output['{}{}'.format(prefix, key)] = value
-        return prefixed_output
+        return self.__prefix_dict_keys(raw_output)
 
     def get_required_doctype_fieldnames_list(self):
         prefix = self.get_prefix()
@@ -272,6 +317,22 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             self.set_doctype_class(doctype_class=doctype_class)
         if self._automap_fields:
             self.automap_fields()
+
+    def automake_doctype_fields(self):
+        """
+        Create elasticsearch-dsl :class:`elasticsearch_dsl.field.Field` objects from
+        this Modelmapper.
+
+        Used by :class:`ievv_opensource.ievv_elasticsearch2.doctype.ModelDocType`.
+
+        Returns:
+            dict: A dict where the keys is the doctype field name and the values is
+                :class:`elasticsearch_dsl.field.Field` objects.
+        """
+        doctype_fields = {}
+        for mappingfield in self.mappingfields.values():
+            doctype_fields.update(mappingfield.automake_doctype_fields(model_class=self.model_class))
+        return doctype_fields
 
     def set_doctype_class(self, doctype_class):
         doctype_fieldnames_set = {fieldname for fieldname in doctype_class._doc_type.mapping}

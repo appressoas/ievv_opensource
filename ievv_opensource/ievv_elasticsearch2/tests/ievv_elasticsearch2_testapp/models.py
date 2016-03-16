@@ -24,3 +24,7 @@ class ModelmapperModel(models.Model):
 class ModelMapperChildModel(models.Model):
     modelmappermodel = models.ForeignKey(ModelmapperModel, related_name='children')
     size = models.IntegerField(default=0, blank=True)
+
+
+class SimpleModel(models.Model):
+    name = models.CharField(max_length=255, default='', blank=True)
