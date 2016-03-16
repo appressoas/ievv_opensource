@@ -1,10 +1,39 @@
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from future.utils import with_metaclass
 
 
-class Mapping(object):
+class FieldMappingValidationError(Exception):
+    """
+    Superclass for exceptions raised when :meth:`.FieldMapping.validate_mapping` fails.
+    """
+
+
+class DoctypeFieldDoesNotExist(FieldMappingValidationError):
+    """
+    Raised when :meth:`.FieldMapping.validate_mapping` fails because
+    the referenced doctype field does not exist on the DocType.
+    """
+
+
+class ModelFieldDoesNotExist(FieldMappingValidationError):
+    """
+    Raised when :meth:`.FieldMapping.validate_mapping` fails because
+    the referenced Django model field does not exist.
+    """
+
+
+class FieldMapping(object):
     """
     Base class for all Django field to ElasticSearch field mappings.
+
+    .. attribute:: doctypefieldname
+
+        The name of the doctype field.
+
+    .. attribute:: modelfieldname
+
+        The name of the model field.
     """
 
     #: If this is ``True``, the response from :meth:`.to_doctype_value` is expected to be
@@ -22,9 +51,28 @@ class Mapping(object):
             self.modelfieldname = doctypefieldname
 
     def to_doctype_value(self, modelvalue):
+        """
+        Convert the value stored in the model to a value compatible with
+        ElasticSearch.
+
+        Args:
+            modelvalue: The value stored in the Django model.
+
+        Returns:
+            object: The converted value.
+        """
         return modelvalue
 
     def prettyformat(self, model_class=None):
+        """
+        Prettyformat this FieldMapping instance.
+
+        Args:
+            model_class: If provided, more information is included in the prettyformatted output.
+
+        Returns:
+            str: Prettyformatted information about this FieldMapping.
+        """
         if model_class:
             modelfield = model_class._meta.get_field(self.modelfieldname)
             modelfield_pretty = '{}({})'.format(modelfield.__class__.__name__, self.modelfieldname)
@@ -32,13 +80,49 @@ class Mapping(object):
             modelfield_pretty = self.modelfieldname
         return '{}({} <-> {})'.format(self.__class__.__name__, modelfield_pretty, self.doctypefieldname)
 
-    def get_doctype_fieldnames_list(self):
+    def get_required_doctype_fieldnames_list(self):
+        """
+        Get a list of doctype fieldnames this mapping maps to.
+
+        For simple fields, this returns a list only containing :attr:`~.FieldMapping.doctypefieldname`,
+        but for more complex cases where a single Django model field is mapped to multiple
+        fields in the doctype, this is overridden to return multiple doctype fieldnames.
+        One example of such a more complex case is the :class:`.ForeignKeyPrefixMapping`
+        which maps foreignkey fields as multiple prefixed attributes on the doctype.
+
+        Used by :meth:`.validate_mapping`. This means that you usually do not have to
+        override :meth:`.validate_mapping`, but instead just have to override this method
+        if your custom FieldMapping maps to multiple doctype fields.
+        """
         return [self.doctypefieldname]
 
-    def validate_mapping(self, doctype_class, doctype_fieldnames):
-        for doctypefieldname in self.get_doctype_fieldnames_list():
-            if doctypefieldname not in doctype_fieldnames:
-                raise AttributeError(
+    def validate_mapping(self, model_class, doctype_class, doctype_fieldnames_set):
+        """
+        Validate the mapping, to ensure that the mapped doctype fields actually exists.
+
+        Args:
+            doctype_class: The :class:`ievv_opensource.ievv_elasticsearch2.doctype.DocType` class.
+            doctype_fieldnames_set: Set of doctype fieldnames.
+
+        Raises:
+            DoctypeFieldDoesNotExist: If any of the fieldnames returned by
+                :meth:`.get_required_doctype_fieldnames_list` is not in ``doctype_fieldnames_set``.
+        """
+        try:
+            model_class._meta.get_field(self.modelfieldname)
+        except FieldDoesNotExist:
+            raise ModelFieldDoesNotExist(
+                '{mappingfield} is mapped from '
+                '{model_class_module}.{model_class_name}.{modelfieldname} which does not exist.'.format(
+                    mappingfield=self,
+                    model_class_module=model_class.__module__,
+                    model_class_name=model_class.__name__,
+                    modelfieldname=self.modelfieldname
+                )
+            )
+        for doctypefieldname in self.get_required_doctype_fieldnames_list():
+            if doctypefieldname not in doctype_fieldnames_set:
+                raise DoctypeFieldDoesNotExist(
                     '{mappingfield} is mapped to '
                     '{doctype_class_module}.{doctype_class_name}.{doctypefieldname} which does not exist.'.format(
                         mappingfield=self,
@@ -52,63 +136,63 @@ class Mapping(object):
         return self.prettyformat()
 
 
-class StringMapping(Mapping):
+class StringMapping(FieldMapping):
     """
-    Mapping suitable to string fields (CharField, TextField).
+    FieldMapping suitable to string fields (CharField, TextField).
     """
 
 
-class IntegerMapping(Mapping):
+class IntegerMapping(FieldMapping):
     """
-    Mapping suitable for integer fields.
+    FieldMapping suitable for integer fields.
     """
 
 
 class SmallIntegerMapping(IntegerMapping):
     """
-    Mapping suitable for small integer fields.
+    FieldMapping suitable for small integer fields.
     """
 
 
 class BigIntegerMapping(IntegerMapping):
     """
-    Mapping suitable for big integer fields.
+    FieldMapping suitable for big integer fields.
     """
 
 
-class BooleanMapping(Mapping):
+class BooleanMapping(FieldMapping):
     """
-    Mapping suitable for boolean fields.
-    """
-
-
-class FloatMapping(Mapping):
-    """
-    Mapping suitable for float fields.
+    FieldMapping suitable for boolean fields.
     """
 
 
-class DoubleMapping(Mapping):
+class FloatMapping(FieldMapping):
     """
-    Mapping suitable for double fields.
-    """
-
-
-class DateMapping(Mapping):
-    """
-    Mapping suitable for date fields.
+    FieldMapping suitable for float fields.
     """
 
 
-class DateTimeMapping(Mapping):
+class DoubleMapping(FieldMapping):
     """
-    Mapping suitable for datetime fields.
+    FieldMapping suitable for double fields.
     """
 
 
-class ForeignKeyObjectMapping(Mapping):
+class DateMapping(FieldMapping):
     """
-    Mapping suitable for ForeignKey fields that you want to
+    FieldMapping suitable for date fields.
+    """
+
+
+class DateTimeMapping(FieldMapping):
+    """
+    FieldMapping suitable for datetime fields.
+    """
+
+
+class ForeignKeyObjectMapping(FieldMapping):
+    """
+    FieldMapping suitable for ForeignKey fields that you want to
     map as a nested object in the DocType.
     """
     def __init__(self, modelmapper, modelfieldname=None):
@@ -119,9 +203,9 @@ class ForeignKeyObjectMapping(Mapping):
         return self.modelmapper.to_dict(modelvalue)
 
 
-class ForeignKeyPrefixMapping(Mapping):
+class ForeignKeyPrefixMapping(FieldMapping):
     """
-    Mapping suitable for ForeignKey fields that you want to
+    FieldMapping suitable for ForeignKey fields that you want to
     map as prefixed document attributes in the DocType.
     """
     merge_into_document = True
@@ -152,7 +236,7 @@ class ForeignKeyPrefixMapping(Mapping):
             prefixed_output['{}{}'.format(prefix, key)] = value
         return prefixed_output
 
-    def get_doctype_fieldnames_list(self):
+    def get_required_doctype_fieldnames_list(self):
         prefix = self.get_prefix()
         return ['{}{}'.format(prefix, mappingfield.doctypefieldname)
                 for mappingfield in self.modelmapper]
@@ -165,7 +249,7 @@ class ModelmapperMeta(type):
     def __new__(cls, name, parents, attrs):
         mappingfields = {}
         for key, value in attrs.items():
-            if isinstance(value, Mapping):
+            if isinstance(value, FieldMapping):
                 mappingfield = value
                 mappingfield._set_doctypefieldname(doctypefieldname=key)
                 mappingfields[mappingfield.modelfieldname] = mappingfield
@@ -190,15 +274,16 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             self.automap_fields()
 
     def set_doctype_class(self, doctype_class):
-        doctype_fieldnames = {fieldname for fieldname in doctype_class._doc_type.mapping}
+        doctype_fieldnames_set = {fieldname for fieldname in doctype_class._doc_type.mapping}
         for mappingfield in self.mappingfields.values():
-            mappingfield.validate_mapping(doctype_class=doctype_class,
-                                          doctype_fieldnames=doctype_fieldnames)
+            mappingfield.validate_mapping(model_class=self.model_class,
+                                          doctype_class=doctype_class,
+                                          doctype_fieldnames_set=doctype_fieldnames_set)
         self.doctype_class = doctype_class
 
     def modelfield_to_mappingfieldclass(self, modelfield):
         """
-        Gets a model field, and returns a :class:`.Mapping` subclass
+        Gets a model field, and returns a :class:`.FieldMapping` subclass
         to use for that field. Used by :meth:`.automap_fields`.
 
         You can override this to add support for your own Django model fields,
@@ -208,7 +293,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             modelfield: A :class:`django.db.models.fields.Field` object.
 
         Returns:
-            Mapping: The :class:`.Mapping` subclass to use for the provided modelfield.
+            FieldMapping: The :class:`.FieldMapping` subclass to use for the provided modelfield.
         """
         if isinstance(modelfield, models.CharField):
             return StringMapping
@@ -270,7 +355,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         """
         Convert the provided ``modelobject`` into dict.
 
-        Uses :meth:`.Mapping.to_doctype_value` to convert the values.
+        Uses :meth:`.FieldMapping.to_doctype_value` to convert the values.
 
         Args:
             modelobject: A Django data model object.
@@ -323,7 +408,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             fallback: Fallback value if the model field does not exist. Defaults to ``None``.
 
         Returns:
-            Mapping: A :class:`.Mapping` object.
+            FieldMapping: A :class:`.FieldMapping` object.
         """
         return self.mappingfields.get(modelfieldname, fallback)
 

@@ -56,6 +56,31 @@ class WithForeignKeyPrefixDocType(ievv_elasticsearch2.DocType):
         index = 'main'
 
 
+class TestModelmapperValidateFieldMapping(test.TestCase):
+    def test_modelfield_field_does_not_exist(self):
+        class MyModelmapper(ievv_elasticsearch2.Modelmapper):
+            not_on_model = ievv_elasticsearch2.StringMapping('not_on_model')
+
+        with self.assertRaises(ievv_elasticsearch2.ModelFieldDoesNotExist):
+            class MyDocType(ievv_elasticsearch2.DocType):
+                modelmapper = MyModelmapper(ModelmapperModel)
+                not_on_model = elasticsearch_dsl.String()
+
+                class Meta:
+                    index = 'main'
+
+    def test_doctypefield_does_not_exist(self):
+        class MyModelmapper(ievv_elasticsearch2.Modelmapper):
+            text = ievv_elasticsearch2.StringMapping('text')
+
+        with self.assertRaises(ievv_elasticsearch2.DoctypeFieldDoesNotExist):
+            class MyDocType(ievv_elasticsearch2.DocType):
+                modelmapper = MyModelmapper(ModelmapperModel)
+
+                class Meta:
+                    index = 'main'
+
+
 class TestModelmapperAutomap(test.TestCase):
     # def setUp(self):
     #     self.es = connections.get_connection()
@@ -140,44 +165,3 @@ class TestModelmapperToDict(test.TestCase):
         self.assertEqual(
             {'parent__name': 'Test name'},
             WithForeignKeyPrefixDocType.modelmapper.to_dict(testobject))
-
-
-# class TestModelmapperToDict(test.TestCase):
-#     def test_to_dict_simple_field_types(self):
-#         parent = mommy.make(ModelMapperForeignKeyModel)
-#         testdatetime = datetimeutils.default_timezone_datetime(2015, 12, 24, 18, 30)
-#         testobject = mommy.make(ModelmapperModel,
-#                                 char='Char',
-#                                 text='Text',
-#                                 smallint=5,
-#                                 int=10,
-#                                 bigint=20,
-#                                 float=0,
-#                                 boolean=True,
-#                                 date=testdatetime.date(),
-#                                 datetime=testdatetime,
-#                                 parent=parent)
-#         self.assertEqual(
-#             {'char': 'Char',
-#              'text': 'Text',
-#              'smallint': 5,
-#              'int': 10,
-#              'bigint': 20,
-#              'float': 0,
-#              'boolean': True,
-#              'date': testdatetime.date(),
-#              'datetime': testdatetime,
-#              'parent_id': parent.id},
-#             AutomappedDocType.modelmapper.to_dict(testobject))
-#
-#     def test_to_dict_foreign_key_object_mapping(self):
-#         testobject = mommy.make(ModelmapperModel, parent__name='Test name')
-#         self.assertEqual(
-#             {'parent': {'name': 'Test name'}},
-#             WithForeignKeyObjectDocType.modelmapper.to_dict(testobject))
-#
-#     def test_to_dict_foreign_key_prefix_mapping(self):
-#         testobject = mommy.make(ModelmapperModel, parent__name='Test name')
-#         self.assertEqual(
-#             {'parent__name': 'Test name'},
-#             WithForeignKeyPrefixDocType.modelmapper.to_dict(testobject))

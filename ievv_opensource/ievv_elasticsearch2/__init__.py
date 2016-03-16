@@ -15,4 +15,6 @@ from .modelmapper import DateMapping  # noqa
 from .modelmapper import DateTimeMapping  # noqa
 from .modelmapper import ForeignKeyObjectMapping  # noqa
 from .modelmapper import ForeignKeyPrefixMapping  # noqa
+from .modelmapper import DoctypeFieldDoesNotExist  # noqa
+from .modelmapper import ModelFieldDoesNotExist  # noqa
 from . import indexingmanager
