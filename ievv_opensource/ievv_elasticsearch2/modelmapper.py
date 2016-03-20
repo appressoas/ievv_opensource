@@ -238,7 +238,7 @@ class ForeignKeyObjectMapping(FieldMapping):
         self.modelmapper = modelmapper
 
     def to_doctype_value(self, modelvalue):
-        return self.modelmapper.to_dict(modelvalue)
+        return self.modelmapper.to_dict(modelvalue, with_meta=False)
 
 
 class ForeignKeyPrefixMapping(FieldMapping):
@@ -278,7 +278,7 @@ class ForeignKeyPrefixMapping(FieldMapping):
         return prefix
 
     def to_doctype_value(self, modelvalue):
-        raw_output = self.modelmapper.to_dict(modelvalue)
+        raw_output = self.modelmapper.to_dict(modelvalue, with_meta=False)
         return self.__prefix_dict_keys(raw_output)
 
     def get_required_doctype_fieldnames_list(self):
@@ -308,11 +308,29 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
     """
     Makes it easy to convert a Django model to a :class:`ievv_opensource.ievv_elasticsearch2.doctype.DocType`.
     """
-    def __init__(self, model_class, automap_fields=False, doctype_class=None):
+    def __init__(self, model_class, automap_fields=False, automap_id_field=False, doctype_class=None):
+        """
+        Args:
+            model_class: A :class:`django.models.db.Model` class.
+            automap_fields: Set this to ``True`` to automatically map fields. You can change
+                the ElasticSearch field types fields are mapped to by overriding
+                :meth:`.modelfield_to_mappingfieldclass`.
+            automap_id_field: Automap the automatic ``id`` field? This defaults to ``False`` because
+                we set the ``id`` as the meta ``_id`` attribute by default instead. This is useful
+                when you map a ForeignKey as an object (with :class:`.ForeignKeyObjectMapping` or
+                :class:`.ForeignKeyPrefixMapping`), and you want to include the id-field of the
+                foreignkey object. In that case, you set this to ``True`` for the ``modelmapper``
+                you initialize the :class:`.ForeignKeyObjectMapping` or :class:`.ForeignKeyPrefixMapping` with.
+            doctype_class: Initialize with a doctype class. This is normally not needed outside of
+                tests because this is set (through :meth:`.set_doctype_class`) by the
+                :class:`ievv_opensource.ievv_elasticsearch2.doctype.DocType` metaclass when it detects
+                the ``modelmapper``-attribute.
+        """
         self.model_class = model_class
         self.doctype_class = None
         self.mappingfields = self._explicit_mappingfields.copy()
         self._automap_fields = automap_fields
+        self._automap_id_field = automap_id_field
         if doctype_class:
             self.set_doctype_class(doctype_class=doctype_class)
         if self._automap_fields:
@@ -378,6 +396,8 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             return DateTimeMapping
         elif isinstance(modelfield, models.DateField):
             return DateMapping
+        elif self._automap_id_field and isinstance(modelfield, models.AutoField) and modelfield.name == 'id':
+            return BigIntegerMapping
         else:
             return None
 
@@ -412,7 +432,25 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
             if modelfield.name not in self.mappingfields:
                 self.automap_field(modelfield=modelfield)
 
-    def to_dict(self, modelobject):
+    def to_meta_dict(self, modelobject):
+        """
+        Get a dict of meta attributes for the provided ``modelobject``.
+
+        This is used by :meth:`.to_dict` to create the ``meta``-key.
+
+        Defaults to ``{"id": modelobject.pk}``, and this is usually what you need.
+
+        Args:
+            modelobject:
+
+        Returns:
+            dict: A dict with the meta attributes for the document.
+        """
+        return {
+            'id': modelobject.pk
+        }
+
+    def to_dict(self, modelobject, with_meta=True):
         """
         Convert the provided ``modelobject`` into dict.
 
@@ -420,6 +458,8 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
 
         Args:
             modelobject: A Django data model object.
+            with_meta: If this is ``True`` (the default), we include the return
+                value of :meth:`.to_meta_dict` in the ``meta``-key.
 
         Returns:
             dict: A dict representing data for the document.
@@ -432,11 +472,17 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
                 dct.update(doctype_value)
             else:
                 dct[mappingfield.doctypefieldname] = doctype_value
+        if with_meta:
+            dct['meta'] = self.to_meta_dict(modelobject=modelobject)
         return dct
 
     def to_doctype_object(self, modelobject):
         """
         Convert a Django data model object into a DocType object.
+
+        Uses :meth:`.to_dict` as the keyword arguments when instansiating the doctype object.
+        This means that you should normally override :meth:`.to_dict` or :meth:`.to_meta_dict`
+        (used by to_dict()) instead of this method.
 
         Args:
             modelobject: A Django data model object.
