@@ -77,18 +77,30 @@ class FieldMapping(object):
             self.doctypefieldname: self.elasticsearchdsl_fieldclass()
         }
 
-    def to_doctype_value(self, modelvalue):
+    def get_model_value_from_modelobject(self, modelobject):
+        """
+        Get the value for the Django model field accociated with this mapping
+        from the ``modelobject``.
+
+        Args:
+            modelobject: A Django model object.
+        """
+        return getattr(modelobject, self.modelfieldname)
+
+    def to_doctype_value(self, modelobject):
         """
         Convert the value stored in the model to a value compatible with
         ElasticSearch.
 
         Args:
-            modelvalue: The value stored in the Django model.
+            modelobject: The model object. When overriding this method,
+                you can get the value stored for the model field accociated
+                with this mapping using :meth:`.get_model_value_from_modelobject`.
 
         Returns:
             object: The converted value.
         """
-        return modelvalue
+        return self.get_model_value_from_modelobject(modelobject)
 
     def prettyformat(self, model_class=None):
         """
@@ -191,6 +203,15 @@ class BigIntegerMapping(IntegerMapping):
     elasticsearchdsl_fieldclass = elasticsearch_dsl.Long
 
 
+class ForeignKeyMapping(BigIntegerMapping):
+    """
+    FieldMapping suitable for ForeignKey fields where the ForeignKey is
+    an automatic ``id`` field.
+    """
+    def get_model_value_from_modelobject(self, modelobject):
+        return getattr(modelobject, '{}_id'.format(self.modelfieldname))
+
+
 class BooleanMapping(FieldMapping):
     """
     FieldMapping suitable for boolean fields.
@@ -230,6 +251,8 @@ class ForeignKeyObjectMapping(FieldMapping):
     """
     FieldMapping suitable for ForeignKey fields that you want to
     map as a nested object in the DocType.
+
+    This is mapped to the ``object`` datatype in ElasticSearch.
     """
     elasticsearchdsl_fieldclass = elasticsearch_dsl.Object
 
@@ -237,7 +260,8 @@ class ForeignKeyObjectMapping(FieldMapping):
         super(ForeignKeyObjectMapping, self).__init__(modelfieldname=modelfieldname)
         self.modelmapper = modelmapper
 
-    def to_doctype_value(self, modelvalue):
+    def to_doctype_value(self, modelobject):
+        modelvalue = self.get_model_value_from_modelobject(modelobject)
         return self.modelmapper.to_dict(modelvalue, with_meta=False)
 
 
@@ -277,7 +301,8 @@ class ForeignKeyPrefixMapping(FieldMapping):
             prefix = self.prefix
         return prefix
 
-    def to_doctype_value(self, modelvalue):
+    def to_doctype_value(self, modelobject):
+        modelvalue = self.get_model_value_from_modelobject(modelobject)
         raw_output = self.modelmapper.to_dict(modelvalue, with_meta=False)
         return self.__prefix_dict_keys(raw_output)
 
@@ -285,6 +310,44 @@ class ForeignKeyPrefixMapping(FieldMapping):
         prefix = self.get_prefix()
         return ['{}{}'.format(prefix, mappingfield.doctypefieldname)
                 for mappingfield in self.modelmapper]
+
+
+class OneToManyNestedMapping(FieldMapping):
+    """
+    FieldMapping suitable for one-to-many realationships that you want to
+    map as a nested array of objects (array of dicts) in the DocType.
+
+    This is mapped to the ``nested`` datatype in ElasticSearch.
+    """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Nested
+
+    def __init__(self, modelmapper, modelfieldname=None):
+        super(OneToManyNestedMapping, self).__init__(modelfieldname=modelfieldname)
+        self.modelmapper = modelmapper
+
+    def to_doctype_value(self, modelobject):
+        modelvalue = self.get_model_value_from_modelobject(modelobject)
+        queryset = modelvalue.all()
+        return [self.modelmapper.to_dict(modelobject, with_meta=False)
+                for modelobject in queryset.all()]
+
+
+class OneToManyIdArrayMapping(FieldMapping):
+    """
+    FieldMapping suitable for one-to-many realationships that you want to
+    map as an array of IDs in the DocType.
+
+    This is mapped to the ``array`` datatype in ElasticSearch.
+    """
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Nested
+
+    def __init__(self, modelfieldname=None):
+        super(OneToManyIdArrayMapping, self).__init__(modelfieldname=modelfieldname)
+
+    def to_doctype_value(self, modelobject):
+        modelvalue = self.get_model_value_from_modelobject(modelobject)
+        queryset = modelvalue.all()
+        return [modelobject.pk for modelobject in queryset.all()]
 
 
 class ModelmapperMeta(type):
@@ -308,7 +371,8 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
     """
     Makes it easy to convert a Django model to a :class:`ievv_opensource.ievv_elasticsearch2.doctype.DocType`.
     """
-    def __init__(self, model_class, automap_fields=False, automap_id_field=False, doctype_class=None):
+    def __init__(self, model_class, automap_fields=False, automap_id_field=False, doctype_class=None,
+                 exclude=None, include=None):
         """
         Args:
             model_class: A :class:`django.models.db.Model` class.
@@ -331,6 +395,12 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         self.mappingfields = self._explicit_mappingfields.copy()
         self._automap_fields = automap_fields
         self._automap_id_field = automap_id_field
+
+        if exclude and include:
+            raise ValueError('You can not use both exclude and include at the same time.')
+        self._exclude = exclude
+        self._include = include
+
         if doctype_class:
             self.set_doctype_class(doctype_class=doctype_class)
         if self._automap_fields:
@@ -379,7 +449,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         elif isinstance(modelfield, models.TextField):
             return StringMapping
         elif isinstance(modelfield, models.ForeignKey):
-            return BigIntegerMapping
+            return ForeignKeyMapping
         elif isinstance(modelfield, models.BigIntegerField):
             return BigIntegerMapping
         elif isinstance(modelfield, models.SmallIntegerField):
@@ -414,11 +484,20 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         mappingfieldclass = self.modelfield_to_mappingfieldclass(modelfield=modelfield)
         if mappingfieldclass:
             modelfieldname = modelfield.name
-            if issubclass(mappingfieldclass, IntegerMapping) and isinstance(modelfield, models.ForeignKey):
-                modelfieldname = '{}_id'.format(modelfield.name)
+            # if issubclass(mappingfieldclass, IntegerMapping) and isinstance(modelfield, models.ForeignKey):
+                # modelfieldname = '{}_id'.format(modelfield.name)
             mappingfield = mappingfieldclass()
             mappingfield._set_doctypefieldname(doctypefieldname=modelfieldname)
             self.mappingfields[modelfieldname] = mappingfield
+
+    def _get_automapped_modelfields(self):
+        all_modelfields = self.model_class._meta.get_fields()
+        if self._exclude:
+            return filter(lambda modelfield: modelfield.name not in self._exclude, all_modelfields)
+        elif self._include:
+            return filter(lambda modelfield: modelfield.name in self._include, all_modelfields)
+        else:
+            return all_modelfields
 
     def automap_fields(self):
         """
@@ -428,7 +507,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         You can override this, but you will most likely rather want to override
         :meth:`.modelfield_to_mappingfieldclass` or :meth:`.automap_field`.
         """
-        for modelfield in self.model_class._meta.get_fields():
+        for modelfield in self._get_automapped_modelfields():
             if modelfield.name not in self.mappingfields:
                 self.automap_field(modelfield=modelfield)
 
@@ -466,8 +545,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         """
         dct = {}
         for mappingfield in self.mappingfields.values():
-            modelvalue = getattr(modelobject, mappingfield.modelfieldname)
-            doctype_value = mappingfield.to_doctype_value(modelvalue)
+            doctype_value = mappingfield.to_doctype_value(modelobject)
             if mappingfield.merge_into_document:
                 dct.update(doctype_value)
             else:
