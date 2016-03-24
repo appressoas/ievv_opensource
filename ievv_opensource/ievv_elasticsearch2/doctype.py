@@ -37,11 +37,14 @@ class DocTypeMeta(ElasticSearchDocTypeMeta):
             if isinstance(value, Search):
                 _update_searchobject_for_doctype(doctype_class=doctype_class,
                                                  attributename=key)
-        if not hasattr(doctype_class, 'indexupdater'):
+        if hasattr(doctype_class, 'indexupdater'):
+            doctype_class.indexupdater = doctype_class.indexupdater.clone()
+        else:
             doctype_class.indexupdater = IndexUpdater()
         doctype_class.indexupdater.set_doctype_class(doctype_class=doctype_class)
 
         if hasattr(doctype_class, 'modelmapper'):
+            doctype_class.modelmapper = doctype_class.modelmapper.copy()
             doctype_class.modelmapper.set_doctype_class(doctype_class=doctype_class)
 
         return doctype_class
@@ -81,7 +84,7 @@ class ModelDocTypeMeta(DocTypeMeta):
         modelmapper = None
         if model_class is not None:
             if 'modelmapper' in dct:
-                modelmapper = dct['modelmapper']
+                modelmapper = dct['modelmapper'].copy()
             else:
                 modelmapper = Modelmapper(model_class=model_class, automap_fields=True)
                 dct['modelmapper'] = modelmapper

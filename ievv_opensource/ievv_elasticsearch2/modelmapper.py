@@ -406,6 +406,15 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         if self._automap_fields:
             self.automap_fields()
 
+    def copy(self):
+        copy = self.__class__(model_class=self.model_class,
+                              automap_fields=self._automap_fields,
+                              automap_id_field=self._automap_id_field,
+                              doctype_class=self.doctype_class,
+                              exclude=self._exclude,
+                              include=self._include)
+        return copy
+
     def automake_doctype_fields(self):
         """
         Create elasticsearch-dsl :class:`elasticsearch_dsl.field.Field` objects from

@@ -1,3 +1,5 @@
+from unittest import mock
+
 import elasticsearch_dsl
 from django import test
 from elasticsearch_dsl.connections import connections
@@ -61,15 +63,69 @@ class TestIndexUpdatedBulkIndexModelIds(test.TestCase):
         self.es.indices.flush(index='_all')
 
     def test_single(self):
+        AutomappedDocType.init()
         item = mommy.make(ModelmapperModel, char='a')
-        AutomappedDocType.indexupdater.bulk_index_model_ids(id_iterable=[item.id])
+        AutomappedDocType.indexupdater.bulk_index_model_ids(ids=[item.id])
         self.assertEqual('a', AutomappedDocType.get(id=item.id).char)
 
     def test_multiple(self):
+        AutomappedDocType.init()
         item1 = mommy.make(ModelmapperModel, char='a')
         item2 = mommy.make(ModelmapperModel, char='b')
         item3 = mommy.make(ModelmapperModel, char='c')
-        AutomappedDocType.indexupdater.bulk_index_model_ids(id_iterable=[item1.id, item2.id, item3.id])
+        AutomappedDocType.indexupdater.bulk_index_model_ids(ids=[item1.id, item2.id, item3.id])
+        self.assertEqual('a', AutomappedDocType.get(id=item1.id).char)
+        self.assertEqual('b', AutomappedDocType.get(id=item2.id).char)
+        self.assertEqual('c', AutomappedDocType.get(id=item3.id).char)
+
+
+class TestIndexUpdaterBulkReindexByPriority(test.TestCase):
+    def setUp(self):
+        self.es = connections.get_connection()
+        self.es.indices.delete(index='_all')
+        self.es.indices.flush(index='_all')
+
+    def test_iterate_doctype_objects_for_reindexing_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            ievv_elasticsearch2.IndexUpdater().bulk_reindex_by_priority()
+
+    def test_iterate_doctype_objects_for_reindexing_implemented(self):
+        mockobject = mock.MagicMock()
+
+        class MyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
+            def iterate_doctype_objects_for_reindexing(self, priority=None, using=None):
+                mockobject()
+
+            def bulk_index(self, doctype_object_iterable, using=None):
+                pass
+
+        MyIndexUpdater().bulk_reindex_by_priority()
+        mockobject.assert_called_once_with()
+
+    def test_iterate_doctype_objects_for_reindexing_priority_and_using_forwarded(self):
+        mockobject = mock.MagicMock()
+
+        class MyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
+            def iterate_doctype_objects_for_reindexing(self, priority=None, using=None):
+                mockobject(priority=priority, using=using)
+
+            def bulk_index(self, doctype_object_iterable, using=None):
+                pass
+
+        MyIndexUpdater().bulk_reindex_by_priority(priority=MyIndexUpdater.PRIORITY_HIGH,
+                                                  using='otherserver')
+        mockobject.assert_called_once_with(priority=MyIndexUpdater.PRIORITY_HIGH,
+                                           using='otherserver')
+
+    def test_bulk_reindex_by_priority_no_model_objects_to_index(self):
+        AutomappedDocType().indexupdater.bulk_reindex_by_priority()
+
+    def test_bulk_reindex_by_priority(self):
+        AutomappedDocType.init()
+        item1 = mommy.make(ModelmapperModel, char='a')
+        item2 = mommy.make(ModelmapperModel, char='b')
+        item3 = mommy.make(ModelmapperModel, char='c')
+        AutomappedDocType().indexupdater.bulk_reindex_by_priority()
         self.assertEqual('a', AutomappedDocType.get(id=item1.id).char)
         self.assertEqual('b', AutomappedDocType.get(id=item2.id).char)
         self.assertEqual('c', AutomappedDocType.get(id=item3.id).char)
