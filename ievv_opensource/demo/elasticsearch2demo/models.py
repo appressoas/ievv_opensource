@@ -26,12 +26,12 @@ def on_company_post_save(sender, instance, created, **kwargs):
             actiongroup_name='elasticsearch2demo_company_update',
             context_object=company,
             started_by=get_user_model().objects.first(),
-            assignment_ids=[1, 3, 5]
+            ids=[instance.id]
         )
         print()
         print("*" * 70)
         print()
-        print(executioninfo)
+        print('executioninfo', executioninfo)
         print()
         print("*" * 70)
         print()
