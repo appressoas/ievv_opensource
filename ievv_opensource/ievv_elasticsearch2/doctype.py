@@ -49,6 +49,16 @@ class DocTypeRegistry(Singleton):
       and the base classes (DocType and ModelDocType)) with :obj:`~.DocType.abstract`
       set to ``True``.
       This group of doctypes can be accessed using :meth:`.get_abstract_doctypes_iterator`.
+
+    Examples:
+
+        Iterate all the :class:`.DocType` classes in the registry (does not include abstract
+        doctypes)::
+
+            from ievv_opensource import ievv_elasticsearch2
+            registry = ievv_elasticsearch2.DocTypeRegistry.get_instance()
+            for doctype_class in registry.get_model_doctypes_iterator():
+                print(doctype_class)
     """
     def __init__(self):
         super(DocTypeRegistry, self).__init__()
@@ -138,12 +148,23 @@ class DocTypeMeta(ElasticSearchDocTypeMeta):
 
 
 class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
+    """
+    Base class that you subclass to define an ElasticSearch doctype.
+
+    Refer to :doc:`ievv_elasticsearch2` for examples.
+    """
+
     #: If this is ``True``, the doctype is a base class for other doctypes, and
     #: never instantiated. An abstract DocType is not fully configured, and
     #: it is registered as an abstract doctype in :class:`.DocTypeRegistry`.
     #: This is ``False`` by default for subclasses, and it is not inherited, so you
     #: have to set this explicitly to ``True`` for every abstract doctype class.
     abstract = True
+
+    # @classmethod
+    # def on_registry_ready(cls):
+    #     if hasattr(cls, 'modelmapper') and cls.modelmapper._automap_fields:
+    #         cls.modelmapper.automap_fields()
 
     @classmethod
     def search(cls, *args, **kwargs):
