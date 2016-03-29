@@ -30,6 +30,31 @@ with::
 - ... in short - DRY with elasticsearch-dsl in Django projects ...
 
 
+
+
+*****************
+The DocType class
+*****************
+
+.. currentmodule:: ievv_opensource.ievv_elasticsearch2.doctype
+
+.. autoclass:: DocType
+
+
+DocTypeRegistry
+===============
+
+.. currentmodule:: ievv_opensource.ievv_elasticsearch2.doctype
+
+.. autoclass:: DocTypeRegistry
+
+
+Abstract DocType
+================
+A DocType can be abstract. In simple terms, this means that
+
+
+
 **********
 Search API
 **********

@@ -1,6 +1,7 @@
 from elasticsearch_dsl import Q  # noqa
 from elasticsearch import exceptions  # noqa
 from .search import Search  # noqa
+from .doctype import DocTypeRegistry  # noqa
 from .doctype import DocType  # noqa
 from .doctype import ModelDocType  # noqa
 from .indexupdater import IndexUpdater  # noqa
