@@ -161,11 +161,6 @@ class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
     #: have to set this explicitly to ``True`` for every abstract doctype class.
     abstract = True
 
-    # @classmethod
-    # def on_registry_ready(cls):
-    #     if hasattr(cls, 'modelmapper') and cls.modelmapper._automap_fields:
-    #         cls.modelmapper.automap_fields()
-
     @classmethod
     def search(cls, *args, **kwargs):
         logger.warning('You should use {classname}.objects instead of {classname}.search().'.format(
