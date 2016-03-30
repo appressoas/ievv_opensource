@@ -19,7 +19,8 @@ class ElasticSearch2DemoAppConfig(AppConfig):
     verbose_name = "IEVV ElasticSearch2 demo"
 
     def ready(self):
-        from ievv_opensource.demo.elasticsearch2demo.doctypes import CompanyDocType
+        ievv_elasticsearch2.DocTypeRegistry.get_instance().add(CompanyDocType)
+        ievv_elasticsearch2.DocTypeRegistry.get_instance().add(EmployeeDocType)
         batchregistry.Registry.get_instance().add_actiongroup(
             batchregistry.ActionGroup(
                 name='elasticsearch2demo_company_update',

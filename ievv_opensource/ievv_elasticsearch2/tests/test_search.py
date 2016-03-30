@@ -71,6 +71,10 @@ class TestSearch(test.TestCase):
         # result = search.execute()
         # pprint(result)
 
+        # for match in ievv_elasticsearch2.Search().query('match_all').execute():
+        #     print(match.to_dict())
+
+
     def test_get_error(self):
         PersonDocType.init()
         person = PersonDocType(name='Peter',

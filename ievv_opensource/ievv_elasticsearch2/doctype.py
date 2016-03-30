@@ -3,7 +3,6 @@ import logging
 
 import elasticsearch_dsl
 from django.conf import settings
-from elasticsearch_dsl.document import DocTypeMeta as ElasticSearchDocTypeMeta
 from future.utils import with_metaclass
 
 from ievv_opensource.utils.singleton import Singleton
@@ -73,12 +72,11 @@ class DocTypeRegistry(Singleton):
         """
         return iter(self._abstract_doctypes)
 
-    def _add_doctype(self, doctype_class):
+    def add(self, doctype_class):
         """
         Add a :class:`.DocType` to the registry.
 
-        Called automatically by :class:`.DocTypeMeta`, so you never have
-        to call this yourself.
+        You need to call this from the ready()-method of your AppConfig.
 
         Args:
             doctype_class: A :class:`.DocType` subclass.
@@ -87,22 +85,8 @@ class DocTypeRegistry(Singleton):
             self._abstract_doctypes.append(doctype_class)
         else:
             self._doctypes.append(doctype_class)
-
-    def _add_model_doctype(self, doctype_class):
-        """
-        Add a :class:`.ModelDocType` to the registry.
-
-        Called automatically by :class:`.ModelDocTypeMeta`, so you never have
-        to call this yourself.
-
-        Args:
-            doctype_class: A :class:`.ModelDocType` subclass.
-        """
-        if not doctype_class.is_abstract_doctype:
-            self._model_doctypes.append(doctype_class)
-
-    def ievvinitialize_all_doctypes(self):
-        for doctype_class in self._doctypes:
+            if issubclass(doctype_class, ModelDocType):
+                self._model_doctypes.append(doctype_class)
             doctype_class.ievvinitialize()
 
 
@@ -212,7 +196,6 @@ class DocType(with_metaclass(DocTypeMeta, object)):
         cls.ievvinitialize_modelmapper()
         cls.ievvinitialize_searchobjects()
         cls.ievvinitialize_indexupdater()
-        # DocTypeRegistry.get_instance()._add_doctype(doctype_class=cls)
         cls._has_successfully_executed_ievvinitialize = True
 
     @classmethod

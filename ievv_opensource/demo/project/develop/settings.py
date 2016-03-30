@@ -76,6 +76,10 @@ IEVV_ELASTICSEARCH_MAJOR_VERSION = 2
 IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
     'default': {
         'host': '127.0.0.1',
-        'port': '9252'
+        'port': '9252',
+        'transport_class': 'ievv_opensource.ievv_elasticsearch2.transport.debug.DebugTransport'
     }
 }
+
+# IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS = True
+IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS = False

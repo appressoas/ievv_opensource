@@ -22,7 +22,7 @@ class CompanyDocType(ievv_elasticsearch2.ModelDocType):
         index = 'main'
 
 
-class EmployeeDocType(ievv_elasticsearch2.DocType):
+class EmployeeDocType(ievv_elasticsearch2.ModelDocType):
     model_class = Employee
 
     class Meta:

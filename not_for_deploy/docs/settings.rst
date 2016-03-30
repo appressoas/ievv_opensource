@@ -377,6 +377,17 @@ Add the following to you test settings to enable testmode::
     IEVV_ELASTICSEARCH2_TESTMODE = True
 
 
+*******************
+ievv_batchframework
+*******************
+
+.. setting:: IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS
+
+IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS
+=====================================
+If this is ``True``, all actions will be executed syncronously.
+
+
 
 *****
 utils

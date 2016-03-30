@@ -523,7 +523,10 @@ class ActionGroup(object):
             batchoperation_options: Only used by :meth:`.run_asynchronous` - refer to its docs
                 for more details.
         """
-        mode = self.get_mode(**kwargs)
+        if getattr(settings, 'IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS', False):
+            mode = self.MODE_SYNCHRONOUS
+        else:
+            mode = self.get_mode(**kwargs)
         if mode == self.MODE_ASYNCHRONOUS:
             return self.run_asynchronous(**kwargs)
         else:

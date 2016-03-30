@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django_cradmin import crinstance, crmenu
 
-from ievv_opensource.ievv_elasticsearchbrowser.views import indexbrowse
+from ievv_opensource.ievv_elasticsearch2browser.views import indexbrowse
 
 
 class Menu(crmenu.Menu):
@@ -32,4 +32,4 @@ class ElasticSearchBrowserCrAdminInstance(crinstance.BaseCrAdminInstance):
         We only need this because we have multiple cradmin UIs
         in the same project.
         """
-        return urlpath.startswith('/ievv_elasticsearchbrowser')
+        return urlpath.startswith('/ievv_elasticsearch2browser')
