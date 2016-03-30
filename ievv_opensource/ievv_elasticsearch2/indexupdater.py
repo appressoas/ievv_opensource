@@ -119,6 +119,9 @@ class IndexUpdater(object):
         else:
             return queryset.all()
 
+    def make_queryset_from_model_ids(self, ids):
+        return self.doctype_class.model_class.objects.filter(id__in=ids)
+
     def bulk_index_model_ids(self, ids, using=None):
         """
         Bulk index the provided IDs using :func:`elasticsearch.helpers.bulk`.
@@ -137,7 +140,7 @@ class IndexUpdater(object):
                 'The doctype_class ({}.{}) for {}.{} does not have a model_class attribute.'.format(
                     self.doctype_class.__module__, self.doctype_class.__name__,
                     self.__class__.__module__, self.__class__.__name__))
-        queryset = self.doctype_class.model_class.objects.filter(id__in=ids)
+        queryset = self.make_queryset_from_model_ids(ids=ids)
         queryset = self.optimize_queryset_by_expected_result_count(queryset=queryset,
                                                                    expected_result_count=len(ids))
         doctype_object_iterable = self.make_doctype_object_iterable_from_queryset(queryset=queryset)

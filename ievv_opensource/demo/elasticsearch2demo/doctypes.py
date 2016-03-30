@@ -1,60 +1,29 @@
 from ievv_opensource import ievv_elasticsearch2
-from ievv_opensource.demo.elasticsearch2demo.models import Company
+from ievv_opensource.demo.elasticsearch2demo.models import Company, Employee
 
 
-# class CompanyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
-#     def index_one(self, company, **kwargs):
-#         company_doctype = self.doctype_class(
-#             id=company.id,
-#             name=company.name,
-#             employee_count=company.employee_set.count()
-#         )
-#         return company_doctype.save()
-#
-#     def reindex_employee_count(self, company, **kwargs):
-#         self.index(company)
+class CompanyIndexUpdater(ievv_elasticsearch2.IndexUpdater):
+    def bulk_index_by_employee_ids(self, employee_ids):
+        company_ids = Company.objects.filter(employee__id__in=employee_ids)\
+            .distinct()\
+            .values_list('id')
+        self.bulk_index_model_ids(ids=company_ids)
 
-
-# class CompanyModelmapper(ievv_elasticsearch2.Modelmapper):
+    def make_queryset_from_model_ids(self, ids):
+        queryset = super(CompanyIndexUpdater, self).make_queryset_from_model_ids(ids=ids)
+        return queryset.prefetch_related('employee_set')
 
 
 class CompanyDocType(ievv_elasticsearch2.ModelDocType):
     model_class = Company
-    # modelmapper = CompanyModelmapper()
-    # indexupdater = CompanyIndexUpdater()
-
-    # name = elasticsearch_dsl.String()
-    # employee_count = elasticsearch_dsl.Integer()
-
-    # @classmethod
-    # def reindex(cls, company):
-    #     pass
+    indexupdater = CompanyIndexUpdater()
 
     class Meta:
         index = 'main'
 
 
-# class EmployeeIndexUpdater(ievv_elasticsearch2.IndexUpdater):
-#     def index(self, employee):
-#         employee_doctype = self.doctype_class(
-#             id=employee.id,
-#             name=employee.name,
-#             description=employee.description,
-#             company_name=employee.company.name
-#         )
-#         return employee_doctype.save()
-#
-#     def reindex_company_name(self, company, **kwargs):
-#         for employee in company.employee_set.all():
-#             self.reindex(employee)
-#
-#
-# class EmployeeDocType(ievv_elasticsearch2.DocType):
-#     indexupdater = EmployeeIndexUpdater()
-#
-#     name = elasticsearch_dsl.String()
-#     description = elasticsearch_dsl.String()
-#     company_name = elasticsearch_dsl.String()
-#
-#     class Meta:
-#         index = 'main'
+class EmployeeDocType(ievv_elasticsearch2.DocType):
+    model_class = Employee
+
+    class Meta:
+        index = 'main'
