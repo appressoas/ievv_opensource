@@ -432,7 +432,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         return doctype_fields
 
     def set_doctype_class(self, doctype_class):
-        doctype_fieldnames_set = {fieldname for fieldname in doctype_class._doc_type.mapping}
+        doctype_fieldnames_set = {fieldname for fieldname in doctype_class.get_doc_type_options().mapping}
         for mappingfield in self.mappingfields.values():
             mappingfield.validate_mapping(model_class=self.model_class,
                                           doctype_class=doctype_class,

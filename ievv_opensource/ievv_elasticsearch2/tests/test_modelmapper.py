@@ -86,24 +86,28 @@ class TestModelmapperValidateFieldMapping(test.TestCase):
         class MyModelmapper(ievv_elasticsearch2.Modelmapper):
             not_on_model = ievv_elasticsearch2.StringMapping('not_on_model')
 
-        with self.assertRaises(ievv_elasticsearch2.ModelFieldDoesNotExist):
-            class MyDocType(ievv_elasticsearch2.DocType):
-                modelmapper = MyModelmapper(ModelmapperModel)
-                not_on_model = elasticsearch_dsl.String()
+        class MyDocType(ievv_elasticsearch2.DocType):
+            modelmapper = MyModelmapper(ModelmapperModel)
+            not_on_model = elasticsearch_dsl.String()
 
-                class Meta:
-                    index = 'main'
+            class Meta:
+                index = 'main'
+
+        with self.assertRaises(ievv_elasticsearch2.ModelFieldDoesNotExist):
+            MyDocType.ievvinitialize()
 
     def test_doctypefield_does_not_exist(self):
         class MyModelmapper(ievv_elasticsearch2.Modelmapper):
             text = ievv_elasticsearch2.StringMapping('text')
 
-        with self.assertRaises(ievv_elasticsearch2.DoctypeFieldDoesNotExist):
-            class MyDocType(ievv_elasticsearch2.DocType):
-                modelmapper = MyModelmapper(ModelmapperModel)
+        class MyDocType(ievv_elasticsearch2.DocType):
+            modelmapper = MyModelmapper(ModelmapperModel)
 
-                class Meta:
-                    index = 'main'
+            class Meta:
+                index = 'main'
+
+        with self.assertRaises(ievv_elasticsearch2.DoctypeFieldDoesNotExist):
+            MyDocType.ievvinitialize()
 
 
 class TestModelmapperAutomap(test.TestCase):
@@ -245,6 +249,10 @@ class TestModelmapperToDict(test.TestCase):
 
 
 class TestModelmapperToDoctypeObject(test.TestCase):
+    def setUp(self):
+        AutomappedDocType.ievvinitialize()
+        WithForeignKeyObjectDocType.ievvinitialize()
+
     def test_simple_field_types(self):
         parent = mommy.make(ModelMapperForeignKeyModel)
         testdatetime = datetimeutils.default_timezone_datetime(2015, 12, 24, 18, 30)

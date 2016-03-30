@@ -47,6 +47,7 @@ class TestSearch(test.TestCase):
         pprint(result)
 
     def test_doctype(self):
+        PersonDocType.ievvinitialize()
         PersonDocType.init()
         person = PersonDocType(name='Peter',
                                description='The Pan')
@@ -55,23 +56,18 @@ class TestSearch(test.TestCase):
 
         # search = ievv_elasticsearch2.Search()\
         #     .query('match', name='Peter')
-        #
         # result = search.execute()
-
+        # pprint(result)
+        #
         # search = PersonDocType.objects.query_name(name='Peter')
         # result = search.execute()
         # pprint(result)
-
+        #
         # search = PersonDocType.fancysearch.query_all(text='Pan')
         # result = search.execute()
         # pprint(result)
-
-        # search = PersonDocType.search().query('match', name='Peter')
-        # result = search.execute()
-        # pprint(result)
-
-        # search = ievv_elasticsearch2.Search().query('match', name='Peter')
-        # pprint(search.to_dict())
+        #
+        # search = PersonDocType.elasticsearch_dsl_doctype_class.search().query('match', name='Peter')
         # result = search.execute()
         # pprint(result)
 

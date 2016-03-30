@@ -62,7 +62,7 @@ class IndexUpdater(object):
         Returns:
             elasticsearch.client.Elasticsearch: An Elasticsearch object for the connection.
         """
-        return connections.get_connection(using or self.doctype_class._doc_type.using)
+        return connections.get_connection(using or self.doctype_class.get_doc_type_options().using)
 
     def __iterate_bulk_index_actions(self, doctype_object_iterable):
         for doctype_object in doctype_object_iterable:

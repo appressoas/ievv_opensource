@@ -363,6 +363,21 @@ but you can also use this in tests to debug just some requests::
             # ... more code here ...
 
 
+
+.. setting:: IEVV_ELASTICSEARCH2_TESTMODE
+
+IEVV_ELASTICSEARCH2_TESTMODE
+============================
+
+Set this to True to make ElasticSearch behave in a manner that
+makes writing Unit tests a bit easier.
+
+Add the following to you test settings to enable testmode::
+
+    IEVV_ELASTICSEARCH2_TESTMODE = True
+
+
+
 *****
 utils
 *****

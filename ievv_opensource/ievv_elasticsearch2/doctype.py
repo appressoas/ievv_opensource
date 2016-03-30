@@ -1,6 +1,8 @@
+import inspect
 import logging
 
 import elasticsearch_dsl
+from django.conf import settings
 from elasticsearch_dsl.document import DocTypeMeta as ElasticSearchDocTypeMeta
 from future.utils import with_metaclass
 
@@ -10,22 +12,6 @@ from .modelmapper import Modelmapper
 from .search import Search
 
 logger = logging.getLogger()
-
-
-class DocTypeConfigurationError(Exception):
-    """
-    Raised when a :class:`.DocType` is configured incorrectly.
-    """
-
-
-def _update_searchobject_for_doctype(doctype_class, attributename):
-    searchclass = getattr(doctype_class, attributename).__class__
-    searchobject = searchclass(
-        using=doctype_class._doc_type.using,
-        index=doctype_class._doc_type.index,
-        doc_type={doctype_class._doc_type.name: doctype_class.from_es},
-    )
-    setattr(doctype_class, attributename, searchobject)
 
 
 class DocTypeRegistry(Singleton):
@@ -97,7 +83,7 @@ class DocTypeRegistry(Singleton):
         Args:
             doctype_class: A :class:`.DocType` subclass.
         """
-        if doctype_class.abstract:
+        if doctype_class.is_abstract_doctype:
             self._abstract_doctypes.append(doctype_class)
         else:
             self._doctypes.append(doctype_class)
@@ -112,60 +98,229 @@ class DocTypeRegistry(Singleton):
         Args:
             doctype_class: A :class:`.ModelDocType` subclass.
         """
-        if not doctype_class.abstract:
+        if not doctype_class.is_abstract_doctype:
             self._model_doctypes.append(doctype_class)
 
+    def ievvinitialize_all_doctypes(self):
+        for doctype_class in self._doctypes:
+            doctype_class.ievvinitialize()
 
-class DocTypeMeta(ElasticSearchDocTypeMeta):
+
+class DocTypeMeta(type):
     """
     Metaclass for :class:`.DocType`.
     """
-    def __new__(cls, name, parents, dct):
-        abstract = dct.get('abstract', False)
-        dct['abstract'] = abstract
-        doctype_class = super(DocTypeMeta, cls).__new__(cls, name, parents, dct)
-
-        if 'objects' not in dct:
-            doctype_class.objects = Search()
-            _update_searchobject_for_doctype(doctype_class=doctype_class,
-                                             attributename='objects')
-        for key, value in dct.items():
-            if isinstance(value, Search):
-                _update_searchobject_for_doctype(doctype_class=doctype_class,
-                                                 attributename=key)
-        if hasattr(doctype_class, 'indexupdater'):
-            doctype_class.indexupdater = doctype_class.indexupdater.clone()
-        else:
-            doctype_class.indexupdater = IndexUpdater()
-        doctype_class.indexupdater.set_doctype_class(doctype_class=doctype_class)
-
-        if hasattr(doctype_class, 'modelmapper'):
-            doctype_class.modelmapper = doctype_class.modelmapper.copy()
-            doctype_class.modelmapper.set_doctype_class(doctype_class=doctype_class)
-
-        DocTypeRegistry.get_instance()._add_doctype(doctype_class=doctype_class)
-        return doctype_class
+    def __new__(mcs, name, bases, dct):
+        is_abstract_doctype = dct.get('is_abstract_doctype', False)
+        dct['is_abstract_doctype'] = is_abstract_doctype
+        return super(DocTypeMeta, mcs).__new__(mcs, name, bases, dct)
 
 
-class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
+class UnIevvInitializedDocTypeError(Exception):
+    """
+    Raised when trying to use a :class:`.DocType` before
+    :meth:`.DocType.ievvinitialize` has been called.
+    """
+
+
+class DocType(with_metaclass(DocTypeMeta, object)):
     """
     Base class that you subclass to define an ElasticSearch doctype.
 
     Refer to :doc:`ievv_elasticsearch2` for examples.
     """
+    is_abstract_doctype = True
+    _has_successfully_executed_ievvinitialize = False
 
     #: If this is ``True``, the doctype is a base class for other doctypes, and
-    #: never instantiated. An abstract DocType is not fully configured, and
+    #: never instantiated. An abstract DocType is not fully configured
+    #: (:meth:`~.DocType.setup` returns without doing anything), and
     #: it is registered as an abstract doctype in :class:`.DocTypeRegistry`.
     #: This is ``False`` by default for subclasses, and it is not inherited, so you
     #: have to set this explicitly to ``True`` for every abstract doctype class.
-    abstract = True
 
     @classmethod
-    def search(cls, *args, **kwargs):
-        logger.warning('You should use {classname}.objects instead of {classname}.search().'.format(
-            classname=cls.__name__))
-        return super(DocType, cls).search(*args, **kwargs)
+    def __initialize_searchobject(cls, attributename):
+        searchclass = getattr(cls, attributename).__class__
+        searchobject = searchclass(
+            using=cls.elasticsearch_dsl_doctype_class._doc_type.using,
+            index=cls.elasticsearch_dsl_doctype_class._doc_type.index,
+            doc_type={cls.elasticsearch_dsl_doctype_class._doc_type.name: cls.elasticsearch_dsl_doctype_class.from_es},
+        )
+        setattr(cls, attributename, searchobject)
+
+    @classmethod
+    def ievvinitialize_get_elasticsearch_dsl_doctype_base_class(cls):
+        return elasticsearch_dsl.DocType
+
+    @classmethod
+    def __get_manually_added_doctype_fields(cls):
+        doctype_fields = {}
+        for name, value in inspect.getmembers(cls):
+            if isinstance(value, elasticsearch_dsl.Field):
+                doctype_fields[name] = value
+                delattr(cls, name)
+        return doctype_fields
+
+    @classmethod
+    def ievvinitialize_create_doctype_class(cls):
+        attributes = {}
+        attributes.update(cls.doctype_fields)
+        if hasattr(cls, 'Meta'):
+            attributes['Meta'] = cls.Meta
+            delattr(cls, 'Meta')
+
+        attributes['_autocreated_by_ievv_elasticsearch'] = True
+        name = '{}Dsl'.format(cls.__name__)
+        cls.elasticsearch_dsl_doctype_class = type(
+            name, (cls.ievvinitialize_get_elasticsearch_dsl_doctype_base_class(),), attributes)
+
+    @classmethod
+    def ievvinitialize_searchobjects(cls):
+        if not hasattr(cls, 'objects'):
+            cls.objects = Search()
+            cls.__initialize_searchobject(attributename='objects')
+        for name, value in inspect.getmembers(cls):
+            if isinstance(value, Search):
+                cls.__initialize_searchobject(attributename=name)
+
+    @classmethod
+    def ievvinitialize_indexupdater(cls):
+        if hasattr(cls, 'indexupdater'):
+            cls.indexupdater = cls.indexupdater.clone()
+        else:
+            cls.indexupdater = IndexUpdater()
+        cls.indexupdater.set_doctype_class(doctype_class=cls)
+
+    @classmethod
+    def ievvinitialize_create_modelmapper(cls):
+        if hasattr(cls, 'modelmapper'):
+            cls.modelmapper = cls.modelmapper.copy()
+
+    @classmethod
+    def ievvinitialize_modelmapper(cls):
+        if hasattr(cls, 'modelmapper'):
+            cls.modelmapper.set_doctype_class(doctype_class=cls)
+
+    @classmethod
+    def ievvinitialize(cls):
+        if cls._has_successfully_executed_ievvinitialize:
+            return
+        cls.doctype_fields = cls.__get_manually_added_doctype_fields()
+        cls.ievvinitialize_create_modelmapper()
+        cls.ievvinitialize_create_doctype_class()
+        cls.ievvinitialize_modelmapper()
+        cls.ievvinitialize_searchobjects()
+        cls.ievvinitialize_indexupdater()
+        # DocTypeRegistry.get_instance()._add_doctype(doctype_class=cls)
+        cls._has_successfully_executed_ievvinitialize = True
+
+    @classmethod
+    def ievvinitialize_and_create_in_index(cls):
+        if not getattr(settings, 'IEVV_ELASTICSEARCH2_TESTMODE', False):
+            raise Exception('Can not use ievvinitialize_and_create_in_index() unless '
+                            'the IEVV_ELASTICSEARCH2_TESTMODE-setting is set to True.')
+        cls.ievvinitialize()
+        cls.init()
+
+    #
+    #
+    # Mirror classmethods on elasticsearch_dsl.DocType
+    #
+    #
+
+    @classmethod
+    def __classmethod_use_before_ievvinitialize_check(cls, methodname):
+        if not cls._has_successfully_executed_ievvinitialize:
+            raise UnIevvInitializedDocTypeError(
+                'Can not use {}.{}.{} before the DocType has been initialized with ievvinitialize().'.format(
+                    cls.__module__, cls.__name__, methodname
+                ))
+
+    @classmethod
+    def init(cls, index=None, using=None):
+        cls.__classmethod_use_before_ievvinitialize_check('init')
+        cls.elasticsearch_dsl_doctype_class.init(index=index, using=using)
+
+    @classmethod
+    def get(cls, id, using=None, index=None, **kwargs):
+        cls.__classmethod_use_before_ievvinitialize_check('get')
+        return cls.elasticsearch_dsl_doctype_class.get(
+            id=id, using=using, index=index, **kwargs)
+
+    #
+    #
+    # Convenience class methods
+    #
+    #
+
+    @classmethod
+    def get_doc_type_options(cls):
+        return cls.elasticsearch_dsl_doctype_class._doc_type
+
+    def __init__(self, **kwargs):
+        if not self.__class__._has_successfully_executed_ievvinitialize:
+            raise UnIevvInitializedDocTypeError(
+                'Can not initialize {}.{} it has been been initialized with ievvinitialize().'.format(
+                    self.__class__.__module__, self.__class__.__name__))
+        self.kwargs = kwargs
+        self.elasticsearch_dsl_doctype = self.elasticsearch_dsl_doctype_class(**kwargs)
+
+    #
+    #
+    # Make attribute access work as close to working with
+    # elasticsearch_dsl.DocType as possible.
+    #
+    #
+
+    def __getattr__(self, name):
+        if name in self.__class__.doctype_fields:
+            return getattr(self.elasticsearch_dsl_doctype, name)
+        else:
+            raise AttributeError('No attribute named {}'.format(name))
+
+    def __setattr__(self, name, value):
+        if name in self.__class__.doctype_fields:
+            return setattr(self.elasticsearch_dsl_doctype, name, value)
+        else:
+            return super(DocType, self).__setattr__(name, value)
+
+    @property
+    def meta(self):
+        return self.elasticsearch_dsl_doctype.meta
+
+    @property
+    def _id(self):
+        return self.elasticsearch_dsl_doctype.meta.id
+
+    @_id.setter
+    def _id(self, value):
+        self.elasticsearch_dsl_doctype.meta.id = value
+
+    #
+    #
+    # Mirror instance methods from elasticsearch_dsl.DocType
+    #
+    #
+
+    def delete(self, **kwargs):
+        return self.elasticsearch_dsl_doctype.delete(**kwargs)
+
+    def to_dict(self, **kwargs):
+        return self.elasticsearch_dsl_doctype.to_dict(**kwargs)
+
+    def update(self, **kwargs):
+        return self.elasticsearch_dsl_doctype.update(**kwargs)
+
+    def save(self, **kwargs):
+        self.elasticsearch_dsl_doctype.save(**kwargs)
+
+
+    #
+    #
+    # Convenience instance methods
+    #
+    #
 
     def get_from_index(self):
         """
@@ -185,30 +340,20 @@ class DocType(with_metaclass(DocTypeMeta, elasticsearch_dsl.DocType)):
             this since it can impact performance. It is mostly useful
             for debugging and in tests.
         """
-        self._get_connection(using=using).flush()
+        self.elasticsearch_dsl_doctype._get_connection(using=using).flush()
 
 
-class ModelDocTypeMeta(DocTypeMeta):
-    def __new__(cls, name, parents, dct):
-        modelmapper = None
-        model_class = dct.get('model_class', None)
+class ModelDocType(DocType):
+    is_abstract_doctype = True
+
+    @classmethod
+    def ievvinitialize_create_modelmapper(cls):
+        super(ModelDocType, cls).ievvinitialize_create_modelmapper()
+
+        model_class = getattr(cls, 'model_class', None)
         if model_class is not None:
-            if 'modelmapper' in dct:
-                modelmapper = dct['modelmapper'].copy()
-            else:
-                modelmapper = Modelmapper(model_class=model_class, automap_fields=True)
-                dct['modelmapper'] = modelmapper
-            for doctypefieldname, doctypefield in modelmapper.automake_doctype_fields().items():
-                if doctypefieldname not in dct:
-                    dct[doctypefieldname] = doctypefield
-        doctype_class = super(ModelDocTypeMeta, cls).__new__(cls, name, parents, dct)
-        if modelmapper:
-            modelmapper.set_doctype_class(doctype_class=doctype_class)
-
-        DocTypeRegistry.get_instance()._add_model_doctype(doctype_class=doctype_class)
-        return doctype_class
-
-
-class ModelDocType(with_metaclass(ModelDocTypeMeta, DocType)):
-    model_class = None
-    abstract = True
+            if not hasattr(cls, 'modelmapper'):
+                cls.modelmapper = Modelmapper(model_class=model_class, automap_fields=True)
+            for doctypefieldname, doctypefield in cls.modelmapper.automake_doctype_fields().items():
+                if doctypefieldname not in cls.doctype_fields:
+                    cls.doctype_fields[doctypefieldname] = doctypefield

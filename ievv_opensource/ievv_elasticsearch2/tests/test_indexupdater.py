@@ -22,9 +22,9 @@ class TestIndexUpdaterBulkIndex(test.TestCase):
         self.es = connections.get_connection()
         self.es.indices.delete(index='_all')
         self.es.indices.flush(index='_all')
+        PersonDocType.ievvinitialize_and_create_in_index()
 
     def test_single(self):
-        PersonDocType.init()
         person = PersonDocType(name='Test')
         person.meta.id = 1
         PersonDocType.indexupdater.bulk_index([person])
@@ -32,7 +32,6 @@ class TestIndexUpdaterBulkIndex(test.TestCase):
         self.assertEqual('Test', person.name)
 
     def test_multiple(self):
-        PersonDocType.init()
         person1 = PersonDocType(name='Test1')
         person1.meta.id = 10
         person2 = PersonDocType(name='Test2')
@@ -61,15 +60,14 @@ class TestIndexUpdatedBulkIndexModelIds(test.TestCase):
         self.es = connections.get_connection()
         self.es.indices.delete(index='_all')
         self.es.indices.flush(index='_all')
+        AutomappedDocType.ievvinitialize_and_create_in_index()
 
     def test_single(self):
-        AutomappedDocType.init()
         item = mommy.make(ModelmapperModel, char='a')
         AutomappedDocType.indexupdater.bulk_index_model_ids(ids=[item.id])
         self.assertEqual('a', AutomappedDocType.get(id=item.id).char)
 
     def test_multiple(self):
-        AutomappedDocType.init()
         item1 = mommy.make(ModelmapperModel, char='a')
         item2 = mommy.make(ModelmapperModel, char='b')
         item3 = mommy.make(ModelmapperModel, char='c')

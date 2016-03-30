@@ -23,4 +23,3 @@ from .modelmapper import DoctypeFieldDoesNotExist  # noqa
 from .modelmapper import ModelFieldDoesNotExist  # noqa
 from .batchframework import IndexAction  # noqa
 from .batchframework import indexaction_factory  # noqa
-from . import indexingmanager

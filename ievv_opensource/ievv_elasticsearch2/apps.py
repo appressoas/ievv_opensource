@@ -3,6 +3,8 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 from elasticsearch_dsl.connections import connections
 
+from .doctype import DocTypeRegistry
+
 
 class IevvElasticSearch2AppConfig(AppConfig):
     name = 'ievv_opensource.ievv_elasticsearch2'
@@ -18,3 +20,5 @@ class IevvElasticSearch2AppConfig(AppConfig):
                 configdict['transport_class'] = transport_class
             kwargs[name] = configdict
         connections.configure(**kwargs)
+
+        DocTypeRegistry.get_instance().ievvinitialize_all_doctypes()
