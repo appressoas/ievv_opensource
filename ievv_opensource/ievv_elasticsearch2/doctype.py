@@ -50,6 +50,7 @@ class DocTypeRegistry(Singleton):
         self._doctypes = []
         self._model_doctypes = []
         self._abstract_doctypes = []
+        self._default_index_to_doctype_class_map = {}
 
     def get_doctypes_iterator(self):
         """
@@ -72,6 +73,13 @@ class DocTypeRegistry(Singleton):
         """
         return iter(self._abstract_doctypes)
 
+    def __add_doctype_class_to_index_map(self, doctype_class):
+        default_index = doctype_class.get_doc_type_options().index
+        if default_index:
+            doctypes_in_index = self._default_index_to_doctype_class_map.get(default_index, [])
+            doctypes_in_index.append(doctype_class)
+            self._default_index_to_doctype_class_map[default_index] = doctypes_in_index
+
     def add(self, doctype_class):
         """
         Add a :class:`.DocType` to the registry.
@@ -88,6 +96,7 @@ class DocTypeRegistry(Singleton):
             if issubclass(doctype_class, ModelDocType):
                 self._model_doctypes.append(doctype_class)
             doctype_class.ievvinitialize()
+            self.__add_doctype_class_to_index_map(doctype_class=doctype_class)
 
 
 class DocTypeMeta(type):
