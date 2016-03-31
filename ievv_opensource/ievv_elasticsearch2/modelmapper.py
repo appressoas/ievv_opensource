@@ -406,7 +406,7 @@ class Modelmapper(with_metaclass(ModelmapperMeta)):
         if self._automap_fields:
             self.automap_fields()
 
-    def copy(self):
+    def clone(self):
         copy = self.__class__(model_class=self.model_class,
                               automap_fields=self._automap_fields,
                               automap_id_field=self._automap_id_field,

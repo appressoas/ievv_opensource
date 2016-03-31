@@ -179,7 +179,7 @@ class DocType(with_metaclass(DocTypeMeta, object)):
     @classmethod
     def ievvinitialize_create_modelmapper(cls):
         if hasattr(cls, 'modelmapper'):
-            cls.modelmapper = cls.modelmapper.copy()
+            cls.modelmapper = cls.modelmapper.clone()
 
     @classmethod
     def ievvinitialize_modelmapper(cls):
