@@ -385,7 +385,8 @@ ievv_batchframework
 
 IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS
 =====================================
-If this is ``True``, all actions will be executed syncronously.
+If this is ``True``, all actions will be executed syncronously. Read more about
+this in :ref:`ievv_batchframework_develop_asyncronous`.
 
 
 

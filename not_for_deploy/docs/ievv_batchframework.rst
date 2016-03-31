@@ -156,6 +156,40 @@ to start the Django server, redis and the celery worker. To test that everything
    If this works, Celery is configured correctly.
 
 
+.. _ievv_batchframework_develop_asyncronous
+
+***********************************
+Developing with asyncronous actions
+***********************************
+When developing with asyncronous tasks with the setup from the introduction guide above,
+you need to restart ``ievv devrun`` each time you change some code used by an asyncronous
+action. This means that if you add an Action or ActionGroup, or change any code used within
+an Action or ActionGroup, you have to stop ``ievv devrun``, and start it again. We provide
+two options for avoiding this.
+
+
+Option 1: Run all actions synchronously
+=======================================
+This is great for unit tests, and for developing and debugging code in your
+:meth:`ievv_opensource.ievv_batchframework.batchregistry.Action.executable`
+methods. To enable this, add the following to your settings::
+
+   IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS = True
+
+
+Option 2: Run celery worker manually
+====================================
+Restarting ``ievv devrun`` can take some time if you have lots of commands that have
+to stop and start again. You can save some time for each change if you remove/comment out
+the ``ievvdevrun.runnables.celery_worker.RunnableThread`` line from the ``IEVVTASKS_DEVRUN_RUNNABLES``
+setting (restart ``ievv devrun`` after this change), and run Celery manually with the following
+command instead::
+
+   $ celery -A myproject worker -l debug
+
+Now you can start and stop only the Celery worker instead of restarting ``ievv devrun``.
+
+
 *****************
 Batchregistry API
 *****************
