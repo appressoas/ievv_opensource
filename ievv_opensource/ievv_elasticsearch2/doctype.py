@@ -163,7 +163,6 @@ class DocType(with_metaclass(DocTypeMeta, object)):
     def ievvinitialize_searchobjects(cls):
         if not hasattr(cls, 'objects'):
             cls.objects = Search()
-            cls.__initialize_searchobject(attributename='objects')
         for name, value in inspect.getmembers(cls):
             if isinstance(value, Search):
                 cls.__initialize_searchobject(attributename=name)
