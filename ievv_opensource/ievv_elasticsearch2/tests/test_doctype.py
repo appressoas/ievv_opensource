@@ -46,6 +46,31 @@ class TestIevvDocType(test.TestCase):
 
         self.assertTrue(MyDocType.is_abstract_doctype)
 
+    # def test_get_all_fieldnames_simple(self):
+    #     class MyDocType(ievv_elasticsearch2.DocType):
+    #         name = elasticsearch_dsl.String()
+    #         age = elasticsearch_dsl.Integer()
+    #     MyDocType.ievvinitialize()
+    #
+    #     self.assertEqual(
+    #         {'name', 'age'},
+    #         MyDocType.get_all_fieldnames_set())
+    #
+    # def test_get_all_fieldnames_nested(self):
+    #     class MyDocType(ievv_elasticsearch2.DocType):
+    #         size = elasticsearch_dsl.Integer()
+    #         parent = elasticsearch_dsl.Nested(
+    #             properties={
+    #                 'name': elasticsearch_dsl.String(),
+    #                 'size': elasticsearch_dsl.Integer()
+    #             }
+    #         )
+    #     MyDocType.ievvinitialize()
+    #
+    #     self.assertEqual(
+    #         {'size', 'parent.name', 'parent.size'},
+    #         MyDocType.get_all_fieldnames_set())
+
     # def test_baseclass_is_added_correctly_to_registry(self):
     #     registry = ievv_elasticsearch2.DocTypeRegistry.get_instance()
     #     ievv_elasticsearch2.DocType.ievvinitialize()

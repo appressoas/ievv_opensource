@@ -6,6 +6,7 @@ from .doctype import DocType  # noqa
 from .doctype import ModelDocType  # noqa
 from .indexupdater import IndexUpdater  # noqa
 from .modelmapper import Modelmapper  # noqa
+from .modelmapper import FieldMapping  # noqa
 from .modelmapper import StringMapping  # noqa
 from .modelmapper import IntegerMapping  # noqa
 from .modelmapper import BigIntegerMapping  # noqa
@@ -15,6 +16,7 @@ from .modelmapper import FloatMapping  # noqa
 from .modelmapper import DoubleMapping  # noqa
 from .modelmapper import DateMapping  # noqa
 from .modelmapper import DateTimeMapping  # noqa
+from .modelmapper import ForeignKeyMapping  # noqa
 from .modelmapper import ForeignKeyObjectMapping  # noqa
 from .modelmapper import ForeignKeyPrefixMapping  # noqa
 from .modelmapper import OneToManyNestedMapping  # noqa

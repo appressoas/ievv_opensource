@@ -58,7 +58,12 @@ class TestSearch(test.TestCase):
         #     .query('match', name='Peter')
         # result = search.execute()
         # pprint(result)
-        #
+
+        # search = ievv_elasticsearch2.Search()\
+        #     .query('multi_match', query='The', fields=['_all'])
+        # result = search.execute()
+        # pprint(result)
+
         # search = PersonDocType.objects.query_name(name='Peter')
         # result = search.execute()
         # pprint(result)
@@ -73,7 +78,6 @@ class TestSearch(test.TestCase):
 
         # for match in ievv_elasticsearch2.Search().query('match_all').execute():
         #     print(match.to_dict())
-
 
     def test_get_error(self):
         PersonDocType.init()

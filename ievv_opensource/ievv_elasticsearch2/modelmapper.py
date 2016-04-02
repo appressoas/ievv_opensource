@@ -140,6 +140,7 @@ class FieldMapping(object):
         Validate the mapping, to ensure that the mapped doctype fields actually exists.
 
         Args:
+            model_class: The django.db.Model class to validate the mapping against.
             doctype_class: The :class:`ievv_opensource.ievv_elasticsearch2.doctype.DocType` class.
             doctype_fieldnames_set: Set of doctype fieldnames.
 

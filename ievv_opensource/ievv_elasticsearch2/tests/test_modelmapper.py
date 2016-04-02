@@ -8,6 +8,177 @@ from ievv_opensource.ievv_elasticsearch2.tests.ievv_elasticsearch2_testapp.model
     ModelMapperChildModel, ModelMapperForeignKeyModel
 
 
+class TestFieldMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        class MyFieldMapping(ievv_elasticsearch2.FieldMapping):
+            elasticsearchdsl_fieldclass = elasticsearch_dsl.String
+
+        field = MyFieldMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.String))
+
+    def test_get_model_value_from_modelobject(self):
+        field = ievv_elasticsearch2.FieldMapping('char')
+        modelobject = mommy.make(ModelmapperModel, char='test')
+        self.assertEqual('test', field.get_model_value_from_modelobject(modelobject))
+
+    def test_to_doctype_value(self):
+        field = ievv_elasticsearch2.FieldMapping('char')
+        field._set_doctypefieldname('docchar')
+        modelobject = mommy.make(ModelmapperModel, char='test')
+        self.assertEqual('test', field.to_doctype_value(modelobject))
+
+    def test_prettyformat(self):
+        field = ievv_elasticsearch2.FieldMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        self.assertEqual('FieldMapping(modelfield <-> docfield)', field.prettyformat())
+
+    def test_prettyformat_with_modelclass(self):
+        field = ievv_elasticsearch2.FieldMapping('char')
+        field._set_doctypefieldname('docchar')
+        self.assertEqual('FieldMapping(CharField(char) <-> docchar)',
+                         field.prettyformat(model_class=ModelmapperModel))
+
+    def test_str(self):
+        field = ievv_elasticsearch2.FieldMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        self.assertEqual('FieldMapping(modelfield <-> docfield)', str(field))
+
+    def test_get_required_doctype_fieldnames_list(self):
+        field = ievv_elasticsearch2.FieldMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        self.assertEqual(['docfield'], field.get_required_doctype_fieldnames_list())
+
+    def test_validate_mapping_modelfield_does_not_exist(self):
+        class MyDocType(ievv_elasticsearch2.DocType):
+            docfield = elasticsearch_dsl.String()
+
+        field = ievv_elasticsearch2.FieldMapping('unknown_modelfield')
+        field._set_doctypefieldname('docfield')
+        with self.assertRaises(ievv_elasticsearch2.ModelFieldDoesNotExist):
+            field.validate_mapping(model_class=ModelmapperModel, doctype_class=MyDocType,
+                                   doctype_fieldnames_set={'docfield'})
+
+    def test_validate_mapping_doctypefield_does_not_exist(self):
+        class MyDocType(ievv_elasticsearch2.DocType):
+            docfield = elasticsearch_dsl.String()
+
+        field = ievv_elasticsearch2.FieldMapping('char')
+        field._set_doctypefieldname('unknown_docfield')
+        with self.assertRaises(ievv_elasticsearch2.DoctypeFieldDoesNotExist):
+            field.validate_mapping(model_class=ModelmapperModel, doctype_class=MyDocType,
+                                   doctype_fieldnames_set={'docfield'})
+
+
+class TestStringMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.StringMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.String))
+
+
+class TestIntegerMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.IntegerMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Integer))
+
+
+class TestSmallIntegerMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.SmallIntegerMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Short))
+
+
+class TestForeignKeyMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.ForeignKeyMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Long))
+
+    def test_get_model_value_from_modelobject(self):
+        field = ievv_elasticsearch2.ForeignKeyMapping('parent')
+        parentobject = mommy.make(ModelmapperModel)
+        modelobject = mommy.make(ModelMapperChildModel, parent=parentobject)
+        self.assertEqual(parentobject.id, field.get_model_value_from_modelobject(modelobject))
+
+
+class TestBooleanMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.BooleanMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Boolean))
+
+
+class TestFloatMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.FloatMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Float))
+
+
+class TestDoubleMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.DoubleMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Double))
+
+
+class TestDateMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.DateMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Date))
+
+
+class TestDateTimeMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.DateTimeMapping('modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Date))
+
+
+class TestForeignKeyObjectMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.ForeignKeyObjectMapping(
+            modelmapper=None,
+            modelfieldname='modelfield')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Object))
+
+    def test_to_doctype_value(self):
+        field = ievv_elasticsearch2.ForeignKeyObjectMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True),
+            modelfieldname='parent')
+        parentobject = mommy.make(ModelMapperForeignKeyModel, name='test')
+        modelobject = mommy.make(ModelmapperModel, parent=parentobject)
+        self.assertEqual({'name': 'test'}, field.to_doctype_value(modelobject))
+
+
 class AutomappedDocType(ievv_elasticsearch2.DocType):
     modelmapper = ievv_elasticsearch2.Modelmapper(ModelmapperModel, automap_fields=True)
     char = elasticsearch_dsl.String()

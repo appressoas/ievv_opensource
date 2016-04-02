@@ -249,6 +249,13 @@ class DocType(with_metaclass(DocTypeMeta, object)):
     def get_doc_type_options(cls):
         return cls.elasticsearch_dsl_doctype_class._doc_type
 
+    # @classmethod
+    # def get_all_fieldnames_set(cls):
+    #     all_fieldnames = set()
+    #     for fieldname in cls.get_doc_type_options().mapping:
+    #         all_fieldnames.add(fieldname)
+    #     return all_fieldnames
+
     def __init__(self, **kwargs):
         if not self.__class__._has_successfully_executed_ievvinitialize:
             raise UnIevvInitializedDocTypeError(
