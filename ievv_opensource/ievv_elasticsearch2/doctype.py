@@ -337,17 +337,71 @@ class DocType(with_metaclass(DocTypeMeta, object)):
     #
     #
 
-    def delete(self, **kwargs):
-        return self.elasticsearch_dsl_doctype.delete(**kwargs)
+    def delete(self, using=None, index=None, flush=False, **kwargs):
+        """
+        Delete the document.
 
-    def to_dict(self, **kwargs):
+        Args:
+            using: The connection alias to use. Defaults to the default connection.
+            index: The index to save to. Defaults to the default index for the DocType.
+            flush: If this is ``True``, we call :meth:`.flush` after saving. This
+                is useful when writing tests and debugging, but should not be used
+                for production code.
+            **kwargs: Extra kwargs for :class:`:class:`elasticsearch.Elasticsearch.delete`.
+        """
+        self.elasticsearch_dsl_doctype.delete(using=using, index=index, **kwargs)
+        if flush:
+            self.flush(using=using, index=index)
+
+    def to_dict(self, include_meta=False, **kwargs):
+        """
+        Get the document as a dict.
+
+        Args:
+            include_meta: Include the metadata fields? Defaults to ``False``.
+            **kwargs: Extra kwargs for :class:`elasticsearch_dsl.document.DocType.to_dict`.
+
+        Returns:
+
+        """
         return self.elasticsearch_dsl_doctype.to_dict(**kwargs)
 
-    def update(self, **kwargs):
-        return self.elasticsearch_dsl_doctype.update(**kwargs)
+    def update(self, using=None, index=None, flush=False, **fields):
+        """
+        (partially) Update the document.
 
-    def save(self, **kwargs):
-        self.elasticsearch_dsl_doctype.save(**kwargs)
+        Args:
+            using: The connection alias to use. Defaults to the default connection.
+            index: The index to save to. Defaults to the default index for the DocType.
+            flush: If this is ``True``, we call :meth:`.flush` after updating. This
+                is useful when writing tests and debugging, but should not be used
+                for production code.
+            **fields: Fieldname-to-value map for the fields you want to update.
+        """
+        self.elasticsearch_dsl_doctype.update(using=using, index=index, **fields)
+        if flush:
+            self.flush(using=using, index=index)
+
+    def save(self, using=None, index=None, validate=True, flush=False, **kwargs):
+        """
+        Save the document.
+
+        Args:
+            using: The connection alias to use. Defaults to the default connection.
+            index: The index to save to. Defaults to the default index for the DocType.
+            validate: Validate the values.
+            flush: If this is ``True``, we call :meth:`.flush` after saving. This
+                is useful when writing tests and debugging, but should not be used
+                for production code.
+            **kwargs: Extra kwargs for :class:`:class:`elasticsearch.Elasticsearch.index`.
+
+        Returns:
+            boolean: ``True`` if the document was created, and ``False`` if it was updated.
+        """
+        created = self.elasticsearch_dsl_doctype.save(using=using, index=index, validate=validate, **kwargs)
+        if flush:
+            self.flush(using=using, index=index)
+        return created
 
 
     #
@@ -363,19 +417,24 @@ class DocType(with_metaclass(DocTypeMeta, object)):
         """
         return self.__class__.get(id=self.meta.id)
 
-    def flush(self, using=None):
+    def flush(self, using=None, index=None):
         """
         Flush the index this document belongs to.
 
         Useful if you need to retrieve data that was updated in the index, but
         may not be avaiable right away.
 
+        Args:
+            using: The connection alias to use. Defaults to the default connection.
+            index: The index to save to. Defaults to the default index for the DocType.
+
         .. warning:: You should be very careful when using
             this since it can impact performance. It is mostly useful
             for debugging and in tests.
         """
         es = self.elasticsearch_dsl_doctype._get_connection(using=using)
-        es.indices.flush(index=self.elasticsearch_dsl_doctype.meta.index)
+        index = index or self.elasticsearch_dsl_doctype.meta.index
+        es.indices.flush(index=index)
 
 
 class ModelDocType(DocType):

@@ -66,34 +66,28 @@ class TestSearch(test.TestCase):
         self.assertEqual('John Doe', result[1].name)
 
     def test_use_doctype(self):
-        PersonDocType.ievvinitialize()
-        PersonDocType.init()
+        PersonDocType.ievvinitialize_and_create_in_index()
         person = PersonDocType(name='Peter',
                                description='The Pan')
-        person.save()
-        self.es.indices.flush()
+        person.save(flush=True)
         result = PersonDocType.objects.query_name(name='Peter').execute()
         self.assertEqual(1, len(result))
         self.assertEqual('Peter', result[0].name)
 
     def test_extra_search_object(self):
-        PersonDocType.ievvinitialize()
-        PersonDocType.init()
+        PersonDocType.ievvinitialize_and_create_in_index()
         person = PersonDocType(name='Peter',
                                description='The Pan')
-        person.save()
-        self.es.indices.flush()
+        person.save(flush=True)
         result = PersonDocType.fancysearch.query_all(text='Pan').execute()
         self.assertEqual(1, len(result))
         self.assertEqual('Peter', result[0].name)
 
     def test_underlying_elasticsearchdsl_doctype(self):
-        PersonDocType.ievvinitialize()
-        PersonDocType.init()
+        PersonDocType.ievvinitialize_and_create_in_index()
         person = PersonDocType(name='Peter',
                                description='The Pan')
-        person.save()
-        person.flush()
+        person.save(flush=True)
         result = PersonDocType.elasticsearch_dsl_doctype_class.search()\
             .query('match', name='Peter').execute()
         self.assertEqual(1, len(result))
@@ -103,8 +97,7 @@ class TestSearch(test.TestCase):
         PersonDocType.init()
         person = PersonDocType(name='Peter',
                                description='The Pan')
-        person.save()
-        self.es.indices.flush()
+        person.save(flush=True)
         with self.assertRaises(ievv_elasticsearch2.exceptions.NotFoundError):
             PersonDocType.get(id=10)
 
@@ -113,7 +106,7 @@ class TestSearch(test.TestCase):
     #     PersonDocType.init()
     #     person = PersonDocType(name='Peter',
     #                            description='The Pan')
-    #     person.save()
+    #     person.save(flush=True)
     #     self.es.indices.flush()
     #
     #     search = ievv_elasticsearch2.Search()\
