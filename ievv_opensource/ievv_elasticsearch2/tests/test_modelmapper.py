@@ -162,12 +162,17 @@ class TestDateTimeMapping(test.TestCase):
 class TestForeignKeyObjectMapping(test.TestCase):
     def test_automake_doctype_fields(self):
         field = ievv_elasticsearch2.ForeignKeyObjectMapping(
-            modelmapper=None,
-            modelfieldname='modelfield')
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True),
+            modelfieldname='parent')
         field._set_doctypefieldname('docfield')
         doctype_fields = field.automake_doctype_fields(model_class=None)
         self.assertEqual({'docfield'}, set(doctype_fields.keys()))
         self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Object))
+        self.assertEqual(
+            {'name'},
+            set(doctype_fields['docfield'].properties.to_dict().keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'].properties['name'], elasticsearch_dsl.String))
 
     def test_to_doctype_value(self):
         field = ievv_elasticsearch2.ForeignKeyObjectMapping(
@@ -177,6 +182,116 @@ class TestForeignKeyObjectMapping(test.TestCase):
         parentobject = mommy.make(ModelMapperForeignKeyModel, name='test')
         modelobject = mommy.make(ModelmapperModel, parent=parentobject)
         self.assertEqual({'name': 'test'}, field.to_doctype_value(modelobject))
+
+    def test_to_doctype_value_include_id(self):
+        field = ievv_elasticsearch2.ForeignKeyObjectMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True,
+                                                        automap_id_field=True),
+            modelfieldname='parent')
+        parentobject = mommy.make(ModelMapperForeignKeyModel, name='test')
+        modelobject = mommy.make(ModelmapperModel, parent=parentobject)
+        self.assertEqual({'name': 'test', 'id': parentobject.id}, field.to_doctype_value(modelobject))
+
+
+class TestForeignKeyPrefixMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.ForeignKeyPrefixMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True),
+            modelfieldname='parent')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield__name'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield__name'], elasticsearch_dsl.String))
+
+    def test_to_doctype_value(self):
+        field = ievv_elasticsearch2.ForeignKeyPrefixMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True),
+            modelfieldname='parent')
+        field._set_doctypefieldname('docfield')
+        parentobject = mommy.make(ModelMapperForeignKeyModel, name='test')
+        modelobject = mommy.make(ModelmapperModel, parent=parentobject)
+        self.assertEqual({'docfield__name': 'test'}, field.to_doctype_value(modelobject))
+
+    def test_to_doctype_value_include_id(self):
+        field = ievv_elasticsearch2.ForeignKeyPrefixMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperForeignKeyModel,
+                                                        automap_fields=True,
+                                                        automap_id_field=True),
+            modelfieldname='parent')
+        field._set_doctypefieldname('docfield')
+        parentobject = mommy.make(ModelMapperForeignKeyModel, name='test')
+        modelobject = mommy.make(ModelmapperModel, parent=parentobject)
+        self.assertEqual({'docfield__name': 'test', 'docfield__id': parentobject.id},
+                         field.to_doctype_value(modelobject))
+
+
+class TestOneToManyNestedMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.OneToManyNestedMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperChildModel,
+                                                        automap_fields=True),
+            modelfieldname='children')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Nested))
+        self.assertEqual(
+            {'size', 'parent'},
+            set(doctype_fields['docfield'].properties.to_dict().keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'].properties['size'], elasticsearch_dsl.Integer))
+
+    def test_to_doctype_value(self):
+        field = ievv_elasticsearch2.OneToManyNestedMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperChildModel,
+                                                        automap_fields=True),
+            modelfieldname='children')
+        parentobject = mommy.make(ModelmapperModel)
+        mommy.make(ModelMapperChildModel, parent=parentobject, size=1)
+        mommy.make(ModelMapperChildModel, parent=parentobject, size=2)
+        self.assertEqual(
+            [
+                {'size': 1, 'parent': parentobject.id},
+                {'size': 2, 'parent': parentobject.id},
+            ],
+            field.to_doctype_value(parentobject))
+
+    def test_to_doctype_value_include_id(self):
+        field = ievv_elasticsearch2.OneToManyNestedMapping(
+            modelmapper=ievv_elasticsearch2.Modelmapper(model_class=ModelMapperChildModel,
+                                                        automap_fields=True,
+                                                        automap_id_field=True),
+            modelfieldname='children')
+        parentobject = mommy.make(ModelmapperModel)
+        modelobject1 = mommy.make(ModelMapperChildModel, parent=parentobject, size=1)
+        modelobject2 = mommy.make(ModelMapperChildModel, parent=parentobject, size=2)
+        self.assertEqual(
+            [
+                {'id': modelobject1.id, 'size': 1, 'parent': parentobject.id},
+                {'id': modelobject2.id, 'size': 2, 'parent': parentobject.id},
+            ],
+            field.to_doctype_value(parentobject))
+
+
+class TestOneToManyIdArrayMapping(test.TestCase):
+    def test_automake_doctype_fields(self):
+        field = ievv_elasticsearch2.OneToManyIdArrayMapping(modelfieldname='children')
+        field._set_doctypefieldname('docfield')
+        doctype_fields = field.automake_doctype_fields(model_class=None)
+        self.assertEqual({'docfield'}, set(doctype_fields.keys()))
+        self.assertTrue(isinstance(doctype_fields['docfield'], elasticsearch_dsl.Long))
+        self.assertTrue(doctype_fields['docfield']._multi)
+
+    def test_to_doctype_value(self):
+        field = ievv_elasticsearch2.OneToManyIdArrayMapping(modelfieldname='children')
+        parentobject = mommy.make(ModelmapperModel)
+        modelobject1 = mommy.make(ModelMapperChildModel, parent=parentobject, size=1)
+        modelobject2 = mommy.make(ModelMapperChildModel, parent=parentobject, size=2)
+        self.assertEqual(
+            [modelobject1.id, modelobject2.id],
+            field.to_doctype_value(parentobject))
 
 
 class AutomappedDocType(ievv_elasticsearch2.DocType):

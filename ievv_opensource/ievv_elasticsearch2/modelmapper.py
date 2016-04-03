@@ -261,6 +261,14 @@ class ForeignKeyObjectMapping(FieldMapping):
         super(ForeignKeyObjectMapping, self).__init__(modelfieldname=modelfieldname)
         self.modelmapper = modelmapper
 
+    def automake_doctype_fields(self, model_class):
+        foreignkey_doctype_fields = self.modelmapper.automake_doctype_fields()
+        return {
+            self.doctypefieldname: self.elasticsearchdsl_fieldclass(
+                properties=foreignkey_doctype_fields
+            )
+        }
+
     def to_doctype_value(self, modelobject):
         modelvalue = self.get_model_value_from_modelobject(modelobject)
         return self.modelmapper.to_dict(modelvalue, with_meta=False)
@@ -326,6 +334,14 @@ class OneToManyNestedMapping(FieldMapping):
         super(OneToManyNestedMapping, self).__init__(modelfieldname=modelfieldname)
         self.modelmapper = modelmapper
 
+    def automake_doctype_fields(self, model_class):
+        child_doctype_fields = self.modelmapper.automake_doctype_fields()
+        return {
+            self.doctypefieldname: self.elasticsearchdsl_fieldclass(
+                properties=child_doctype_fields
+            )
+        }
+
     def to_doctype_value(self, modelobject):
         modelvalue = self.get_model_value_from_modelobject(modelobject)
         queryset = modelvalue.all()
@@ -338,12 +354,19 @@ class OneToManyIdArrayMapping(FieldMapping):
     FieldMapping suitable for one-to-many realationships that you want to
     map as an array of IDs in the DocType.
 
-    This is mapped to the ``array`` datatype in ElasticSearch.
+    This is mapped to an array in ElasticSearch (which does not require a special datatype).
     """
-    elasticsearchdsl_fieldclass = elasticsearch_dsl.Nested
+    elasticsearchdsl_fieldclass = elasticsearch_dsl.Long
 
     def __init__(self, modelfieldname=None):
         super(OneToManyIdArrayMapping, self).__init__(modelfieldname=modelfieldname)
+
+    def automake_doctype_fields(self, model_class):
+        return {
+            self.doctypefieldname: self.elasticsearchdsl_fieldclass(
+                multi=True
+            )
+        }
 
     def to_doctype_value(self, modelobject):
         modelvalue = self.get_model_value_from_modelobject(modelobject)
