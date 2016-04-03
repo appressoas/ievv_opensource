@@ -121,7 +121,7 @@ class DocType(with_metaclass(DocTypeMeta, object)):
     """
     Base class that you subclass to define an ElasticSearch doctype.
 
-    Refer to :doc:`ievv_elasticsearch2` for examples.
+    See :doc:`ievv_elasticsearch2` for an introduction and examples.
     """
     is_abstract_doctype = True
     _has_successfully_executed_ievvinitialize = False
@@ -197,6 +197,16 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
     @classmethod
     def ievvinitialize(cls):
+        """
+        Initialize this DocType. This does not create anything in ElasticSearch, it
+        only intializes all the magic that makes modelmapper, indexupdater, etc. work.
+
+        You normally do not call this directly, instead you add your doctype to
+        :class:`.DocTypeRegistry`, and let the registry call this.
+
+        In tests you may have to call this yourself. In that case, you may want to use
+        the :meth:`.ievvinitialize_and_create_in_index` shortcut.
+        """
         if cls._has_successfully_executed_ievvinitialize:
             return
         cls.doctype_fields = cls.__get_manually_added_doctype_fields()
@@ -209,6 +219,12 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
     @classmethod
     def ievvinitialize_and_create_in_index(cls):
+        """
+        Shortcut for calling :meth:`.ievvinitialize` followed by :meth:`.init`.
+
+        This raises an exeception if the :setting:`IEVV_ELASTICSEARCH2_TESTMODE` is not ``True``.
+        So this is not for production code - only for tests.
+        """
         if not getattr(settings, 'IEVV_ELASTICSEARCH2_TESTMODE', False):
             raise Exception('Can not use ievvinitialize_and_create_in_index() unless '
                             'the IEVV_ELASTICSEARCH2_TESTMODE-setting is set to True.')
@@ -321,10 +337,16 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
     @property
     def meta(self):
+        """
+        Shortcut for getting ``elasticsearch_dsl_doctype.meta``.
+        """
         return self.elasticsearch_dsl_doctype.meta
 
     @property
     def _id(self):
+        """
+        Shortcut for getting and setting ``elasticsearch_dsl_doctype.meta.id``.
+        """
         return self.elasticsearch_dsl_doctype.meta.id
 
     @_id.setter
@@ -403,7 +425,6 @@ class DocType(with_metaclass(DocTypeMeta, object)):
             self.flush(using=using, index=index)
         return created
 
-
     #
     #
     # Convenience instance methods
@@ -438,6 +459,11 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
 
 class ModelDocType(DocType):
+    """
+    Base class for elasticsearch doctype mapped to a Django model.
+
+    See :doc:`ievv_elasticsearch2` for an introduction and examples.
+    """
     is_abstract_doctype = True
 
     @classmethod
