@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import elasticsearch_dsl
 from django import test
 from elasticsearch_dsl.connections import connections
@@ -34,50 +32,72 @@ class TestSearch(test.TestCase):
         self.es.indices.delete(index='_all')
         self.es.indices.flush(index='_all')
 
-    def test_raw(self):
+    def test_use_search_without_doctype(self):
         self.es.index(index='test', doc_type='person', id=1, body={
             'name': 'Peter'
         })
         self.es.indices.flush()
-        search = ievv_elasticsearch2.Search()\
-            .query('match', name='Peter')
+        result = ievv_elasticsearch2.Search()\
+            .query('match', name='Peter')\
+            .execute()
+        self.assertEqual(1, len(result))
+        self.assertEqual('Peter', result[0].name)
 
-        result = search.execute()
-        print(type(result))
-        pprint(result)
+    def test_use_search_without_doctype_match_all(self):
+        self.es.index(index='test', doc_type='person', id=1, body={
+            'name': 'John Doe',
+            'description': 'The man'
+        })
+        self.es.index(index='test', doc_type='person', id=2, body={
+            'name': 'Jane Doe',
+            'description': 'The woman'
+        })
+        self.es.index(index='test', doc_type='person', id=3, body={
+            'name': 'Jack Doe',
+            'description': 'Unknown'
+        })
+        self.es.indices.flush()
+        result = ievv_elasticsearch2.Search()\
+            .query('multi_match', query='The', fields=['_all'])\
+            .sort('name')\
+            .execute()
+        self.assertEqual(2, len(result))
+        self.assertEqual('Jane Doe', result[0].name)
+        self.assertEqual('John Doe', result[1].name)
 
-    def test_doctype(self):
+    def test_use_doctype(self):
         PersonDocType.ievvinitialize()
         PersonDocType.init()
         person = PersonDocType(name='Peter',
                                description='The Pan')
         person.save()
         self.es.indices.flush()
+        result = PersonDocType.objects.query_name(name='Peter').execute()
+        self.assertEqual(1, len(result))
+        self.assertEqual('Peter', result[0].name)
 
-        # search = ievv_elasticsearch2.Search()\
-        #     .query('match', name='Peter')
-        # result = search.execute()
-        # pprint(result)
+    def test_extra_search_object(self):
+        PersonDocType.ievvinitialize()
+        PersonDocType.init()
+        person = PersonDocType(name='Peter',
+                               description='The Pan')
+        person.save()
+        self.es.indices.flush()
+        result = PersonDocType.fancysearch.query_all(text='Pan').execute()
+        self.assertEqual(1, len(result))
+        self.assertEqual('Peter', result[0].name)
 
-        # search = ievv_elasticsearch2.Search()\
-        #     .query('multi_match', query='The', fields=['_all'])
-        # result = search.execute()
-        # pprint(result)
-
-        # search = PersonDocType.objects.query_name(name='Peter')
-        # result = search.execute()
-        # pprint(result)
-        #
-        # search = PersonDocType.fancysearch.query_all(text='Pan')
-        # result = search.execute()
-        # pprint(result)
-        #
-        # search = PersonDocType.elasticsearch_dsl_doctype_class.search().query('match', name='Peter')
-        # result = search.execute()
-        # pprint(result)
-
-        # for match in ievv_elasticsearch2.Search().query('match_all').execute():
-        #     print(match.to_dict())
+    def test_underlying_elasticsearchdsl_doctype(self):
+        PersonDocType.ievvinitialize()
+        PersonDocType.init()
+        person = PersonDocType(name='Peter',
+                               description='The Pan')
+        person.save()
+        person.flush()
+        result = PersonDocType.elasticsearch_dsl_doctype_class.search()\
+            .query('match', name='Peter').execute()
+        self.assertEqual(1, len(result))
+        self.assertEqual('Peter', result[0].name)
 
     def test_get_error(self):
         PersonDocType.init()
@@ -87,3 +107,36 @@ class TestSearch(test.TestCase):
         self.es.indices.flush()
         with self.assertRaises(ievv_elasticsearch2.exceptions.NotFoundError):
             PersonDocType.get(id=10)
+
+    # def test_debug(self):
+    #     PersonDocType.ievvinitialize()
+    #     PersonDocType.init()
+    #     person = PersonDocType(name='Peter',
+    #                            description='The Pan')
+    #     person.save()
+    #     self.es.indices.flush()
+    #
+    #     search = ievv_elasticsearch2.Search()\
+    #         .query('match', name='Peter')
+    #     result = search.execute()
+    #     pprint(result)
+    #
+    #     search = ievv_elasticsearch2.Search()\
+    #         .query('multi_match', query='The', fields=['_all'])
+    #     result = search.execute()
+    #     pprint(result)
+    #
+    #     search = PersonDocType.objects.query_name(name='Peter')
+    #     result = search.execute()
+    #     pprint(result)
+    #
+    #     search = PersonDocType.fancysearch.query_all(text='Pan')
+    #     result = search.execute()
+    #     pprint(result)
+    #
+    #     search = PersonDocType.elasticsearch_dsl_doctype_class.search().query('match', name='Peter')
+    #     result = search.execute()
+    #     pprint(result)
+    #
+    #     for match in ievv_elasticsearch2.Search().query('match_all').execute():
+    #         print(match.to_dict())

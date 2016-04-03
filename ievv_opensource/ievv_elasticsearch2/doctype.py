@@ -3,6 +3,7 @@ import logging
 
 import elasticsearch_dsl
 from django.conf import settings
+from elasticsearch_dsl.connections import connections
 from future.utils import with_metaclass
 
 from ievv_opensource.utils.singleton import Singleton
@@ -230,11 +231,28 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
     @classmethod
     def init(cls, index=None, using=None):
+        """
+        Create mappings for this DocType in ElasticSearch.
+
+        Args:
+            index: The index to create the mapping in. Defaults to the default index configured
+                for this DocType.
+            using: The connection alias to use. Defaults to the default connection.
+        """
         cls.__classmethod_use_before_ievvinitialize_check('init')
         cls.elasticsearch_dsl_doctype_class.init(index=index, using=using)
 
     @classmethod
     def get(cls, id, using=None, index=None, **kwargs):
+        """
+        Get a DocType object by ``id``.
+
+        Args:
+            id: The ID of the document.
+            using: The alias for the ElasticSearch connection. Defaults to the default connection.
+            index: The index to get the document from. Defaults to the default index for this doctype.
+            **kwargs: Other kwargs for :class:`elasticsearch.Elasticsearch.get`.
+        """
         cls.__classmethod_use_before_ievvinitialize_check('get')
         return cls.elasticsearch_dsl_doctype_class.get(
             id=id, using=using, index=index, **kwargs)
@@ -247,14 +265,32 @@ class DocType(with_metaclass(DocTypeMeta, object)):
 
     @classmethod
     def get_doc_type_options(cls):
+        """
+        Get the :class:`elasticsearch_dsl.document.DocTypeOptions` object for the
+        underlying elasticsearch_dls DocType. This is the object that is created
+        from the ``Meta`` class, and it has attributes for all the MetaFields including:
+
+        - index (the default index to use for the doctype)
+        - using (the default connection to use for the doctype)
+        - name (the name of the elasticsearch doctype)
+        - mapping (an AttrDict of the doctype fields)
+        """
         return cls.elasticsearch_dsl_doctype_class._doc_type
 
-    # @classmethod
-    # def get_all_fieldnames_set(cls):
-    #     all_fieldnames = set()
-    #     for fieldname in cls.get_doc_type_options().mapping:
-    #         all_fieldnames.add(fieldname)
-    #     return all_fieldnames
+    @classmethod
+    def flush_index(cls, using='default'):
+        """
+        Flush the default index for this DocType.
+
+        Useful if you need to retrieve data that was updated in the index, but
+        may not be avaiable right away.
+
+        .. warning:: You should be very careful when using
+            this since it can impact performance. It is mostly useful
+            for debugging and in tests.
+        """
+        es = connections.get_connection(alias=using)
+        es.indices.flush(index=cls.get_doc_type_options().index)
 
     def __init__(self, **kwargs):
         if not self.__class__._has_successfully_executed_ievvinitialize:
@@ -327,7 +363,7 @@ class DocType(with_metaclass(DocTypeMeta, object)):
         """
         return self.__class__.get(id=self.meta.id)
 
-    def flush_index(self, using=None):
+    def flush(self, using=None):
         """
         Flush the index this document belongs to.
 
@@ -338,7 +374,8 @@ class DocType(with_metaclass(DocTypeMeta, object)):
             this since it can impact performance. It is mostly useful
             for debugging and in tests.
         """
-        self.elasticsearch_dsl_doctype._get_connection(using=using).flush()
+        es = self.elasticsearch_dsl_doctype._get_connection(using=using)
+        es.indices.flush(index=self.elasticsearch_dsl_doctype.meta.index)
 
 
 class ModelDocType(DocType):
