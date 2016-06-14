@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand
@@ -27,6 +29,13 @@ class Command(BaseCommand):
                                 ignore=ignore)
 
     def handle(self, *args, **options):
-        self.__build_python_translations()
-        if getattr(settings, 'IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS', False):
-            self.__build_javascript_translations()
+        current_directory = os.getcwd()
+        for directory in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
+            directory = os.path.abspath(directory)
+            self.stdout.write('Running makemessages for python files in {}'.format(directory))
+            os.chdir(directory)
+            self.__build_python_translations()
+            if getattr(settings, 'IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS', False):
+                self.stdout.write('Running makemessages for javascript files in {}'.format(directory))
+                self.__build_javascript_translations()
+            os.chdir(current_directory)

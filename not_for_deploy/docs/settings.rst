@@ -76,6 +76,33 @@ The patterns to ignore when making translations. Defaults to::
     ]
 
 
+.. setting:: IEVVTASKS_MAKEMESSAGES_DIRECTORIES
+
+IEVVTASKS_MAKEMESSAGES_DIRECTORIES
+==================================
+Directories to run makemessages and compilemessages in. Defaults to a list with the
+current working directory as the only item. The use case for this setting is if you
+have your translation files split over multiple apps or directories. Then you can use
+this setting to specify the parent directories of all your ``locale`` directories.
+
+Lets say you have this structure::
+
+    myproject/
+        usersapp/
+            locale/
+        untranslatedapp/
+        themeapp/
+            locale/
+
+You can then configure ``ievv makemessages`` and ``ievv compilemessages`` to
+build the translations in ``myproject.usersapp`` and ``myproject.themeapp`` with
+the following setting::
+
+    IEVVTASKS_MAKEMESSAGES_DIRECTORIES = [
+        'myproject/usersapp',
+        'myproject/themeapp',
+    ]
+
 .. setting:: IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
 
 IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
