@@ -112,7 +112,9 @@ class MockableRegistry(Registry):
 
     Typical usage in a test::
 
-        class MockCustomSql(customsql_registry.CustomSql):
+        from ievv_opensource.ievv_customsql import customsql_registry
+
+        class MockCustomSql(customsql_registry.AbstractCustomSql):
             # ...
 
         mockregistry = customsql_registry.MockableRegistry()
