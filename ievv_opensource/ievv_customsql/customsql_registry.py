@@ -128,7 +128,7 @@ class Registry(Singleton):
         classes initialized with no arguments.
         """
         for appname in self.iter_appnames():
-            for customsql in self.iter_customsql_in_appname(appname):
+            for customsql in self.iter_customsql_in_app(appname):
                 yield customsql
 
     def iter_appnames(self):
@@ -138,7 +138,7 @@ class Registry(Singleton):
         """
         return iter(self._customsql_classes_by_appname_map.keys())
 
-    def iter_customsql_in_appname(self, appname):
+    def iter_customsql_in_app(self, appname):
         """
         Iterate over all :class:`.AbstractCustomSql` subclasses registered
         in the provided appname. The yielded values are objects of the
@@ -147,10 +147,18 @@ class Registry(Singleton):
         for customsql_class in self._customsql_classes_by_appname_map[appname]:
             yield customsql_class(appname)
 
+    def run_all_in_app(self, appname):
+        """
+        Loops through all the :class:`.AbstractCustomSql` classes registered in the registry
+        with the provided ``appname``, and call :meth:`.AbstractCustomSql.run` for each of them.
+        """
+        for customsql in self.iter_customsql_in_app(appname):
+            customsql.run()
+
     def run_all(self):
         """
-        Loops through all the :class:`.CustomSql` classes in the registry, and call
-        :meth:`.CustomSql.run` for each of them.
+        Loops through all the :class:`.AbstractCustomSql` classes in the registry, and call
+        :meth:`.AbstractCustomSql.run` for each of them.
         """
         for customsql in self:
             customsql.run()

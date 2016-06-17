@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         registry = customsql_registry.Registry.get_instance()
         if appname:
-            customsql_iterator = registry.iter_customsql_in_appname(appname=appname)
+            customsql_iterator = registry.iter_customsql_in_app(appname=appname)
         else:
             customsql_iterator = iter(registry)
 

@@ -120,7 +120,7 @@ class TestRegistry(test.TestCase):
         mockregistry.add('my_first_app', MockCustomSql2)
         mockregistry.add('my_second_app', MockCustomSql3)
 
-        iter_list = list(mockregistry.iter_customsql_in_appname('my_first_app'))
+        iter_list = list(mockregistry.iter_customsql_in_app('my_first_app'))
         self.assertEqual(2, len(iter_list))
         self.assertTrue(isinstance(iter_list[0], MockCustomSql1))
         self.assertTrue(isinstance(iter_list[1], MockCustomSql2))

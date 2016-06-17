@@ -31,7 +31,7 @@ Apps
    ievv_tagframework
    ievv_batchframework
    ievv_elasticsearch
-   ievv_elasticsearch2
+   ievv_customsql
 
 
 ********

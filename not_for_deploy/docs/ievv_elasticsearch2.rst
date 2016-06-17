@@ -1,6 +1,6 @@
-###################################################
+###############################################################
 `ievv_elasticsearch2` --- Makes working with ElasticSearch easy
-###################################################
+###############################################################
 Extends `elasticsearch-py`_ and `elasticsearch-dsl`_ with some very
 useful utilities that makes it easier to use ElasticSearch with
 Django.
@@ -15,12 +15,11 @@ Add ``"ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig"`` to ``INSTALLE
 Goals
 *****
 The goal of ``ievv_elasticsearch2`` is to extend elasticsearch-dsl
-with::
+with:
 
 - Django settings based configuration.
 - Configuration that makes it easy to write tests.
-- Configuration that makes it easy to disable certain indexing
-  operations.
+- Configuration that makes it easy to disable certain indexing operations.
 - Common structure for handling index updates, even for complex
   cases where performance is really important. This includes a
   structure that makes offloading heavy indexing operations to Celery
