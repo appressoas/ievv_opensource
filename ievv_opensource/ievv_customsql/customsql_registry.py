@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django.db import connection
 
 from ievv_opensource.utils.singleton import Singleton
@@ -14,6 +16,14 @@ class AbstractCustomSql(object):
     triggers and functions, and override :meth:`.recreate_data` to rebuild the data
     maintained by the triggers, but many other use-cases are also possible.
     """
+    def __init__(self, appname=None):
+        """
+        Args:
+            appname: Not required - it is added automatically by :class:`.Registry`, and
+                used by :meth:`.__str__`` for easier debugging / prettier output.
+        """
+        self.appname = appname
+
     def execute_sql(self, sql):
         cursor = connection.cursor()
         cursor.execute(sql)
@@ -47,6 +57,9 @@ class AbstractCustomSql(object):
         self.initialize()
         self.recreate_data()
 
+    def __str__(self):
+        return '{} in {}'.format(self.__class__.__name__, self.appname)
+
 
 class Registry(Singleton):
     """
@@ -61,49 +74,86 @@ class Registry(Singleton):
 
             from django.apps import AppConfig
             from ievv_opensource.ievv_customsql import customsql_registry
-
             from myapp import customsql
-
 
             class MyAppConfig(AppConfig):
                 name = 'myapp'
 
                 def ready(self):
                     customsql_registry.Registry.get_instance().add(customsql.MyCustomSql)
+
+        See ``ievv_opensource/demo/customsql/apps.py`` for a complete demo.
     """
 
     def __init__(self):
         super(Registry, self).__init__()
         self._customsql_classes = []
+        self._customsql_classes_by_appname_map = OrderedDict()
 
-    def add(self, customsql_class):
+    def add(self, appname, customsql_class):
         """
         Add the given ``customsql_class`` to the registry.
 
         Parameters:
+            appname: The django appname where the ``customsql_class`` belongs.
             customsql_class: A subclass of :class:`.AbstractCustomSql`.
         """
         if customsql_class in self._customsql_classes:
             raise ValueError('{}.{} is already in the custom SQL registry.'.format(
                 customsql_class.__module__, customsql_class.__name__))
         self._customsql_classes.append(customsql_class)
+        if appname not in self._customsql_classes_by_appname_map:
+            self._customsql_classes_by_appname_map[appname] = []
+        self._customsql_classes_by_appname_map[appname].append(customsql_class)
+
+    def remove(self, appname, customsql_class):
+        self._customsql_classes.remove(customsql_class)
+        self._customsql_classes_by_appname_map[appname].remove(customsql_class)
+        if len(self._customsql_classes_by_appname_map[appname]) == 0:
+            del self._customsql_classes_by_appname_map[appname]
 
     def __contains__(self, customsql_class):
         """
-        Check if the provided customsql_class is in the registry.
+        Returns ``True`` if the provided customsql_class is in the registry.
 
         Parameters:
             customsql_class: A subclass of :class:`.AbstractCustomSql`.
         """
         return customsql_class in self._customsql_classes
 
+    def __iter__(self):
+        """
+        Iterate over all :class:`.AbstractCustomSql` subclasses registered
+        in the registry. The yielded values are objects of the
+        classes initialized with no arguments.
+        """
+        for appname in self.iter_appnames():
+            for customsql in self.iter_customsql_in_appname(appname):
+                yield customsql
+
+    def iter_appnames(self):
+        """
+        Returns an iterator over all the appnames in the registry.
+        Each item in the iterator is an appname (a string).
+        """
+        return iter(self._customsql_classes_by_appname_map.keys())
+
+    def iter_customsql_in_appname(self, appname):
+        """
+        Iterate over all :class:`.AbstractCustomSql` subclasses registered
+        in the provided appname. The yielded values are objects of the
+        classes initialized with no arguments.
+        """
+        for customsql_class in self._customsql_classes_by_appname_map[appname]:
+            yield customsql_class(appname)
+
     def run_all(self):
         """
         Loops through all the :class:`.CustomSql` classes in the registry, and call
         :meth:`.CustomSql.run` for each of them.
         """
-        for customsql_class in self._customsql_classes:
-            customsql_class().run()
+        for customsql in self:
+            customsql.run()
 
 
 class MockableRegistry(Registry):
