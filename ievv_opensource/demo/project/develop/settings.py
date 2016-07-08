@@ -4,6 +4,7 @@ from ievv_opensource.utils import ievvdevrun
 
 THIS_DIR = os.path.dirname(__file__)
 
+ROOT_URLCONF = 'ievv_opensource.demo.project.develop.urls'
 IEVVTASKS_DUMPDATA_DIRECTORY = os.path.join(THIS_DIR, 'dumps')
 
 

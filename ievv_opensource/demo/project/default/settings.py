@@ -70,8 +70,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
-
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
 THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'

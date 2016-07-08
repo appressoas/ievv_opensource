@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 from ievv_opensource.ievv_elasticsearchbrowser.cradmin import ElasticSearchBrowserCrAdminInstance
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^', include(ElasticSearchBrowserCrAdminInstance.urls())),
-)
+]
