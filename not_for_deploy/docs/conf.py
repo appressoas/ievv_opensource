@@ -19,8 +19,9 @@ import sys, os
 #sys.path.insert(0, os.path.abspath('.'))
 
 
-from django.conf import settings
-settings.configure()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ievv_opensource.demo.project.settingsproxy")
+import django
+django.setup()
 
 # Workaround for https://bitbucket.org/birkenfeld/sphinx/issue/1254/autodoc-fails-to-handle-descriptors-with
 from django.db.models.fields.files import FileDescriptor

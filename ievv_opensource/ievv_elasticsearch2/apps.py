@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.utils.module_loading import import_string
-from elasticsearch_dsl.connections import connections
 
 
 class IevvEsAppConfig(AppConfig):
@@ -9,6 +8,7 @@ class IevvEsAppConfig(AppConfig):
     verbose_name = "IEVV ES"
 
     def ready(self):
+        from elasticsearch_dsl.connections import connections
         kwargs = {}
         for name, configdict in settings.IEVV_ELASTICSEARCH2_CONNECTION_ALIASES.items():
             configdict = configdict.copy()
