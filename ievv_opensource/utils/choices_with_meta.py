@@ -75,7 +75,8 @@ class ChoicesWithMeta(object):
 
     Compatible with the ``choices``-attribute used in Django
     (I.E.: django.forms.ChoiceField, django.forms.CharField, ...)
-    through the :meth:`~.ChoicesWithMeta.iter_as_django_choices` method.
+    through the :meth:`~.ChoicesWithMeta.iter_as_django_choices_short`
+    and :meth:`~.ChoicesWithMeta.iter_as_django_choices_long` methods.
 
     Examples:
 
