@@ -165,7 +165,7 @@ class ChoicesWithMeta(object):
             fallback: Fallback value if ``value`` is not registered as a choice value.
 
         Returns:
-            The :class:`.Choice` with matching the value if it exists, otherwise return ``fallback``.
+            .Choice: The Choice matching the value if it exists, otherwise return ``fallback``.
         """
         return self.choices.get(value, fallback)
 
@@ -174,7 +174,8 @@ class ChoicesWithMeta(object):
         Get the :class:`.Choice` with the provided ``value``.
 
         Raises:
-            KeyError: If ``value`` is not in the ChoicesWithMeta.
+            KeyError: If no :class:`.Choice` with the provided
+                ``value`` is in the ChoicesWithMeta.
         """
         return self.choices[value]
 
@@ -183,7 +184,8 @@ class ChoicesWithMeta(object):
         Check if ``value`` is one of the choices.
 
         Returns:
-            True if ``value`` is one of the choices.
+            bool: True a :class:`.Choice` with the provided ``value``
+                is in the ChoicesWithMeta.
         """
         return value in self.choices
 
@@ -204,7 +206,7 @@ class ChoicesWithMeta(object):
         that users of your app can override.
 
         Returns:
-            An iterable of :class:`.Choice` objects.
+            iterable: An iterable of :class:`.Choice` objects.
         """
         return []
 
@@ -217,7 +219,7 @@ class ChoicesWithMeta(object):
             IndexError: If the index does not correspond to a choice.
 
         Returns:
-            The :class:`.Choice` at the provided index.
+            .Choice: The :class:`.Choice` at the provided index.
         """
         keys = list(self.choices.keys())
         value = keys[index]
