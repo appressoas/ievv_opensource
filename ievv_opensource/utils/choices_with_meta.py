@@ -126,7 +126,7 @@ class ChoicesWithMeta(object):
             User.USERTYPE_CHOICES['admin'].label
 
         You can access values as an attribute of the ChoicesWithMeta object
-        as the value uppercased with ``-`` and space replaced with ``_``:
+        as the value uppercased with ``-`` and space replaced with ``_``::
 
             User.USERTYPE_CHOICES.ADMIN.label
 
