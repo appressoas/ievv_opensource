@@ -10,13 +10,16 @@ class Choice(object):
     if you need more metadata.
 
     .. attribute:: value
+
         The value which is typically stored in the database, or
         sent as the actual POST data value in forms.
 
     .. attribute:: label
+
         A short user-friendly label for the choice.
 
     .. attribute:: description
+
         A user-friendly longer description of the choice.
     """
     def __init__(self, value, label=None, description=''):
@@ -63,7 +66,7 @@ class Choice(object):
 
 class ChoicesWithMeta(object):
     """
-    A more object oriented structure for choices.
+    An object oriented structure for model/form field choices.
 
     Unlike the simple ``(value, label)`` tuple used in
     Django, this miniframework supports more metadata because

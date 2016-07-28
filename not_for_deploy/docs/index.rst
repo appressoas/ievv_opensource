@@ -70,6 +70,7 @@ Utilities
    utils.singleton
    utils.text
    utils.ievv_colorize
+   utils.choices_with_meta
 
 
 ************
