@@ -85,19 +85,16 @@ class ChoicesWithMeta(object):
             class User(models.Model):
                 username = models.CharField(max_length=255, unique=True)
 
-                USERTYPE_ADMIN = 'admin'
-                USERTYPE_EDITOR = 'editor'
-                USERTYPE_NORMAL = 'normal'
                 USERTYPE_CHOICES = choices_with_meta.ChoicesWithMeta(
-                    choices_with_meta.Choice(value=USERTYPE_NORMAL, label='Normal'),
-                    choices_with_meta.Choice(value=USERTYPE_EDITOR, label='Editor'),
-                    choices_with_meta.Choice(value=USERTYPE_ADMIN, label='Admin')
+                    choices_with_meta.Choice(value='normal', label='Normal'),
+                    choices_with_meta.Choice(value='editor', label='Editor'),
+                    choices_with_meta.Choice(value='admin', label='Admin')
                 )
 
                 usertype = models.CharField(
                     max_length=255,
                     choices=USERTYPE_CHOICES.iter_as_django_choices_short,
-                    default=USERTYPE_NORMAL
+                    default=USERTYPE_CHOICES.NORMAL
                 )
 
         Lets say you want to provivide a bit more information about
@@ -105,7 +102,7 @@ class ChoicesWithMeta(object):
         for :class:`.Choice`::
 
             choices_with_meta.Choice(
-                value=USERTYPE_ADMIN,
+                value='admin',
                 label='Admin',
                 description='An administrator user with access to everything.')
 
@@ -126,7 +123,12 @@ class ChoicesWithMeta(object):
 
         Getting choices by value is easy::
 
-            User.USERTYPE_CHOICES[User.USERTYPE_ADMIN].label
+            User.USERTYPE_CHOICES['admin'].label
+
+        You can access values as an attribute of the ChoicesWithMeta object
+        as the value uppercased with ``-`` and space replaced with ``_``:
+
+            User.USERTYPE_CHOICES.ADMIN.label
 
         Getting choices by index is also easy::
 
@@ -151,6 +153,7 @@ class ChoicesWithMeta(object):
     """
     def __init__(self, *choices):
         self.choices = OrderedDict()
+        self.choices_attributes = {}
         for choice in self.get_default_choices():
             self.add(choice)
         for choice in choices:
@@ -190,7 +193,24 @@ class ChoicesWithMeta(object):
         return value in self.choices
 
     def __len__(self):
+        """
+        Get the number of choices.
+        """
         return len(self.choices)
+
+    def __getattr__(self, value):
+        """
+
+        Args:
+            value:
+
+        Returns:
+
+        """
+        if value in self.choices_attributes:
+            return self.choices_attributes[value]
+        else:
+            raise AttributeError()
 
     def get_default_choices(self):
         """
@@ -235,6 +255,10 @@ class ChoicesWithMeta(object):
         except IndexError:
             return None
 
+    def _value_to_attributename(self, value):
+        attributename = value.upper().replace('-', '_').replace(' ', '_')
+        return attributename
+
     def add(self, choice):
         """
         Add a :class:`.Choice`.
@@ -245,6 +269,20 @@ class ChoicesWithMeta(object):
         if choice.value in self.choices:
             raise KeyError('A choice with value "{}" alredy exists.'.format(choice.value))
         self.choices[choice.value] = choice
+        self.choices_attributes[self._value_to_attributename(value=choice.value)] = choice
+
+    def remove(self, value):
+        """
+        Remove a choice by value.
+
+        Args:
+            value: The value to remove from the ChoicesWithMeta.
+        """
+        if value in self.choices:
+            del self.choices[value]
+            del self.choices_attributes[self._value_to_attributename(value=value)]
+        else:
+            raise KeyError('{value} is not a valid choice value.'.format(value=value))
 
     def itervalues(self):
         """

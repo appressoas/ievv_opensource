@@ -22,11 +22,23 @@ class TestChoice(test.TestCase):
 
 
 class TestChoicesWithMeta(test.TestCase):
-    def test_add(self):
+    def test_value_to_attributename(self):
+        choices = choices_with_meta.ChoicesWithMeta()
+        self.assertEqual('TEST', choices._value_to_attributename('test'))
+        self.assertEqual('MULTI_WORD', choices._value_to_attributename('multi word'))
+        self.assertEqual('LINE_SEPARATED_WORDS', choices._value_to_attributename('line-separated-words'))
+
+    def test_add_adds_to_choices(self):
         choices = choices_with_meta.ChoicesWithMeta()
         choice = choices_with_meta.Choice(value='test1')
         choices.add(choice)
-        self.assertEqual(choice, choices['test1'])
+        self.assertEqual(choice, choices.choices['test1'])
+
+    def test_add_adds_to_choices_attributes(self):
+        choices = choices_with_meta.ChoicesWithMeta()
+        choice = choices_with_meta.Choice(value='test1')
+        choices.add(choice)
+        self.assertEqual(choice, choices.choices_attributes['TEST1'])
 
     def test_getitem_value_exists(self):
         choices = choices_with_meta.ChoicesWithMeta()
@@ -52,6 +64,17 @@ class TestChoicesWithMeta(test.TestCase):
     def test_get_by_value_value_does_not_exist_custom_fallback(self):
         choices = choices_with_meta.ChoicesWithMeta()
         self.assertEqual('fall back', choices.get_by_value('somevalue', 'fall back'))
+
+    def test_getattr_invalid_value(self):
+        choices = choices_with_meta.ChoicesWithMeta()
+        with self.assertRaises(AttributeError):
+            choices.INVALID
+
+    def test_getattr_valid_value(self):
+        choices = choices_with_meta.ChoicesWithMeta()
+        choice = choices_with_meta.Choice(value='test1')
+        choices.add(choice)
+        self.assertEqual(choice, choices.TEST1)
 
     def test_contains(self):
         choices = choices_with_meta.ChoicesWithMeta(
