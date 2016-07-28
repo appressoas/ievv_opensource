@@ -94,7 +94,9 @@ class ChoicesWithMeta(object):
                 )
 
                 usertype = models.CharField(
+                    max_length=255,
                     choices=USERTYPE_CHOICES.iter_as_django_choices_short,
+                    default=USERTYPE_NORMAL
                 )
 
         Lets say you want to provivide a bit more information about
