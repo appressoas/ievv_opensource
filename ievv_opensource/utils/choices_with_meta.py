@@ -87,14 +87,64 @@ class ChoicesWithMeta(object):
                 USERTYPE_ADMIN = 'admin'
                 USERTYPE_EDITOR = 'editor'
                 USERTYPE_NORMAL = 'normal'
+                USERTYPE_CHOICES = choices_with_meta.ChoicesWithMeta(
+                    choices_with_meta.Choice(value=USERTYPE_NORMAL, label='Normal'),
+                    choices_with_meta.Choice(value=USERTYPE_EDITOR, label='Editor'),
+                    choices_with_meta.Choice(value=USERTYPE_ADMIN, label='Admin')
+                )
 
                 usertype = models.CharField(
-                    choices=choices_with_meta.ChoicesWithMeta(
-                        choices_with_meta.Choice(value=USERTYPE_ADMIN, label='Admin'),
-                        choices_with_meta.Choice(value=USERTYPE_EDITOR, label='Editor'),
-                        choices_with_meta.Choice(value=USERTYPE_NORMAL, label='Normal')
-                    )
+                    choices=USERTYPE_CHOICES.iter_as_django_choices_short,
                 )
+
+        Lets say you want to provivide a bit more information about
+        each choice. Then you can use the ``description`` parameter
+        for :class:`.Choice`::
+
+            choices_with_meta.Choice(
+                value=USERTYPE_ADMIN,
+                label='Admin',
+                description='An administrator user with access to everything.')
+
+        You will most likely also want to update the ``choices``-argument for
+        your choice field to use :meth:`~.ChoicesWithMeta.iter_as_django_choices_long`
+        (to include description in the default label), or you may just want
+        to do that in certain views. You can also extend the :class:`Choice class<.Choice>`
+        and add your own logic in :meth:`.get_long_label` and :meth:`.get_short_label`.
+
+        ChoicesWithMeta makes it easier to provide good exception messages::
+
+            if "somechoice" not in User.USERTYPE_CHOICES:
+                raise ValidationError({
+                    'usertype': 'Must be one of: {}'.format(
+                        User.USERTYPE_CHOICES.get_values_as_commaseparated_string()
+                    )
+                })
+
+        Getting choices by value is easy::
+
+            User.USERTYPE_CHOICES[User.USERTYPE_ADMIN].label
+
+        Getting choices by index is also easy::
+
+            User.USERTYPE_CHOICES.get_choice_at_index(1).label
+
+        Getting the first choice (typically the default choice) is easy::
+
+            User.USERTYPE_CHOICES.get_first_choice()
+
+        You can iterate over the choices or values::
+
+            for choice in User.USERTYPE_CHOICES.iterchoices():
+                pass
+
+            for value in User.USERTYPE_CHOICES.itervalues():
+                pass
+
+        You can get the values as a list or as a comma separated string::
+
+            User.USERTYPE_CHOICES.get_values_as_list()
+            User.USERTYPE_CHOICES.get_values_as_commaseparated_string()
     """
     def __init__(self, *choices):
         self.choices = OrderedDict()
