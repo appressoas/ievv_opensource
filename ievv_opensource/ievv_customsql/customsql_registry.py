@@ -47,6 +47,12 @@ class AbstractCustomSql(object):
         """
         Recreate all data that any triggers created in :meth:`.initialize`
         would normally keep in sync automatically.
+
+        Can not be used unless :meth:`.initialize` has already be run (at some point).
+        This restriction is here to make it possible to create SQL functions
+        in :meth:`.initialize` that this method uses to recreate the data. Without this
+        restriction, code-reuse between :meth:`.initialize` and this function would be
+        very difficult.
         """
         pass
 
