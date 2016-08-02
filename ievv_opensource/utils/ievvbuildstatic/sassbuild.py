@@ -10,6 +10,10 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     SASS build plugin --- builds .scss files into css, and supports watching
     for changes.
 
+    By default, we assume ``sassc`` is available on PATH, but you can
+    override the path to the sassc executable by setting the
+    ``IEVVTASKS_BUILDSTATIC_SASSC_EXECUTABLE`` environment variable.
+
     Examples:
 
         Very simple example where the source file is in
@@ -92,9 +96,12 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         else:
             return ''
 
+    def get_sassc_executable(self):
+        return os.environ.get('IEVVTASKS_BUILDSTATIC_SASSC_EXECUTABLE', 'sassc')
+
     def run(self):
         self.get_logger().command_start('Building {}.'.format(self.get_sourcefile_path()))
-        executable = 'sassc'
+        executable = self.get_sassc_executable()
         kwargs = {}
         sass_include_paths = self.format_sass_include_paths()
         if sass_include_paths:
