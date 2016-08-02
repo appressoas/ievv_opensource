@@ -22,28 +22,23 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='demoapp2',
         version='2.0.1',
         plugins=[
-            ievvbuildstatic.bowerinstall.Plugin(
-                packages={
-                    'bootstrap': '~3.1.1'
-                }
-            ),
-            ievvbuildstatic.lessbuild.Plugin(
+            ievvbuildstatic.sassbuild.Plugin(
                 sourcefolder='styles/theme',
-                sourcefile='theme.less',
+                sourcefile='theme.scss',
                 other_sourcefolders=[
                     'styles/base',
                 ],
-                less_include_paths=[
+                sass_include_paths=[
                     'bower_components',
                 ]
             ),
-            ievvbuildstatic.lessbuild.Plugin(
+            ievvbuildstatic.sassbuild.Plugin(
                 sourcefolder='styles/theme2',
-                sourcefile='theme2.less',
+                sourcefile='theme2.scss',
                 other_sourcefolders=[
                     'styles/base',
                 ],
-                less_include_paths=[
+                sass_include_paths=[
                     'bower_components',
                 ]
             ),
