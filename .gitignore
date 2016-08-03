@@ -49,3 +49,6 @@ ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
 /.idea/dataSources.xml
 /.idea/dataSources.local.xml
 /.idea/dataSources.ids
+
+/ievv_opensource/demo/demoapp/static/
+/ievv_opensource/demo/demoapp2/static/

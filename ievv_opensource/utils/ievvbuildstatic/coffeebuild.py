@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import json
 import os
-from io import StringIO
 
 import sh
 
@@ -250,6 +249,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.get_logger().command_error('CoffeeScript build FAILED!')
         else:
             javascript_source = self.merge_javascript_files(js_directory=js_directory)
+            destination_directory = os.path.dirname(self.get_destinationfile_path())
+            if not os.path.exists(destination_directory):
+                os.makedirs(destination_directory)
             open(self.get_destinationfile_path(), 'wb').write(
                 javascript_source.encode('utf-8'))
             self.get_logger().command_success(
