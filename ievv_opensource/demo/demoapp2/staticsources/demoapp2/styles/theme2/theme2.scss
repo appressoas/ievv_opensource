@@ -1,5 +1,8 @@
 @import "../base/styles";
 
 .myclass {
-  color: red;
+    color: red;
+    &:fullscreen {
+        display: flex;
+    }
 }

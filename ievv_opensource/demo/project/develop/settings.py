@@ -37,33 +37,30 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ),
         ]
     ),
-    # ievvbuildstatic.config.App(
-    #     appname='demoapp2',
-    #     version='2.0.1',
-    #     plugins=[
-    #         ievvbuildstatic.sassbuild.Plugin(
-    #             sourcefolder='styles/theme',
-    #             sourcefile='theme.scss',
-    #             other_sourcefolders=[
-    #                 'styles/base',
-    #             ],
-    #             sass_include_paths=[
-    #                 'bower_components',
-    #             ]
-    #         ),
-    #         ievvbuildstatic.sassbuild.Plugin(
-    #             sourcefolder='styles/theme2',
-    #             sourcefile='theme2.scss',
-    #             other_sourcefolders=[
-    #                 'styles/base',
-    #             ],
-    #             sass_include_paths=[
-    #                 'bower_components',
-    #             ]
-    #         ),
-    #         ievvbuildstatic.mediacopy.Plugin(),
-    #     ]
-    # ),
+    ievvbuildstatic.config.App(
+        appname='demoapp2',
+        version='2.0.1',
+        plugins=[
+            ievvbuildstatic.sassbuild.Plugin(
+                sourcefolder='styles/theme',
+                sourcefile='theme.scss',
+                other_sourcefolders=[
+                    'styles/base',
+                ]
+            ),
+            ievvbuildstatic.sassbuild.Plugin(
+                sourcefolder='styles/theme2',
+                sourcefile='theme2.scss',
+                other_sourcefolders=[
+                    'styles/base',
+                ]
+            ),
+            ievvbuildstatic.mediacopy.Plugin(),
+        ]
+    ),
+    help_header='You can configure the settings for ievv buildstatic in '
+                'the IEVVTASKS_BUILDSTATIC_APPS setting in: '
+                '{configfile}'.format(configfile=__file__),
 )
 
 

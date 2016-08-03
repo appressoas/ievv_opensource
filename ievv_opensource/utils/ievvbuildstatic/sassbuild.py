@@ -1,10 +1,12 @@
 import os
 
-from ievv_opensource.utils.ievvbuildstatic import pluginbase
+from ievv_opensource.utils.ievvbuildstatic import cssbuildbaseplugin
+from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic.utils import RegexFileList
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
 
 
-class Plugin(pluginbase.Plugin, ShellCommandMixin):
+class Plugin(cssbuildbaseplugin.AbstractPlugin):
     """
     SASS build plugin --- builds .scss files into css, and supports watching
     for changes.
@@ -63,7 +65,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def __init__(self, sourcefile, sourcefolder='styles',
                  other_sourcefolders=None,
-                 sass_include_paths=None):
+                 sass_include_paths=None,
+                 **kwargs):
         """
         Parameters:
             sourcefile: Main source file (the one including all other scss files)
@@ -72,19 +75,28 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
             sass_include_paths: Less include paths as a list. Paths are relative
                 to the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
-
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin.AbstractPlugin`.
         """
         self.sourcefolder = sourcefolder
         self.other_sourcefolders = other_sourcefolders
         self.sass_include_paths = sass_include_paths
-        self.sourcefile = os.path.join(sourcefolder, sourcefile)
+        self.sourcefile = sourcefile
+        super(Plugin, self).__init__(**kwargs)
+
+    def install(self):
+        super(Plugin, self).install()
+        self.app.get_installer(NpmInstaller).queue_install(
+            'postcss-scss')
+
+    def get_sourcefolder_path(self):
+        return self.app.get_source_path(self.sourcefolder)
 
     def get_sourcefile_path(self):
-        return self.app.get_source_path(self.sourcefile)
+        return self.app.get_source_path(self.sourcefolder, self.sourcefile)
 
     def get_destinationfile_path(self):
         return self.app.get_destination_path(
-            self.sourcefile, new_extension='.css')
+            self.sourcefolder, self.sourcefile, new_extension='.css')
 
     def get_other_sourcefolders_paths(self):
         return map(self.app.get_source_path, self.other_sourcefolders)
@@ -98,7 +110,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def get_sassc_executable(self):
         return os.environ.get('IEVVTASKS_BUILDSTATIC_SASSC_EXECUTABLE', 'sassc')
 
-    def run(self):
+    def build_css(self):
         self.get_logger().command_start('Building {source} into {destination}.'.format(
             source=self.get_sourcefile_path(),
             destination=self.get_destinationfile_path()))
@@ -122,6 +134,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                    kwargs=kwargs)
         except ShellCommandError:
             self.get_logger().command_error('SASS build FAILED!')
+            raise cssbuildbaseplugin.CssBuildException()
         else:
             self.get_logger().command_success('SASS build successful :)')
 
@@ -136,7 +149,19 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return folders
 
     def get_watch_regexes(self):
-        return ['^.+[.]sass$']
+        return ['^.+\.scss$']
 
     def __str__(self):
-        return '{}({})'.format(super(Plugin, self).__str__(), self.sourcefile)
+        return '{}({})'.format(super(Plugin, self).__str__(),
+                               os.path.join(self.sourcefolder, self.sourcefile))
+
+    def get_all_source_file_paths(self):
+        regexfilelist = RegexFileList(include_patterns=self.get_watch_regexes())
+        source_file_paths = []
+        sourcefolders = [self.get_sourcefolder_path()]
+        sourcefolders.extend(self.get_other_sourcefolders_paths())
+        for folder in sourcefolders:
+            source_file_paths.extend(
+                os.path.join(folder, relative_path)
+                for relative_path in regexfilelist.get_files_as_list(folder))
+        return source_file_paths

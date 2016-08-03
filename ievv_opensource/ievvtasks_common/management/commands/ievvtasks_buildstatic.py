@@ -14,6 +14,7 @@ class Command(BaseCommand):
         #                     help='')
 
     def handle(self, *args, **options):
+        settings.IEVVTASKS_BUILDSTATIC_APPS.log_help_header()
         settings.IEVVTASKS_BUILDSTATIC_APPS.configure_logging()
         settings.IEVVTASKS_BUILDSTATIC_APPS.install()
         settings.IEVVTASKS_BUILDSTATIC_APPS.run()

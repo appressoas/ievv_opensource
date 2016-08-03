@@ -186,12 +186,13 @@ class Apps(LogMixin):
     """
     Basically a list around :class:`.App` objects.
     """
-    def __init__(self, *apps):
+    def __init__(self, *apps, help_header=None):
         """
         Parameters:
             apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
         """
         self.apps = []
+        self.help_header = help_header
         for app in apps:
             self.add_app(app)
 
@@ -209,6 +210,10 @@ class Apps(LogMixin):
         """
         for app in self.apps:
             app.install()
+
+    def log_help_header(self):
+        if self.help_header:
+            self.get_logger().infobox(self.help_header)
 
     def run(self):
         """

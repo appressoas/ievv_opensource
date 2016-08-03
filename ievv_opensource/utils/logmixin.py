@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import sys
+import textwrap
 import threading
 
 from ievv_opensource.utils import ievv_colorize
@@ -84,11 +85,25 @@ class Logger(object):
     def __colorprint(self, message, **kwargs):
         self._queue_message(self.__colorize(message, **kwargs))
 
+    def infobox(self, message):
+        message = textwrap.fill(message, width=70)
+        message = '\n{line}\n\n{message}\n\n{line}\n'.format(
+            message=message,
+            line='*' * 70
+        )
+        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
+
     def info(self, message):
         """
         Log an info message.
         """
         self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
+
+    def success(self, message):
+        """
+        Log a success message.
+        """
+        self.__colorprint(message, color=ievv_colorize.COLOR_GREEN)
 
     def warning(self, message):
         """
