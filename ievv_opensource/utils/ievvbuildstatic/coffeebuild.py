@@ -15,14 +15,29 @@ class JavascriptMerger(object):
     def add(self, javascript_filepath):
         self.javascript_filepaths.append(javascript_filepath)
 
-    def merge(self, rootdirectory):
+    def __wrap_with_function_wrapper(self, source):
+        sourcelines = []
+        for line in source.splitlines():
+            if line:
+                line = '  {}'.format(line)
+            sourcelines.append(line)
+
+        sourcelines.insert(0, '(function() {')
+        sourcelines.append('}).call(this);')
+        return '\n'.join(sourcelines)
+
+    def merge(self, rootdirectory, with_function_wrapper=True):
         output = []
         for javascript_filepath in self.javascript_filepaths:
             filecontent = open(javascript_filepath, 'rb').read().decode('utf-8')
+            filecontent = filecontent.replace('\r\n', '\n').replace('\r', '\n')
             output.append('/* {} */'.format(
                             os.path.relpath(javascript_filepath, rootdirectory)))
             output.append(filecontent)
-        return '\n\n'.join(output)
+        source = '\n\n'.join(output)
+        if with_function_wrapper:
+            source = self.__wrap_with_function_wrapper(source=source)
+        return source
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
@@ -51,7 +66,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def __init__(self, destinationfile, sourcefile_include_patterns=None,
                  sourcefile_exclude_patterns=None,
                  sourcefolder=os.path.join('scripts', 'coffeescript'),
-                 extra_watchfolders=None):
+                 extra_watchfolders=None,
+                 with_function_wrapper=True):
         """
         Parameters:
             sourcefile_include_patterns: List of source file regexes. Same format as
@@ -65,6 +81,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             extra_watchfolders: List of extra folders to watch for changes.
                 Relative to the source folder of the
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+            with_function_wrapper: Include function wrapper around the resulting
+                javascript file.
         """
         self.destinationfile = destinationfile
         self.sourcefiles = utils.RegexFileList(
@@ -73,6 +91,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         )
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
+        self.with_function_wrapper = with_function_wrapper
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
@@ -125,7 +144,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             for filename in files:
                 filepath = os.path.abspath(os.path.join(root, filename))
                 javascript_merger.add(filepath)
-        return javascript_merger.merge(rootdirectory=js_directory)
+        return javascript_merger.merge(rootdirectory=js_directory,
+                                       with_function_wrapper=self.with_function_wrapper)
 
     def build(self, temporary_directory):
         js_directory = os.path.join(temporary_directory, 'js')
