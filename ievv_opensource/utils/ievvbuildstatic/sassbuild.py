@@ -100,7 +100,14 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return os.environ.get('IEVVTASKS_BUILDSTATIC_SASSC_EXECUTABLE', 'sassc')
 
     def run(self):
-        self.get_logger().command_start('Building {}.'.format(self.get_sourcefile_path()))
+        self.get_logger().command_start('Building {source} into {destination}.'.format(
+            source=self.get_sourcefile_path(),
+            destination=self.get_destinationfile_path()))
+
+        destinationdirectory = os.path.dirname(self.get_destinationfile_path())
+        if not os.path.exists(destinationdirectory):
+            os.makedirs(destinationdirectory)
+
         executable = self.get_sassc_executable()
         kwargs = {}
         sass_include_paths = self.format_sass_include_paths()
