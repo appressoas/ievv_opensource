@@ -105,23 +105,30 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     name = 'coffeebuild'
 
-    def __init__(self, destinationfile, sourcefile_include_patterns=None,
+    def __init__(self,
+                 destinationfile,
+                 sourcefile_include_patterns=None,
                  sourcefile_exclude_patterns=None,
                  sourcefolder=os.path.join('scripts', 'coffeescript'),
+                 destinationfolder=os.path.join('scripts'),
                  extra_watchfolders=None,
                  with_function_wrapper=True,
                  lint=True,
                  lintconfig=None):
         """
         Parameters:
+            destinationfile: Path to destination file relative to ``destinationfolder``.
             sourcefile_include_patterns: List of source file regexes. Same format as
                 as for :class:`ievv_opensource.utils.ievvbuildstatic.utils.RegexFileList`.
                 Defaults to ``['^.*\.coffee$']``.
             sourcefile_exclude_patterns: List of source file regexes. Same format as
                 as for :class:`ievv_opensource.utils.ievvbuildstatic.utils.RegexFileList`.
-            sourcefolder: The folder where ``sourcefiles`` is located relative to
+            sourcefolder: The folder where sourcefiles is located relative to
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
-                Defaults to ``scripts/coffeescript``.
+                Defaults to ``scripts/coffeescript/``.
+            destinationfolder: The folder where ``destinationfile`` is located relative to
+                the destination folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+                Defaults to ``scripts/``.
             extra_watchfolders: List of extra folders to watch for changes.
                 Relative to the source folder of the
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
@@ -133,6 +140,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             include_patterns=sourcefile_include_patterns or ['^.*\.coffee$'],
             exclude_patterns=sourcefile_exclude_patterns
         )
+        self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
         self.with_function_wrapper = with_function_wrapper
@@ -143,7 +151,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return self.app.get_source_path(self.sourcefolder)
 
     def get_destinationfile_path(self):
-        return self.app.get_destination_path(self.destinationfile)
+        return self.app.get_destination_path(self.destinationfolder, self.destinationfile)
 
     def get_coffee_version(self):
         return None
