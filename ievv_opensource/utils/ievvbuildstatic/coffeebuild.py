@@ -264,11 +264,10 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         try:
             self.build(temporary_directory=temporary_directory)
         except:
-            # self.delete_temporary_build_directory()
+            self.delete_temporary_build_directory()
             raise
         else:
-            # self.delete_temporary_build_directory()
-            pass
+            self.delete_temporary_build_directory()
 
     def get_extra_watchfolder_paths(self):
         return map(self.app.get_source_path, self.extra_watchfolders)
