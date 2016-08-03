@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from future.utils import python_2_unicode_compatible
 
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfig
@@ -89,3 +92,29 @@ class Plugin(LogMixin):
 
     def __str__(self):
         return self.get_logger_name()
+
+    def __get_temporary_build_directory_path(self):
+        return self.app.get_source_path(
+            'ievvbuildstatic_temporary_build_directory', self.name)
+
+    def make_temporary_build_directory(self):
+        """
+        Make a temporary directory that you can use for building something.
+        You should remove the directory with :meth:`.delete_temporary_build_directory`
+        when you are done with it.
+
+        Returns:
+            str: The absolute path of the new directory.
+        """
+        self.delete_temporary_build_directory()
+        temporary_directory_path = self.__get_temporary_build_directory_path()
+        os.makedirs(temporary_directory_path)
+        return temporary_directory_path
+
+    def delete_temporary_build_directory(self):
+        """
+        Delete a temporary directory created with :meth:`.make_temporary_build_directory`.
+        """
+        temporary_directory_path = self.__get_temporary_build_directory_path()
+        if os.path.exists(temporary_directory_path):
+            shutil.rmtree(temporary_directory_path)

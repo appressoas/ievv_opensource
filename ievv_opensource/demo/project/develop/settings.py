@@ -13,38 +13,40 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='demoapp',
         version='1.0.0',
         plugins=[
-            ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
-            ievvbuildstatic.mediacopy.Plugin(),
-            # CoffeeBuild(sourcefolder='scripts'),
+            # ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
+            # ievvbuildstatic.mediacopy.Plugin(),
+            ievvbuildstatic.coffeebuild.Plugin(
+                destinationfile='coffeetest.js'
+            ),
         ]
     ),
-    ievvbuildstatic.config.App(
-        appname='demoapp2',
-        version='2.0.1',
-        plugins=[
-            ievvbuildstatic.sassbuild.Plugin(
-                sourcefolder='styles/theme',
-                sourcefile='theme.scss',
-                other_sourcefolders=[
-                    'styles/base',
-                ],
-                sass_include_paths=[
-                    'bower_components',
-                ]
-            ),
-            ievvbuildstatic.sassbuild.Plugin(
-                sourcefolder='styles/theme2',
-                sourcefile='theme2.scss',
-                other_sourcefolders=[
-                    'styles/base',
-                ],
-                sass_include_paths=[
-                    'bower_components',
-                ]
-            ),
-            ievvbuildstatic.mediacopy.Plugin(),
-        ]
-    ),
+    # ievvbuildstatic.config.App(
+    #     appname='demoapp2',
+    #     version='2.0.1',
+    #     plugins=[
+    #         ievvbuildstatic.sassbuild.Plugin(
+    #             sourcefolder='styles/theme',
+    #             sourcefile='theme.scss',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ],
+    #             sass_include_paths=[
+    #                 'bower_components',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.sassbuild.Plugin(
+    #             sourcefolder='styles/theme2',
+    #             sourcefile='theme2.scss',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ],
+    #             sass_include_paths=[
+    #                 'bower_components',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.mediacopy.Plugin(),
+    #     ]
+    # ),
 )
 
 

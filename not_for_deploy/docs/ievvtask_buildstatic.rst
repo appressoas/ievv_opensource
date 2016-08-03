@@ -142,6 +142,9 @@ Details
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
 
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.sassbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.sassbuild
+
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.lessbuild
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.lessbuild
 
@@ -171,6 +174,16 @@ Details
 =======
 
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.config
+
+
+*****
+Utils
+*****
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.utils
+
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.utils
+
 
 
 **********

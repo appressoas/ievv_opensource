@@ -118,7 +118,7 @@ class App(LogMixin):
             path = os.path.join(destinationfolder, *sourcefolder_relative_path)
             if new_extension:
                 path, extension = os.path.splitext(path)
-                path = path + new_extension
+                path = '{}{}'.format(path, new_extension)
                 return path
             else:
                 return path

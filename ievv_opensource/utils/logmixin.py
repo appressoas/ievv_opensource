@@ -96,6 +96,12 @@ class Logger(object):
         """
         self.__colorprint(message, color=ievv_colorize.COLOR_YELLOW)
 
+    def error(self, message):
+        """
+        Log a warning message.
+        """
+        self.__colorprint(message, color=ievv_colorize.COLOR_RED)
+
     def debug(self, message):
         """
         Log a debug message.
