@@ -5,6 +5,7 @@ from . import lessbuild  # noqa
 from . import coffeebuild  # noqa
 from . import mediacopy  # noqa
 from . import bowerinstall  # noqa
+from . import npminstall  # noqa
 from . import browserify_jsbuild  # noqa
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     'coffeebuild',
     'mediacopy',
     'bowerinstall',
+    'npminstall',
     'browserify_jsbuild',
 ]

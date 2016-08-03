@@ -31,7 +31,7 @@ class ShellCommandMixin(object):
         """
         self.get_logger().stderr(line.rstrip())
 
-    def run_shell_command(self, executable, args=None, kwargs=None):
+    def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None):
         """
         Run a shell command.
 
@@ -46,6 +46,8 @@ class ShellCommandMixin(object):
         command = sh.Command(executable)
         args = args or []
         kwargs = kwargs or {}
+        if _cwd:
+            kwargs['_cwd'] = _cwd
         try:
             return command(*args,
                            _out=self.log_shell_command_stdout,

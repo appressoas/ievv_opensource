@@ -88,10 +88,10 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                    args=[
                                        self.get_sourcefile_path(),
                                        '-o', self.get_destinationfile_path()
-                                   ])
+                                   ],
+                                   _cwd=self.app.get_source_path())
         except ShellCommandError:
             self.get_logger().command_error('browserify build FAILED!')
-            raise SystemExit()
         else:
             self.get_logger().command_success('browserify build succeeded :)')
 

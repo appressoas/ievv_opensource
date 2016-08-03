@@ -25,6 +25,12 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                     }
                 }
             ),
+            ievvbuildstatic.npminstall.Plugin(
+                packages={
+                    'uniq': None,
+                    'momentjs': None
+                }
+            ),
             ievvbuildstatic.browserify_jsbuild.Plugin(
                 sourcefile='jstest.js',
                 destinationfile='jstest.js',
