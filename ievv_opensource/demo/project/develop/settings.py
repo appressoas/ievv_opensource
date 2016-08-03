@@ -16,7 +16,14 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             # ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
             # ievvbuildstatic.mediacopy.Plugin(),
             ievvbuildstatic.coffeebuild.Plugin(
-                destinationfile='coffeetest.js'
+                destinationfile='coffeetest.js',
+                lintconfig={
+                    "max_line_length": {
+                        'value': 102,
+                        'level': "warn",
+                        'limitComments': True,
+                    }
+                }
             ),
         ]
     ),

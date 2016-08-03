@@ -1,6 +1,10 @@
 from __future__ import unicode_literals
 
+import json
 import os
+from io import StringIO
+
+import sh
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic import utils
@@ -76,6 +80,28 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 )
             )
 
+        We also support linting, and it is enabled by default. You can disable
+        linting with ``lint=False``, and you can override the coffeelint options.
+        Lets say we want to change max line length to 120, and make breaking
+        it a warning instead of an error::
+
+            ievvbuildstatic.config.App(
+                appname='demoapp',
+                version='1.0.0',
+                plugins=[
+                    ievvbuildstatic.coffeebuild.Plugin(
+                        destinationfile='app.js',
+                        lintconfig={
+                            "max_line_length": {
+                                'value': 120,
+                                'level': "warn",
+                                'limitComments': True,
+                            }
+                        }
+                    ),
+                ]
+            ),
+
     """
 
     name = 'coffeebuild'
@@ -84,7 +110,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  sourcefile_exclude_patterns=None,
                  sourcefolder=os.path.join('scripts', 'coffeescript'),
                  extra_watchfolders=None,
-                 with_function_wrapper=True):
+                 with_function_wrapper=True,
+                 lint=True,
+                 lintconfig=None):
         """
         Parameters:
             sourcefile_include_patterns: List of source file regexes. Same format as
@@ -109,6 +137,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
         self.with_function_wrapper = with_function_wrapper
+        self.lint = lint
+        self.lintconfig = lintconfig or {}
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
@@ -119,15 +149,60 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def get_coffee_version(self):
         return None
 
+    def get_coffeelint_version(self):
+        return None
+
     def install(self):
         self.app.get_installer(NpmInstaller).queue_install(
             'coffee-script', version=self.get_coffee_version())
+        if self.lint:
+            self.app.get_installer(NpmInstaller).queue_install(
+                'coffeelint', version=self.get_coffeelint_version())
 
     def get_coffee_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('coffee')
 
+    def get_coffeelint_executable(self):
+        return self.app.get_installer(NpmInstaller).find_executable('coffeelint')
+
     def get_all_sourcefiles(self):
         return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path())
+
+    def lint_coffeescript_file(self, relative_filepath, lintconfig_path):
+        executable = self.get_coffeelint_executable()
+        sourcefile_path = os.path.join(self.get_sourcefolder_path(), relative_filepath)
+        self.get_logger().debug('CoffeeScript linting {!r}'.format(
+            relative_filepath))
+        try:
+            self.run_shell_command(executable,
+                                   args=[
+                                       '-f', lintconfig_path,
+                                       sourcefile_path
+                                   ])
+        except ShellCommandError:
+            self.get_logger().error('CoffeeScript linting of {!r} FAILED!'.format(
+                relative_filepath))
+
+    def make_lintconfig_file(self, temporary_directory):
+        lintconfig_path = os.path.join(temporary_directory, 'coffeelint.json')
+        try:
+            coffeelint = sh.Command(self.get_coffeelint_executable())
+            default_lintconfig_json = coffeelint('--makeconfig',
+                                                 _err=self.log_shell_command_stderr)
+        except sh.ErrorReturnCode:
+            self.get_logger().error('Failed to create coffeelint config file.')
+            raise ShellCommandError()
+        else:
+            lintconfig = json.loads(str(default_lintconfig_json))
+            lintconfig.update(self.lintconfig)
+            open(lintconfig_path, 'wb').write(json.dumps(lintconfig, indent=2).encode('utf-8'))
+            return lintconfig_path
+
+    def lint_coffeescript_files(self, temporary_directory):
+        lintconfig_path = self.make_lintconfig_file(temporary_directory=temporary_directory)
+        for relative_filepath in self.get_all_sourcefiles():
+            self.lint_coffeescript_file(relative_filepath=relative_filepath,
+                                        lintconfig_path=lintconfig_path)
 
     def compile_coffescript_file(self, js_directory, relative_filepath):
         executable = self.get_coffee_executable()
@@ -165,6 +240,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                        with_function_wrapper=self.with_function_wrapper)
 
     def build(self, temporary_directory):
+        if self.lint:
+            self.lint_coffeescript_files(temporary_directory=temporary_directory)
         js_directory = os.path.join(temporary_directory, 'js')
         os.mkdir(js_directory)
         try:
@@ -187,10 +264,11 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         try:
             self.build(temporary_directory=temporary_directory)
         except:
-            self.delete_temporary_build_directory()
+            # self.delete_temporary_build_directory()
             raise
         else:
-            self.delete_temporary_build_directory()
+            # self.delete_temporary_build_directory()
+            pass
 
     def get_extra_watchfolder_paths(self):
         return map(self.app.get_source_path, self.extra_watchfolders)
