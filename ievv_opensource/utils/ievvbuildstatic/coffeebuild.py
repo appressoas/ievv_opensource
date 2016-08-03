@@ -55,10 +55,27 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                     appname='demoapp',
                     version='1.0.0',
                     plugins=[
-                        ievvbuildstatic.coffeebuild.Plugin(sourcefile='app.coffee'),
+                        ievvbuildstatic.coffeebuild.Plugin(destinationfile='app.js'),
                     ]
                 )
             )
+
+        Lets say we want build a different folder, and exclude all
+        ``*.spec.coffee`` files in within the folder::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.coffeebuild.Plugin(
+                            destinationfile='myapp.js',
+                            sourcefolder=os.path.join('scripts', 'coffeescript', 'myapp')
+                            sourcefile_exclude_patterns=['^.*\.spec\.coffee$']),
+                    ]
+                )
+            )
+
     """
 
     name = 'coffeebuild'
