@@ -11,7 +11,7 @@ class Plugin(pluginbase.Plugin):
 
     Examples:
 
-        Copy all files in ``demoapp/staticsources/media/`` into
+        Copy all files in ``demoapp/staticsources/demoapp/media/`` into
         ``demoapp/static/1.0.0/media/``::
 
             IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
@@ -25,7 +25,7 @@ class Plugin(pluginbase.Plugin):
             )
 
         Using a different source folder. This will copy
-        all files in ``demoapp/staticsources/assets/`` into
+        all files in ``demoapp/staticsources/demoapp/assets/`` into
         ``demoapp/static/1.0.0/assets/``::
 
             IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
