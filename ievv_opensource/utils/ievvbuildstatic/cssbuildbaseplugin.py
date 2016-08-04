@@ -24,16 +24,16 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             lintrules (dict): Rules for the linter. See https://github.com/stylelint/stylelint.
                 Defaults to::
 
-                {
-                    "block-no-empty": None,
-                    "color-no-invalid-hex": True,
-                    "comment-empty-line-before": ["always", {
-                        "ignore": ["stylelint-commands", "between-comments"],
-                    }],
-                    "declaration-colon-space-after": "always",
-                    "indentation": 4,
-                    "max-empty-lines": 2
-                }
+                    {
+                        "block-no-empty": None,
+                        "color-no-invalid-hex": True,
+                        "comment-empty-line-before": ["always", {
+                            "ignore": ["stylelint-commands", "between-comments"],
+                        }],
+                        "declaration-colon-space-after": "always",
+                        "indentation": 4,
+                        "max-empty-lines": 2
+                    }
 
             lintrules_overrides (dict): Overrides for ``lintrules``. Use this
                 if you just want to add new rules or override some of the existing rules.

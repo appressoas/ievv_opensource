@@ -131,9 +131,12 @@ Overview
 .. autosummary::
 
    pluginbase.Plugin
+   sassbuild.Plugin
    lessbuild.Plugin
    mediacopy.Plugin
    bowerinstall.Plugin
+   browserify_jsbuild.Plugin
+   cssbuildbaseplugin.AbstractPlugin
 
 
 Details
@@ -153,6 +156,12 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
 
 
 ************
