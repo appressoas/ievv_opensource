@@ -78,8 +78,8 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
             **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin.AbstractPlugin`.
         """
         self.sourcefolder = sourcefolder
-        self.other_sourcefolders = other_sourcefolders
-        self.sass_include_paths = sass_include_paths
+        self.other_sourcefolders = other_sourcefolders or []
+        self.sass_include_paths = sass_include_paths or []
         self.sourcefile = sourcefile
         super(Plugin, self).__init__(**kwargs)
 
