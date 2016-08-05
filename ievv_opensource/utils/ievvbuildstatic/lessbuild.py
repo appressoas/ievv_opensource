@@ -71,6 +71,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 to the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
 
         """
+        super(Plugin, self).__init__()
         self.sourcefolder = sourcefolder
         self.other_sourcefolders = other_sourcefolders
         self.less_include_paths = less_include_paths

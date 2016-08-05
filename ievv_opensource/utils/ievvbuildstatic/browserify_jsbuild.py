@@ -55,6 +55,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 Relative to the source folder of the
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
         """
+        super(Plugin, self).__init__()
         self.sourcefile = sourcefile
         self.destinationfile = destinationfile
         self.destinationfolder = destinationfolder

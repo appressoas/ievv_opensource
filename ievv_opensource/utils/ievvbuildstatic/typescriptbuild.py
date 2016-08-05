@@ -25,10 +25,12 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  with_function_wrapper=True,
                  lint=True,
                  lintconfig=None,
-                 tsc_compiler_options=None):
-
+                 tsc_compiler_options=None,
+                 register_tsconfig_as_temporaryfile=True):
+        super(Plugin, self).__init__()
         self.destinationfile = destinationfile
         self.main_sourcefile = main_sourcefile
+        self.register_tsconfig_as_temporaryfile = register_tsconfig_as_temporaryfile
         self.sourcefiles = utils.RegexFileList(
             include_patterns=sourcefile_include_patterns or ['^.*\.ts'],
             exclude_patterns=sourcefile_exclude_patterns
@@ -143,6 +145,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         tsconfig_dict = self.make_tsconfig_dict(output_directory)
         path = self.app.get_source_path("tsconfig.json")
         open(path, 'wb').write(json.dumps(tsconfig_dict, indent=2).encode('utf-8'))
+        if self.register_tsconfig_as_temporaryfile:
+            self.register_temporary_file_or_directory(path)
 
     def compile_typescript(self):
         executable = self.get_tsc_executable()
@@ -217,14 +221,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.get_sourcefolder_path(),
             self.sourcefiles.prettyformat_patterns()))
         temporary_directory = self.make_temporary_build_directory()
-        try:
-            self.build(temporary_directory=temporary_directory)
-        except:
-            # self.delete_temporary_build_directory()
-            raise
-            # else:
-            # self.delete_temporary_build_directory()
-
+        self.build(temporary_directory=temporary_directory)
 
     def get_extra_watchfolder_paths(self):
         return map(self.app.get_source_path, self.extra_watchfolders)

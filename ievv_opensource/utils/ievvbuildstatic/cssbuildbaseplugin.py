@@ -44,6 +44,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                 for https://github.com/ai/browserslist. Used by the autoprefix
                 and cssnano (used when minify=True) commands.
         """
+        super(AbstractPlugin, self).__init__()
         self.lint = lint
         self.autoprefix = autoprefix
         self.minify = minify
@@ -176,14 +177,8 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
     def run(self):
         temporary_directory = self.make_temporary_build_directory()
         try:
-            try:
-                self.preprocess_styles(temporary_directory=temporary_directory)
-                self.build_css()
-                self.postprocess_styles(temporary_directory=temporary_directory)
-            except CssBuildException:
-                pass
-        except:
-            self.delete_temporary_build_directory()
-            raise
-        else:
-            self.delete_temporary_build_directory()
+            self.preprocess_styles(temporary_directory=temporary_directory)
+            self.build_css()
+            self.postprocess_styles(temporary_directory=temporary_directory)
+        except CssBuildException:
+            pass

@@ -47,6 +47,7 @@ class Plugin(pluginbase.Plugin):
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
 
         """
+        super(Plugin, self).__init__()
         self.sourcefolder = sourcefolder
 
     def get_sourcefolder_path(self):

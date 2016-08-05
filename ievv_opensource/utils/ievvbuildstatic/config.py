@@ -16,7 +16,8 @@ class App(LogMixin):
     """
     def __init__(self, appname, version, plugins,
                  sourcefolder='staticsources',
-                 destinationfolder='static'):
+                 destinationfolder='static',
+                 keep_temporary_files=False):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -33,6 +34,7 @@ class App(LogMixin):
         self.destinationfolder = destinationfolder
         self.installers = {}
         self.plugins = []
+        self.keep_temporary_files = keep_temporary_files
         for plugin in plugins:
             self.add_plugin(plugin)
 
@@ -49,7 +51,7 @@ class App(LogMixin):
         for all plugins within the app.
         """
         for plugin in self.plugins:
-            plugin.run()
+            plugin.runwrapper()
 
     def install(self):
         """
@@ -154,31 +156,29 @@ class App(LogMixin):
     def get_logger_name(self):
         return '{}.{}'.format(self.apps.get_logger_name(), self.appname)
 
-    def __get_temporary_build_directory_path(self, *path):
+    def get_temporary_build_directory_path(self, *path):
         return self.get_source_path('ievvbuildstatic_temporary_build_directory', *path)
 
     def make_temporary_build_directory(self, name):
         """
         Make a temporary directory that you can use for building something.
-        You should remove the directory with :meth:`.delete_temporary_build_directory`
-        when you are done with it.
 
         Returns:
             str: The absolute path of the new directory.
         """
-        self.delete_temporary_build_directory(name)
-        temporary_directory_path = self.__get_temporary_build_directory_path(name)
+        self._delete_temporary_build_directory(name)
+        temporary_directory_path = self.get_temporary_build_directory_path(name)
         os.makedirs(temporary_directory_path)
         return temporary_directory_path
 
-    def delete_temporary_build_directory(self, name):
+    def _delete_temporary_build_directory(self, name):
         """
         Delete a temporary directory created with :meth:`.make_temporary_build_directory`.
         """
-        temporary_directory_path = self.__get_temporary_build_directory_path(name)
+        temporary_directory_path = self.get_temporary_build_directory_path(name)
         if os.path.exists(temporary_directory_path):
             shutil.rmtree(temporary_directory_path)
-        base_temporary_directory = self.__get_temporary_build_directory_path()
+        base_temporary_directory = self.get_temporary_build_directory_path()
         if os.path.exists(base_temporary_directory) and len(os.listdir(base_temporary_directory)) == 0:
             shutil.rmtree(base_temporary_directory)
 

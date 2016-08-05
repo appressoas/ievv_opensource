@@ -18,6 +18,7 @@ class Plugin(LogMixin):
 
     def __init__(self):
         self.app = None
+        self._temporary_files_and_directories = set()
 
     def install(self):
         """
@@ -42,6 +43,19 @@ class Plugin(LogMixin):
         change here.
         """
         pass
+
+    def runwrapper(self):
+        try:
+            self.run()
+        except:
+            self.after_run_cleanup()
+            raise
+        else:
+            self.after_run_cleanup()
+
+    def after_run_cleanup(self):
+        if not self.app.keep_temporary_files:
+            self.clean_temporary_files()
 
     def watch(self):
         """
@@ -96,16 +110,30 @@ class Plugin(LogMixin):
     def make_temporary_build_directory(self):
         """
         Make a temporary directory that you can use for building something.
-        You should remove the directory with :meth:`.delete_temporary_build_directory`
-        when you are done with it.
 
         Returns:
             str: The absolute path of the new directory.
         """
-        return self.app.make_temporary_build_directory(self.name)
+        path = self.app.make_temporary_build_directory(self.name)
+        self.register_temporary_file_or_directory(path)
+        # Register the root temporary directory for the app as a temporary directory
+        # - we do not get problems with duplicates - the registry is a set.
+        self.register_temporary_file_or_directory(self.app.get_temporary_build_directory_path())
+        return path
 
-    def delete_temporary_build_directory(self):
+    def register_temporary_file_or_directory(self, absolute_path):
         """
-        Delete a temporary directory created with :meth:`.make_temporary_build_directory`.
+        Register a temporary file or directory.
+
+        This will automatically be cleaned after run() is finished (even if it crashes)
+        if the app uses ``keep_temporary_files=False`` (the default).
         """
-        return self.app.delete_temporary_build_directory(self.name)
+        self._temporary_files_and_directories.add(absolute_path)
+
+    def clean_temporary_files(self):
+        for absolute_path in self._temporary_files_and_directories:
+            if os.path.exists(absolute_path):
+                if os.path.isdir(absolute_path):
+                    shutil.rmtree(absolute_path)
+                else:
+                    os.remove(absolute_path)

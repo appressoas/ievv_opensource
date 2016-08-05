@@ -101,7 +101,8 @@ class EventHandler(RegexMatchingEventHandler):
             return
         self.is_running = True
         for runnable in self.runnables:
-            runnable.run()
+            runnable.runwrapper()
+
         self.is_running = False
 
     def on_any_event(self, event):
