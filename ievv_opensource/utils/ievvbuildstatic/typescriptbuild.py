@@ -15,7 +15,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     name = 'typescriptbuild'
 
     def __init__(self,
-                 destinationfile,
+                 main_sourcefile="main.ts",
+                 destinationfile=None,
                  sourcefile_include_patterns=None,
                  sourcefile_exclude_patterns=None,
                  sourcefolder=os.path.join('scripts', 'typescript'),
@@ -27,6 +28,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  tsc_compiler_options=None):
 
         self.destinationfile = destinationfile
+        self.main_sourcefile = main_sourcefile
         self.sourcefiles = utils.RegexFileList(
             include_patterns=sourcefile_include_patterns or ['^.*\.ts'],
             exclude_patterns=sourcefile_exclude_patterns
@@ -49,18 +51,27 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             "suppressImplicitAnyIndexErrors": True
         }
         if tsc_compiler_options:
-            self.tsc_compiler_options.update(tsc_compiler_options);
+            self.tsc_compiler_options.update(tsc_compiler_options)
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
 
+    def get_main_sourcefile_path(self):
+        return self.app.get_source_path(self.sourcefolder, self.main_sourcefile)
+
     def get_destinationfile_path(self):
-        return self.app.get_destination_path(self.destinationfolder, self.destinationfile)
+        if self.destinationfile:
+            return self.app.get_destination_path(self.destinationfolder, self.destinationfile)
+        else:
+            return self.app.get_destination_path(self.destinationfolder, self.main_sourcefile, new_extension='.js')
 
     def get_typescript_version(self):
         return None
 
     def get_tslint_version(self):
+        return None
+
+    def get_browserify_version(self):
         return None
 
     def install(self):
@@ -69,6 +80,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         if self.lint:
             self.app.get_installer(NpmInstaller).queue_install(
                 'tslint', version=self.get_tslint_version())
+        self.app.get_installer(NpmInstaller).queue_install(
+            'browserify', version=self.get_browserify_version())
 
     def get_tsc_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('tsc')
@@ -77,7 +90,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return self.app.get_installer(NpmInstaller).find_executable('tslint')
 
     def get_all_sourcefiles(self, absolute_paths=False):
-        return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path(), absolute_paths=absolute_paths)
+        return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path(),
+                                                  absolute_paths=absolute_paths)
 
     def lint_typescript_file(self, relative_filepath, lintconfig_path):
         executable = self.get_tslint_executable()
@@ -142,6 +156,35 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         else:
             self.get_logger().debug('TypeScript build of {!r} successful :)'.format(sourcefolder_path))
 
+    def get_browserify_executable(self):
+        return self.app.get_installer(NpmInstaller).find_executable('browserify')
+
+    def merge_javascript_files(self, js_directory):
+        self.get_logger().command_start(
+            'Running browserify with {sourcefile} as input and {destinationfile} as output'.format(
+                sourcefile=self.get_main_sourcefile_path(),
+                destinationfile=self.get_destinationfile_path()))
+
+        sourcefilepath = os.path.join(js_directory, self.main_sourcefile)
+        sourcefilepath = os.path.splitext(sourcefilepath)[0] + '.js'
+
+        destinationfolder = os.path.dirname(self.get_destinationfile_path())
+        if not os.path.exists(destinationfolder):
+            os.makedirs(destinationfolder)
+        executable = self.get_browserify_executable()
+        try:
+            self.run_shell_command(executable,
+                                   args=[
+                                       sourcefilepath,
+                                       '-o', self.get_destinationfile_path()
+                                   ],
+                                   _cwd=self.app.get_source_path())
+        except ShellCommandError:
+            self.get_logger().command_error('browserify build FAILED!')
+            raise
+        else:
+            self.get_logger().command_success('browserify build succeeded :)')
+
     def build(self, temporary_directory):
         if self.lint:
             self.lint_typecript_files(temporary_directory=temporary_directory)
@@ -160,9 +203,14 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             #     os.makedirs(destination_directory)
             # open(self.get_destinationfile_path(), 'wb').write(
             #     javascript_source.encode('utf-8'))
-            self.get_logger().command_success(
-                'TypeScript build successful :) Output in {}'.format(
-                    self.get_destinationfile_path()))
+            try:
+                self.merge_javascript_files(js_directory)
+            except ShellCommandError:
+                pass
+            else:
+                self.get_logger().command_success(
+                    'TypeScript build successful :) Output in {}'.format(
+                        self.get_destinationfile_path()))
 
     def run(self):
         self.get_logger().command_start('TypeScript building all files in {!r} matching {}'.format(
@@ -174,8 +222,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         except:
             # self.delete_temporary_build_directory()
             raise
-        # else:
+            # else:
             # self.delete_temporary_build_directory()
+
 
     def get_extra_watchfolder_paths(self):
         return map(self.app.get_source_path, self.extra_watchfolders)
