@@ -1,5 +1,6 @@
 from . import utils  # noqa
 from . import config  # noqa
+from . import cssbuildbaseplugin  # noqa
 from . import sassbuild  # noqa
 from . import lessbuild  # noqa
 from . import coffeebuild  # noqa
@@ -11,6 +12,7 @@ from . import browserify_jsbuild  # noqa
 __all__ = [
     'utils',
     'config',
+    'cssbuildbaseplugin',
     'sassbuild',
     'lessbuild',
     'coffeebuild',

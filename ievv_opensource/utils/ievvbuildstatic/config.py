@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import time
+from collections import OrderedDict
 
 from django.apps import apps
 
@@ -191,7 +192,7 @@ class Apps(LogMixin):
         Parameters:
             apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
         """
-        self.apps = []
+        self.apps = OrderedDict()
         self.help_header = help_header
         for app in apps:
             self.add_app(app)
@@ -201,14 +202,20 @@ class Apps(LogMixin):
         Add an :class:`.App`.
         """
         app.apps = self
-        self.apps.append(app)
+        self.apps[app.appname] = app
+
+    def get_app(self, appname):
+        """
+        Get app by appname.
+        """
+        return self.apps[appname]
 
     def install(self):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
-        for app in self.apps:
+        for app in self.apps.values():
             app.install()
 
     def log_help_header(self):
@@ -220,7 +227,7 @@ class Apps(LogMixin):
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
-        for app in self.apps:
+        for app in self.apps.values():
             app.run()
 
     def watch(self):
@@ -232,7 +239,7 @@ class Apps(LogMixin):
         Blocks until ``CTRL-c`` is pressed.
         """
         watchconfigpool = WatchConfigPool()
-        for app in self.apps:
+        for app in self.apps.values():
             watchconfigpool.extend(app.watch())
         all_observers = watchconfigpool.watch()
         try:

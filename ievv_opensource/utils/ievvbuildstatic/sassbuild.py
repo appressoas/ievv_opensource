@@ -3,7 +3,7 @@ import os
 from ievv_opensource.utils.ievvbuildstatic import cssbuildbaseplugin
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.ievvbuildstatic.utils import RegexFileList
-from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
+from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 
 
 class Plugin(cssbuildbaseplugin.AbstractPlugin):
