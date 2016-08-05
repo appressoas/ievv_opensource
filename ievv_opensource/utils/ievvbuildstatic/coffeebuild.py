@@ -110,7 +110,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  sourcefile_include_patterns=None,
                  sourcefile_exclude_patterns=None,
                  sourcefolder=os.path.join('scripts', 'coffeescript'),
-                 destinationfolder=os.path.join('scripts'),
+                 destinationfolder='scripts',
                  extra_watchfolders=None,
                  with_function_wrapper=True,
                  lint=True,
