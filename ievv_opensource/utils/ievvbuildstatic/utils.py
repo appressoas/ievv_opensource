@@ -44,14 +44,18 @@ class RegexFileList(object):
         return (self.matches_include_pattern(relative_filepath) and
                 not self.matches_exclude_pattern(relative_filepath))
 
-    def get_files_as_list(self, rootfolder):
+    def get_files_as_list(self, rootfolder, absolute_paths=False):
         matched_relative_filepaths = []
         for root, dirs, files in os.walk(rootfolder):
             for filename in files:
                 filepath = os.path.abspath(os.path.join(root, filename))
                 relative_filepath = os.path.relpath(filepath, rootfolder)
                 if self.matches_pattern(relative_filepath):
-                    matched_relative_filepaths.append(relative_filepath)
+                    if absolute_paths:
+                        matched_relative_filepaths.append(filepath)
+                    else:
+                        matched_relative_filepaths.append(relative_filepath)
+
         return matched_relative_filepaths
 
     def prettyformat_patterns(self):

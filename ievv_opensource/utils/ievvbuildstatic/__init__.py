@@ -8,6 +8,7 @@ from . import mediacopy  # noqa
 from . import bowerinstall  # noqa
 from . import npminstall  # noqa
 from . import browserify_jsbuild  # noqa
+from . import typescriptbuild   # noqa
 
 __all__ = [
     'utils',
@@ -20,4 +21,5 @@ __all__ = [
     'bowerinstall',
     'npminstall',
     'browserify_jsbuild',
+    'typescriptbuild',
 ]
