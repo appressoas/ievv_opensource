@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django_dbdev',
     'crispy_forms',
     'django_cradmin',
+    'django_cradmin.apps.cradmin_authenticate',
+    'django_cradmin.apps.cradmin_temporaryfileuploadstore',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
     'ievv_opensource.demo.demoapp',
