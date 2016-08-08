@@ -188,15 +188,9 @@ class Action(object):
 
     def execute(self):
         """
-        Exectute the action. Must be overridden in subclasses.
+        Execute the action. Must be overridden in subclasses.
         """
-        self.logger.info('Testing, %r', self.kwargs)
-        return {
-            'a': 10
-        }
-        # raise ActionError({
-        #     'x': 10
-        # })
+        raise NotImplementedError()
 
 
 class ActionGroupExecutionInfo(object):
