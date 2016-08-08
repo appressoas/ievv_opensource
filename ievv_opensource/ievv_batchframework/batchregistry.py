@@ -7,7 +7,6 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-from ievv_opensource.ievv_batchframework.models import BatchOperation
 from ievv_opensource.utils.singleton import Singleton
 
 
@@ -468,6 +467,7 @@ class ActionGroup(object):
         Returns:
             BatchOperation: The created :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`.
         """
+        from ievv_opensource.ievv_batchframework.models import BatchOperation
         batchoperation_options = self.get_batchoperation_options(**kwargs)
         batchoperation = BatchOperation.objects.create_asynchronous(**batchoperation_options)
         return batchoperation

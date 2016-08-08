@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
+    'django_cradmin',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
     'ievv_opensource.demo.demoapp',
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_elasticsearch',
-    'ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig',
+    'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
 ]
 
 MIDDLEWARE_CLASSES = (
