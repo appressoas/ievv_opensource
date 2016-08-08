@@ -429,8 +429,6 @@ class ActionGroup(object):
 
         Args:
             kwargs: The ``kwargs`` the user provided to :meth:`.run_asynchronous`.
-            batchoperation_options: The ``batchoperation_options`` the user provided to
-                :meth:`.run_asynchronous`.
 
         Returns:
             dict: Kwargs for
@@ -456,7 +454,6 @@ class ActionGroup(object):
 
         Args:
             kwargs: See :meth:`.run_asynchronous`.
-            batchoperation_options: See :meth:`.run_asynchronous`.
 
         Returns:
             BatchOperation: The created :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`.
@@ -470,13 +467,6 @@ class ActionGroup(object):
         """
         Args:
             kwargs: Kwargs for :class:`.Action`.
-            batchoperation_options: Kwargs for
-                :meth:`ievv_opensource.ievv_batchframework.models.BatchOperationManager.create_asynchronous`.
-                These are processes by :meth:`.get_batchoperation_options` before they are used
-                with ``create_asynchronous()``. The default implementation of :meth:`.get_batchoperation_options`
-                does nothing with any provided ``batchoperation_options``, but if you use a custom
-                :class:`.ActionGroup` you need to know that your provided ``batchoperation_options``
-                may be overridden.
         """
         batchoperation = self.create_batchoperation(**kwargs)
         full_kwargs = {
@@ -512,10 +502,10 @@ class ActionGroup(object):
           is called.
 
         Args:
-            kwargs: Kwargs for :class:`.Action`. Forwarded to :meth:`.run_asynchronous` and
+            context_object: context_object for :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`.
+            started_by: started_by for :class:`ievv_opensource.ievv_batchframework.models.BatchOperation`.
+            **kwargs: Kwargs for :class:`.Action`. Forwarded to :meth:`.run_asynchronous` and
                 :meth:`.run_synchronous`.
-            batchoperation_options: Only used by :meth:`.run_asynchronous` - refer to its docs
-                for more details.
         """
         if getattr(settings, 'IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS', False):
             mode = self.MODE_SYNCHRONOUS
