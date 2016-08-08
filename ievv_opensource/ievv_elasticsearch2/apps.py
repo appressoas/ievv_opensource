@@ -3,9 +3,9 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 
-class IevvEsAppConfig(AppConfig):
+class IevvElasticSearch2AppConfig(AppConfig):
     name = 'ievv_opensource.ievv_elasticsearch2'
-    verbose_name = "IEVV ES"
+    verbose_name = "IEVV ElasticSearch2"
 
     def ready(self):
         from elasticsearch_dsl.connections import connections

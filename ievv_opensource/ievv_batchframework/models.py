@@ -20,14 +20,14 @@ class BatchOperationManager(models.Manager):
         batchoperation.save()
         return batchoperation
 
-    def create_syncronous(self, input_data=None, **kwargs):
+    def create_synchronous(self, input_data=None, **kwargs):
         """
-        Create a syncronous :class:`.BatchOperation`.
+        Create a synchronous :class:`.BatchOperation`.
 
-        An syncronous batch operation starts with :obj:`.BatchOperation.status` set
+        An synchronous batch operation starts with :obj:`.BatchOperation.status` set
         to :obj:`.BatchOperation.STATUS_RUNNING` and ``started_running_datetime``
         set just as if :meth:`.BatchOperation.mark_as_running` was called. So
-        calling this would have the same result as calling :meth:`.create_asyncronous`
+        calling this would have the same result as calling :meth:`.create_asynchronous`
         and then calling :meth:`.BatchOperation.mark_as_running`, but this will
         just use one database query instead of two.
 
@@ -47,9 +47,9 @@ class BatchOperationManager(models.Manager):
                              started_running_datetime=timezone.now(),
                              **kwargs)
 
-    def create_asyncronous(self, input_data=None, **kwargs):
+    def create_asynchronous(self, input_data=None, **kwargs):
         """
-        Create an asyncronous :class:`.BatchOperation`. An asyncronous
+        Create an asynchronous :class:`.BatchOperation`. An asynchronous
         batch operation starts with :obj:`.BatchOperation.status` set
         to :obj:`.BatchOperation.STATUS_UNPROCESSED`.
 
@@ -151,9 +151,9 @@ class BatchOperation(models.Model):
     finished_datetime = models.DateTimeField(
         null=True, blank=True)
 
-    # #: Is this an asyncronous operation? Set this to ``True`` for
+    # #: Is this an asynchronous operation? Set this to ``True`` for
     # #: background tasks (such as Celery tasks).
-    # asyncronous = models.BooleanField(
+    # asynchronous = models.BooleanField(
     #     default=False)
 
     #: The content type for :obj:`~.BatchOperation.context_object`.
@@ -208,6 +208,9 @@ class BatchOperation(models.Model):
     #: property instead.
     output_data_json = models.TextField(
         null=False, blank=True, default='')
+
+    class Meta:
+        ordering = ['-created_datetime']
 
     @property
     def input_data(self):
@@ -303,6 +306,7 @@ class BatchOperation(models.Model):
             self.result = self.RESULT_SUCCESSFUL
         if output_data:
             self.output_data = output_data
+        self.status = self.STATUS_FINISHED
         self.finished_datetime = timezone.now()
         self.clean()
         self.save()
@@ -316,3 +320,16 @@ class BatchOperation(models.Model):
             raise ValidationError({
                 'started_running_datetime': 'Can not be None when status is "running" or "finished".'
             })
+
+    def __str__(self):
+        return \
+            '#{id}-{operationtype}({created_datetime})[{status}, {result}]' \
+            ' - {context_content_type}#{context_object_id}'.format(
+                id=self.id,
+                operationtype=self.operationtype,
+                created_datetime=self.created_datetime,
+                status=self.status,
+                result=self.result,
+                context_content_type=self.context_content_type,
+                context_object_id=self.context_object_id
+            )

@@ -1,5 +1,8 @@
-from ievv_opensource.demo.project.default import default_urls
+from django.conf.urls import patterns
 
-urlpatterns = [
-    # Develop only URLs here
-] + default_urls.default_urls
+from ievv_opensource.demo.project.default.default_urls import default_urls
+
+urlpatterns = patterns(
+    '',
+    *default_urls
+)

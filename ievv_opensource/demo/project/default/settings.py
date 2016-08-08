@@ -15,6 +15,8 @@ SECRET_KEY = 'y%j0x%=7a^sf53m*s^5nbmfe0_t13d*oibfx#m#*wz1x+k6+m1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+TEMPLATE_DEBUG = True
+
 ALLOWED_HOSTS = []
 
 DATABASES = {
@@ -32,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
@@ -39,11 +42,9 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
-    'ievv_opensource.demo.customsqldemo.apps.CustomSqlDemoAppConfig',
     'ievv_opensource.ievvtasks_common',
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
-    'ievv_opensource.ievv_customsql',
     'ievv_opensource.ievv_elasticsearch',
     'ievv_opensource.ievv_elasticsearch2.apps.IevvEsAppConfig',
 ]
@@ -57,29 +58,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            # insert your TEMPLATE_DIRS here
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'debug': True,
-            'context_processors': [
-                "django.contrib.auth.context_processors.auth",
-                "django.core.context_processors.debug",
-                "django.core.context_processors.i18n",
-                "django.core.context_processors.media",
-                "django.core.context_processors.static",
-                "django.core.context_processors.tz",
-                "django.contrib.messages.context_processors.messages",
-                "django.core.context_processors.request",
-            ],
-        },
-    },
-]
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.request",
+)
 
+ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
@@ -177,3 +167,20 @@ IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
 ]
 
 IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
+
+
+IEVV_BATCHFRAMEWORK_CELERY_APP = 'ievv_opensource.demo.celery_app'
+BROKER_URL = 'redis://localhost:6381'
+CELERY_RESULT_BACKEND = 'redis://localhost:6381'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Oslo'
+CELERY_IMPORTS = [
+    # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
+    'ievv_opensource.ievv_batchframework.celery_tasks',
+]
+CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
+                          '[%(name)s] ' \
+                          '[%(task_name)s(%(task_id)s)] ' \
+                          '%(message)s'
