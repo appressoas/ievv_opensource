@@ -1,3 +1,4 @@
+import unittest
 from unittest import mock
 
 import elasticsearch_dsl
@@ -17,6 +18,7 @@ class PersonDocType(ievv_elasticsearch2.DocType):
         index = 'main'
 
 
+@unittest.skip('Not ready')
 class TestIndexUpdaterBulkIndex(test.TestCase):
     def setUp(self):
         self.es = connections.get_connection()
@@ -55,6 +57,7 @@ class AutomappedDocType(ievv_elasticsearch2.ModelDocType):
         index = 'main'
 
 
+@unittest.skip('Not ready')
 class TestIndexUpdatedBulkIndexModelIds(test.TestCase):
     def setUp(self):
         self.es = connections.get_connection()
@@ -77,6 +80,7 @@ class TestIndexUpdatedBulkIndexModelIds(test.TestCase):
         self.assertEqual('c', AutomappedDocType.get(id=item3.id).char)
 
 
+@unittest.skip('Not ready')
 class TestIndexUpdaterBulkReindexByPriority(test.TestCase):
     def setUp(self):
         self.es = connections.get_connection()
