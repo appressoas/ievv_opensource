@@ -1,5 +1,6 @@
 import logging
 
+import inspect
 import elasticsearch_dsl
 from django.conf import settings
 from elasticsearch_dsl.connections import connections
