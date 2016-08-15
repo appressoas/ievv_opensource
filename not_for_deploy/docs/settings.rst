@@ -390,6 +390,33 @@ but you can also use this in tests to debug just some requests::
             # ... more code here ...
 
 
+
+.. setting:: IEVV_ELASTICSEARCH2_TESTMODE
+
+IEVV_ELASTICSEARCH2_TESTMODE
+============================
+
+Set this to True to make ElasticSearch behave in a manner that
+makes writing Unit tests a bit easier.
+
+Add the following to you test settings to enable testmode::
+
+    IEVV_ELASTICSEARCH2_TESTMODE = True
+
+
+*******************
+ievv_batchframework
+*******************
+
+.. setting:: IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS
+
+IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS
+=====================================
+If this is ``True``, all actions will be executed syncronously. Read more about
+this in :ref:`ievv_batchframework_develop_asyncronous`.
+
+
+
 *****
 utils
 *****

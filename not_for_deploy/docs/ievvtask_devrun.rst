@@ -17,8 +17,28 @@ First of all, make sure you have the following in your ``INSTALLED_APPS`` settin
     'ievv_opensource.ievvtasks_development',
 
 Next, you need to configure what to run when you run ``ievv devrun``. You
-do this with the ``IEVVTASKS_DEVRUN_RUNNABLES``-setting. For this
-example, we will setup *Django runserver* and *Django dbdev database server*::
+do this with the ``IEVVTASKS_DEVRUN_RUNNABLES``-setting.
+
+For the first example, we will use ``ievv devrun`` to just run the Django
+development server, just like ``python manage.py runserver``. Add the
+following you your Django settings::
+
+    IEVVTASKS_DEVRUN_RUNNABLES = {
+        'default': ievvdevrun.config.RunnableThreadList(
+            ievvdevrun.runnables.django_runserver.RunnableThread()
+        )
+    }
+
+With this configured, you can run::
+
+    $ ievv devrun
+
+to start the Django development. Hit ``CTRL-C`` to stop the server.
+
+
+Using Django dbdev
+==================
+For this example, we will setup *Django runserver* and *Django dbdev database server*::
 
     IEVVTASKS_DEVRUN_RUNNABLES = {
         'default': ievvdevrun.config.RunnableThreadList(
@@ -27,14 +47,13 @@ example, we will setup *Django runserver* and *Django dbdev database server*::
         )
     }
 
-With the configured, you can run::
+With this configured, you can run::
 
     $ ievv devrun
 
+to start both the Django development server and your `django_dbdev`_ database.
 Hit ``CTRL-C`` to stop both the servers.
 
-to start both the Django development server and your
-`Django dbdev <https://github.com/espenak/django_dbdev>`_ database.
 
 
 Multiple run configurations
@@ -56,6 +75,9 @@ For this example, we will add an ``design`` key that also runs
         )
     }
 
+To run the ``design``-set of runnables, use::
+
+    $ ievv devrun -n design
 
 
 ****************************************
@@ -101,6 +123,7 @@ Overview
    django_runserver.RunnableThread
    dbdev_runserver.RunnableThread
    elasticsearch.RunnableThread
+   redis_server.RunnableThread
 
 
 Details
@@ -118,6 +141,9 @@ Details
 .. currentmodule:: ievv_opensource.utils.ievvdevrun.runnables.elasticsearch
 .. automodule:: ievv_opensource.utils.ievvdevrun.runnables.elasticsearch
 
+.. currentmodule:: ievv_opensource.utils.ievvdevrun.runnables.redis_server
+.. automodule:: ievv_opensource.utils.ievvdevrun.runnables.redis_server
+
 
 *************
 Low level API
@@ -125,3 +151,7 @@ Low level API
 
 .. currentmodule:: ievv_opensource.utils.ievvdevrun.config
 .. automodule:: ievv_opensource.utils.ievvdevrun.config
+
+
+
+.. _`django_dbdev`: https://github.com/espenak/django_dbdev

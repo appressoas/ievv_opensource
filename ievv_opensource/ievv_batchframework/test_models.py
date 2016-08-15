@@ -1,5 +1,6 @@
 from django import test
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django_cradmin import datetimeutils
 from model_mommy import mommy
 
@@ -76,12 +77,16 @@ class TestBatchOperationModel(test.TestCase):
             batchoperation.output_data)
 
     def test_finish_successful(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation')
+        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+                                       status=BatchOperation.STATUS_RUNNING,
+                                       started_running_datetime=timezone.now())
         batchoperation.finish()
         self.assertEqual(BatchOperation.RESULT_SUCCESSFUL, batchoperation.result)
 
     def test_finish_failed(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation')
+        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+                                       status=BatchOperation.STATUS_RUNNING,
+                                       started_running_datetime=timezone.now())
         mocknow = datetimeutils.default_timezone_datetime(2016, 1, 1)
         with mock.patch('ievv_opensource.ievv_batchframework.models.timezone.now', lambda: mocknow):
             batchoperation.finish(failed=True)
@@ -90,7 +95,9 @@ class TestBatchOperationModel(test.TestCase):
         self.assertEqual(batchoperation.finished_datetime, mocknow)
 
     def test_finish_with_output_data(self):
-        batchoperation = mommy.make('ievv_batchframework.BatchOperation')
+        batchoperation = mommy.make('ievv_batchframework.BatchOperation',
+                                    status=BatchOperation.STATUS_RUNNING,
+                                    started_running_datetime=timezone.now())
         batchoperation.finish(output_data={'hello': 'world'})
         batchoperation = BatchOperation.objects.get(id=batchoperation.id)
         self.assertEqual(
@@ -110,23 +117,23 @@ class TestBatchOperationModel(test.TestCase):
 
 
 class TestBatchOperationManager(test.TestCase):
-    def test_create_syncronous(self):
-        batchoperation = BatchOperation.objects.create_syncronous()
+    def test_create_synchronous(self):
+        batchoperation = BatchOperation.objects.create_synchronous()
         self.assertEqual(BatchOperation.STATUS_RUNNING, batchoperation.status)
 
-    def test_create_syncronous_with_inputdata(self):
-        batchoperation = BatchOperation.objects.create_syncronous(
+    def test_create_synchronous_with_inputdata(self):
+        batchoperation = BatchOperation.objects.create_synchronous(
             input_data={'hello': 'world'})
         self.assertEqual(
             '{"hello": "world"}',
             batchoperation.input_data_json)
 
-    def test_create_asyncronous(self):
-        batchoperation = BatchOperation.objects.create_asyncronous()
+    def test_create_asynchronous(self):
+        batchoperation = BatchOperation.objects.create_asynchronous()
         self.assertEqual(BatchOperation.STATUS_UNPROCESSED, batchoperation.status)
 
-    def test_create_asyncronous_with_inputdata(self):
-        batchoperation = BatchOperation.objects.create_asyncronous(
+    def test_create_asynchronous_with_inputdata(self):
+        batchoperation = BatchOperation.objects.create_asynchronous(
             input_data={'hello': 'world'})
         self.assertEqual(
             '{"hello": "world"}',

@@ -5,6 +5,8 @@ Extends `elasticsearch-py`_ and `elasticsearch-dsl`_ with some very
 useful utilities that makes it easier to use ElasticSearch with
 Django.
 
+.. warning:: Under development.
+
 
 *******
 Install

@@ -1,5 +1,6 @@
-from ievv_opensource.demo.project.default import default_urls
+
+from ievv_opensource.demo.project.default.default_urls import default_urls
 
 urlpatterns = [
-    # Develop only URLs here
-] + default_urls.default_urls
+
+] + default_urls
