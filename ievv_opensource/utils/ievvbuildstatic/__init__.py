@@ -1,4 +1,5 @@
 from . import utils  # noqa
+from . import filepath  # noqa
 from . import config  # noqa
 from . import cssbuildbaseplugin  # noqa
 from . import sassbuild  # noqa
@@ -12,6 +13,7 @@ from . import typescriptbuild   # noqa
 
 __all__ = [
     'utils',
+    'filepath',
     'config',
     'cssbuildbaseplugin',
     'sassbuild',

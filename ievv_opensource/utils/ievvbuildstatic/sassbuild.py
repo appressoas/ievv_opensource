@@ -2,8 +2,9 @@ import os
 
 from ievv_opensource.utils.ievvbuildstatic import cssbuildbaseplugin
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
-from ievv_opensource.utils.ievvbuildstatic.utils import RegexFileList
+from ievv_opensource.utils.ievvbuildstatic import utils
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
+from ievv_opensource.utils.ievvbuildstatic import filepath
 
 
 class Plugin(cssbuildbaseplugin.AbstractPlugin):
@@ -64,6 +65,7 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
     name = 'sassbuild'
 
     def __init__(self, sourcefile, sourcefolder='styles',
+                 destinationfolder=None,
                  other_sourcefolders=None,
                  sass_include_paths=None,
                  **kwargs):
@@ -73,11 +75,20 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
                 relative to ``sourcefolder``.
             sourcefolder: The folder where ``sourcefile`` is located relative to
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+                You can specify a folder in another app using
+                a :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath` object,
+                but this is normally not recommended.
             sass_include_paths: Less include paths as a list. Paths are relative
                 to the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+                You can specify folders in other apps using
+                :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath` objects
             **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin.AbstractPlugin`.
         """
         self.sourcefolder = sourcefolder
+        if isinstance(sourcefolder, filepath.FilePathInterface) and destinationfolder is None:
+            raise ValueError('destinationfolder must be specifed when sourcefolder is not a string.')
+        self.destinationfolder = destinationfolder or sourcefolder
+
         self.other_sourcefolders = other_sourcefolders or []
         self.sass_include_paths = sass_include_paths or []
         self.sourcefile = sourcefile
@@ -96,14 +107,15 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
 
     def get_destinationfile_path(self):
         return self.app.get_destination_path(
-            self.sourcefolder, self.sourcefile, new_extension='.css')
+            self.destinationfolder, self.sourcefile, new_extension='.css')
 
     def get_other_sourcefolders_paths(self):
         return map(self.app.get_source_path, self.other_sourcefolders)
 
     def format_sass_include_paths(self):
         if self.sass_include_paths:
-            return ':'.join(map(self.app.get_source_path, self.sass_include_paths))
+            include_path = ':'.join(map(self.app.get_source_path, self.sass_include_paths))
+            return include_path
         else:
             return ''
 
@@ -156,7 +168,7 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
                                os.path.join(self.sourcefolder, self.sourcefile))
 
     def get_all_source_file_paths(self):
-        regexfilelist = RegexFileList(include_patterns=self.get_watch_regexes())
+        regexfilelist = utils.RegexFileList(include_patterns=self.get_watch_regexes())
         source_file_paths = []
         sourcefolders = [self.get_sourcefolder_path()]
         sourcefolders.extend(self.get_other_sourcefolders_paths())

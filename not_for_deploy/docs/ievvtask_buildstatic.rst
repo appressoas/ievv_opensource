@@ -193,6 +193,10 @@ Utils
 
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.utils
 
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.filepath
+
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.filepath
+
 
 
 **********

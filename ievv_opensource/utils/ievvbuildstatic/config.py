@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.apps import apps
 
+from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin
 
@@ -84,50 +85,85 @@ class App(LogMixin):
         """
         return os.path.join(self.get_appfolder(), apprelative_path)
 
-    def get_source_path(self, *sourcefolder_relative_path):
+    def _relative_or_absolute_path_to_absolute_path(self, relative_path_root, pathlist):
+        if len(pathlist) == 1 and isinstance(pathlist[0], filepath.FilePathInterface):
+            return pathlist[0].abspath
+        else:
+            if pathlist:
+                return os.path.join(relative_path_root, *pathlist)
+            else:
+                return relative_path_root
+
+    def get_source_path(self, *path):
         """
         Returns the absolute path to a folder within the source
-        folder.
-        """
-        sourcefolder = os.path.join(self.get_app_path(self.sourcefolder), self.appname)
-        if sourcefolder_relative_path:
-            return os.path.join(sourcefolder, *sourcefolder_relative_path)
-        else:
-            return sourcefolder
-
-    def get_destination_path(self, *sourcefolder_relative_path, **kwargs):
-        """
-        Returns the absolute path to a folder within the destination
-        folder.
-
-        Parameters:
-            sourcefolder_relative_path: Path relative to the source folder.
-                Same format as ``os.path.join()``.
-            new_extension: A new extension to give the destination path.
-                See example below.
-
+        folder of this app or another app.
 
         Examples:
 
-            Get the destination file for a coffeescript file - extension
+            Get the source path for a coffeescript file::
+
+                self.get_source_path('mylib', 'app.coffee')
+
+            Getting the path of a source file within another app using
+            a :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath`
+            object (a subclass of :class:`ievv_opensource.utils.ievvbuildstatic.filepath.FilePathInterface`)
+            as the path::
+
+                self.get_source_path(
+                    ievvbuildstatic.filepath.SourcePath('myotherapp', 'scripts', 'typescript', 'app.ts'))
+
+
+        Args:
+            *path: Zero or more strings to specify a path relative to the source folder of this app -
+                same format as :func:`os.path.join`.
+                A single :class:`ievv_opensource.utils.ievvbuildstatic.filepath.FilePathInterface`
+                object to specify an absolute path.
+        """
+        sourcefolder = os.path.join(self.get_app_path(self.sourcefolder), self.appname)
+        return self._relative_or_absolute_path_to_absolute_path(relative_path_root=sourcefolder,
+                                                                pathlist=path)
+
+    def get_destination_path(self, *path, **kwargs):
+        """
+        Returns the absolute path to a folder within the destination
+        folder of this app or another app.
+
+        Examples:
+
+            Get the destination path for a coffeescript file - extension
             is changed from ``.coffee`` to ``.js``::
 
-                get_destination_path('mylib', 'app.coffee', new_extension='.js')
+                self.get_destination_path('mylib', 'app.coffee', new_extension='.js')
+
+            Getting the path of a destination file within another app using
+            a :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath`
+            object (a subclass of :class:`ievv_opensource.utils.ievvbuildstatic.filepath.FilePathInterface`)
+            as the path::
+
+                self.get_destination_path(
+                    ievvbuildstatic.filepath.DestinationPath(
+                        'myotherapp', '1.1.0', 'scripts', 'typescript', 'app.ts'),
+                    new_extension='.js')
+
+        Args:
+            path: Path relative to the source folder.
+                Same format as ``os.path.join()``.
+                A single :class:`ievv_opensource.utils.ievvbuildstatic.filepath.FilePathInterface`
+                object to specify an absolute path.
+            new_extension: A new extension to give the destination path.
+                See example below.
 
         """
         new_extension = kwargs.get('new_extension', None)
         destinationfolder = os.path.join(
             self.get_app_path(self.destinationfolder), self.appname, self.version)
-        if sourcefolder_relative_path:
-            path = os.path.join(destinationfolder, *sourcefolder_relative_path)
-            if new_extension:
-                path, extension = os.path.splitext(path)
-                path = '{}{}'.format(path, new_extension)
-                return path
-            else:
-                return path
-        else:
-            return destinationfolder
+        absolute_path = self._relative_or_absolute_path_to_absolute_path(relative_path_root=destinationfolder,
+                                                                         pathlist=path)
+        if new_extension is not None:
+            path, extension = os.path.splitext(absolute_path)
+            absolute_path = '{}{}'.format(path, new_extension)
+        return absolute_path
 
     def watch(self):
         """
