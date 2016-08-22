@@ -26,6 +26,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  lint=True,
                  lintconfig=None,
                  tsc_compiler_options=None,
+                 tsc_exclude=None,
+                 typings_global_dependencies=None,
                  register_tsconfig_as_temporaryfile=True):
         super(Plugin, self).__init__()
         self.destinationfile = destinationfile
@@ -54,6 +56,11 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         }
         if tsc_compiler_options:
             self.tsc_compiler_options.update(tsc_compiler_options)
+        if tsc_exclude is None:
+            self.tsc_exclude = ['node_modules']
+        else:
+            self.tsc_exclude = tsc_exclude
+        self.typings_global_dependencies = typings_global_dependencies
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
@@ -90,6 +97,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def get_tslint_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('tslint')
+
+    def get_typings_executable(self):
+        return self.app.get_installer(NpmInstaller).find_executable('typings')
 
     def get_all_sourcefiles(self, absolute_paths=False):
         return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path(),
@@ -137,7 +147,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         tsc_compiler_options['outDir'] = output_directory
         output = {
             "compilerOptions": tsc_compiler_options,
-            "files": self.get_all_sourcefiles(absolute_paths=True)
+            "include": self.get_all_sourcefiles(absolute_paths=True),
+            "exclude": self.tsc_exclude
         }
         return output
 
@@ -147,6 +158,23 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         open(path, 'wb').write(json.dumps(tsconfig_dict, indent=2).encode('utf-8'))
         if self.register_tsconfig_as_temporaryfile:
             self.register_temporary_file_or_directory(path)
+
+    def run_typings_install(self):
+        self.get_logger().debug("Running typings install")
+        executable = self.get_typings_executable()
+        for typings_install_key in self.typings_global_dependencies:
+            try:
+                self.run_shell_command(executable,
+                                       args=['install', typings_install_key, '--save', '--global'],
+                                       _cwd=self.app.get_source_path())
+            except ShellCommandError:
+                self.get_logger().error('typings install failed: {}'.format(typings_install_key))
+                raise
+
+    def setup_typings(self):
+        if self.typings_global_dependencies is None:
+            return
+        self.run_typings_install()
 
     def compile_typescript(self):
         executable = self.get_tsc_executable()
@@ -195,6 +223,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         js_directory = os.path.join(temporary_directory, 'js')
         os.mkdir(js_directory)
         self.make_tsconfig(js_directory)
+        self.setup_typings()
 
         try:
             self.compile_typescript()
@@ -228,7 +257,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def get_watch_folders(self):
         """
-        We only watch the folder where the coffee sources are located,
+        We only watch the folder where the typescript sources are located,
         so this returns the absolute path of the ``sourcefolder``.
         """
         folders = [self.app.get_source_path(self.sourcefolder)]

@@ -35,9 +35,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.browserify_jsbuild.Plugin(
                 sourcefile='jstest.js',
                 destinationfile='jstest.js',
-            ),
-            ievvbuildstatic.typescriptbuild.Plugin(
-                destinationfile="tsdemo.js"
             )
         ]
     ),

@@ -9,6 +9,7 @@ from . import bowerinstall  # noqa
 from . import npminstall  # noqa
 from . import browserify_jsbuild  # noqa
 from . import typescriptbuild   # noqa
+from . import nodemodulescopy   #noqa
 
 __all__ = [
     'utils',
@@ -22,4 +23,5 @@ __all__ = [
     'npminstall',
     'browserify_jsbuild',
     'typescriptbuild',
+    'nodemodulescopy',
 ]
