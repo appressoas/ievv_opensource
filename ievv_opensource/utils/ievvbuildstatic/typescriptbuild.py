@@ -91,6 +91,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 'tslint', version=self.get_tslint_version())
         self.app.get_installer(NpmInstaller).queue_install(
             'browserify', version=self.get_browserify_version())
+        self.setup_typings()
 
     def get_tsc_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('tsc')
@@ -223,7 +224,6 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         js_directory = os.path.join(temporary_directory, 'js')
         os.mkdir(js_directory)
         self.make_tsconfig(js_directory)
-        self.setup_typings()
 
         try:
             self.compile_typescript()
@@ -251,6 +251,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.sourcefiles.prettyformat_patterns()))
         temporary_directory = self.make_temporary_build_directory()
         self.build(temporary_directory=temporary_directory)
+
 
     def get_extra_watchfolder_paths(self):
         return map(self.app.get_source_path, self.extra_watchfolders)
