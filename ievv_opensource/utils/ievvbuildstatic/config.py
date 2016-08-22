@@ -63,6 +63,8 @@ class App(LogMixin):
             plugin.install()
         for installer in self.installers.values():
             installer.install()
+        for plugin in self.plugins:
+            plugin.post_install()
 
     def get_app_config(self):
         """

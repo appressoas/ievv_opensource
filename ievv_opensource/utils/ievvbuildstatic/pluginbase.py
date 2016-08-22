@@ -37,6 +37,11 @@ class Plugin(LogMixin):
                         'otherpackage', version='~1.0.0')
         """
 
+    def post_install(self):
+        """
+        Called just like install, but after all apps has finished installing.
+        """
+
     def run(self):
         """
         Run the plugin. Put the code executed by the plugin each time files

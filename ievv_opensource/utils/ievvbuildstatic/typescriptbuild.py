@@ -77,6 +77,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def get_typescript_version(self):
         return None
 
+    def get_typings_version(self):
+        return None
+
     def get_tslint_version(self):
         return None
 
@@ -86,11 +89,15 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def install(self):
         self.app.get_installer(NpmInstaller).queue_install(
             'typescript', version=self.get_typescript_version())
+        self.app.get_installer(NpmInstaller).queue_install(
+            'typings', version=self.get_typings_version())
         if self.lint:
             self.app.get_installer(NpmInstaller).queue_install(
                 'tslint', version=self.get_tslint_version())
         self.app.get_installer(NpmInstaller).queue_install(
             'browserify', version=self.get_browserify_version())
+
+    def post_install(self):
         self.setup_typings()
 
     def get_tsc_executable(self):
