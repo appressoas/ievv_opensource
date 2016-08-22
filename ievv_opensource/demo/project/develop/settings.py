@@ -71,8 +71,8 @@ IEVVTASKS_DEVRUN_RUNNABLES = {
         ievvdevrun.runnables.django_runserver.RunnableThread(port=9001),
         ievvdevrun.runnables.redis_server.RunnableThread(port='6381'),
         ievvdevrun.runnables.celery_worker.RunnableThread(app='ievv_opensource.demo'),
-        # ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
-        # ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
+        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
     ),
     'design': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),

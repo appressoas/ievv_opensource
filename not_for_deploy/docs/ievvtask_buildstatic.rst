@@ -135,6 +135,7 @@ Overview
    lessbuild.Plugin
    mediacopy.Plugin
    bowerinstall.Plugin
+   npminstall.Plugin
    browserify_jsbuild.Plugin
    cssbuildbaseplugin.AbstractPlugin
 
@@ -156,6 +157,9 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.bowerinstall
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.npminstall
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.npminstall
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
@@ -192,6 +196,10 @@ Utils
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.utils
 
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.utils
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.filepath
+
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.filepath
 
 
 

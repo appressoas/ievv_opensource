@@ -2,6 +2,7 @@ import os
 import shutil
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
+from ievv_opensource.utils.ievvbuildstatic import filepath
 
 
 class Plugin(pluginbase.Plugin):
@@ -40,21 +41,25 @@ class Plugin(pluginbase.Plugin):
     """
     name = 'mediacopy'
 
-    def __init__(self, sourcefolder='media'):
+    def __init__(self, sourcefolder='media', destinationfolder=None):
         """
         Parameters:
             sourcefolder: The folder where media files is located relative to
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
-
+                You can specify a folder in another app using
+                a :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath` object.
         """
         super(Plugin, self).__init__()
         self.sourcefolder = sourcefolder
+        if isinstance(sourcefolder, filepath.FilePathInterface) and destinationfolder is None:
+            raise ValueError('destinationfolder must be specifed when sourcefolder is not a string.')
+        self.destinationfolder = destinationfolder or sourcefolder
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
 
     def get_destinationfolder_path(self):
-        return self.app.get_destination_path(self.sourcefolder)
+        return self.app.get_destination_path(self.destinationfolder)
 
     def run(self):
         sourcefolder = self.get_sourcefolder_path()
@@ -65,6 +70,10 @@ class Plugin(pluginbase.Plugin):
             return
 
         destinationfolder = self.get_destinationfolder_path()
+        if os.path.abspath(destinationfolder) == os.path.abspath(sourcefolder):
+            raise ValueError('mediacopy: Sourcefolder {} is the same as destinationfolder {}'.format(
+                sourcefolder, destinationfolder))
+
         if os.path.exists(destinationfolder):
             self.get_logger().debug('Removing {}'.format(destinationfolder))
             shutil.rmtree(destinationfolder)
