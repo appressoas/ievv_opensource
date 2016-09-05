@@ -40,7 +40,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def __init__(self, sourcefile, destinationfile,
                  sourcefolder=os.path.join('scripts', 'javascript'),
                  destinationfolder=os.path.join('scripts'),
-                 extra_watchfolders=None):
+                 extra_watchfolders=None,
+                 transform_es2015=False):
         """
         Parameters:
             sourcefile: The source file relative to ``sourcefolder``.
@@ -61,6 +62,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
+        self.transform_es2015 = transform_es2015
 
     def get_sourcefile_path(self):
         return self.app.get_source_path(self.sourcefolder, self.sourcefile)
@@ -74,6 +76,11 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def install(self):
         self.app.get_installer(NpmInstaller).queue_install(
             'browserify', version=self.get_browserify_version())
+        if self.transform_es2015:
+            self.app.get_installer(NpmInstaller).queue_install(
+                'babel-preset-es2015', version='^6.6.0')
+            self.app.get_installer(NpmInstaller).queue_install(
+                'babelify', version='^7.3.0')
 
     def get_browserify_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('browserify')
@@ -84,12 +91,17 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 sourcefile=self.get_sourcefile_path(),
                 destinationfile=self.get_destinationfile_path()))
         executable = self.get_browserify_executable()
+        args = [
+           self.get_sourcefile_path(),
+           '-o', self.get_destinationfile_path(),
+        ]
+        if self.transform_es2015:
+            args.extend([
+                '-t', '[', 'babelify', '--presets', '[', 'es2015', ']', ']'
+            ])
+
         try:
-            self.run_shell_command(executable,
-                                   args=[
-                                       self.get_sourcefile_path(),
-                                       '-o', self.get_destinationfile_path()
-                                   ],
+            self.run_shell_command(executable, args=args,
                                    _cwd=self.app.get_source_path())
         except ShellCommandError:
             self.get_logger().command_error('browserify build FAILED!')
