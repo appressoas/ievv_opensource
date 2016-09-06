@@ -1,3 +1,4 @@
+import os
 import platform
 from ievv_opensource.utils.desktopnotifications import osxnotification
 from ievv_opensource.utils.desktopnotifications import linuxnotification
@@ -28,7 +29,9 @@ def show_message(title, message):
         title (str): The title of the notification.
         message (str): The notification message.
     """
-    _notificationbackend.show_message(title=title, message=message)
+    enabled = os.environ.get('IEVV_OPENSOURCE_ENABLE_DESKTOP_NOTIFICATIONS', 'true')
+    if enabled.lower() == 'true':
+        _notificationbackend.show_message(title=title, message=message)
 
 
 # if __name__ == '__main__':
