@@ -27,7 +27,7 @@ class AbstractRunnableThread(threading.Thread, logmixin.LogMixin):
         """
         Called automatically on startup with ``"Starting <name>"`` message.
         """
-        self.get_logger().command_start('Starting {}'.format(self.get_logger_name()))
+        self.get_logger().info('Starting {}'.format(self.get_logger_name()))
 
     def log_successful_stop(self, message=''):
         """
@@ -37,7 +37,7 @@ class AbstractRunnableThread(threading.Thread, logmixin.LogMixin):
         Parameters:
             message: Optional extra message to show.
         """
-        self.get_logger().command_success('{} stopped :) {}'.format(
+        self.get_logger().info('{} stopped ! {}'.format(
             self.get_logger_name(), message))
 
     def start(self):
@@ -141,7 +141,7 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
                         for childprocess in process.children():
                             self.detected_process_ids.add(childprocess.pid)
                 else:
-                    self.get_logger().command_error('Restarting "{}" because of crash.'.format(
+                    self.get_logger().warning('Restarting "{}" because of crash.'.format(
                         self.get_logger_name()))
                     self._start_command(restart=True)
             else:

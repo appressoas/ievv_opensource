@@ -128,10 +128,10 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                 self.app.get_installer(NpmInstaller).find_executable('postcss'),
                 args=args)
         except ShellCommandError:
-            self.get_logger().command_error('postcss failed!')
+            self.get_logger().error('postcss failed!')
             raise CssBuildException()
         else:
-            self.get_logger().command_success('postcss ran successfully :)')
+            self.get_logger().success('postcss ran successfully :)')
 
     def get_all_source_file_paths(self):
         """
@@ -162,9 +162,9 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                 self.app.get_installer(NpmInstaller).find_executable('stylelint'),
                 args=args)
         except ShellCommandError:
-            self.get_logger().command_error('Stylesheet linting failed!')
+            self.get_logger().error('Stylesheet linting failed!')
         else:
-            self.get_logger().command_success('Stylesheet linting was successful :)')
+            self.get_logger().success('Stylesheet linting was successful :)')
 
     def preprocess_styles(self, temporary_directory):
         if self.lint:
