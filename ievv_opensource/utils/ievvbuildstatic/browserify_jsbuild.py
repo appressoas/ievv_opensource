@@ -1,4 +1,3 @@
-import json
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
@@ -91,6 +90,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 sourcefile=self.get_sourcefile_path(),
                 destinationfile=self.get_destinationfile_path()))
         executable = self.get_browserify_executable()
+        destination_folder = self.app.get_destination_path(self.destinationfolder)
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
         args = [
            self.get_sourcefile_path(),
            '-o', self.get_destinationfile_path(),
