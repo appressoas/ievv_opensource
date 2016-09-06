@@ -143,7 +143,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             open(lintconfig_path, 'wb').write(json.dumps(lintconfig, indent=2).encode('utf-8'))
             return lintconfig_path
 
-    def lint_typecript_files(self, temporary_directory):
+    def lint_typescript_files(self, temporary_directory):
         # lintconfig_path = self.make_lintconfig_file(temporary_directory=temporary_directory)
         # for relative_filepath in self.get_all_sourcefiles():
         #     self.lint_typescript_file(relative_filepath=relative_filepath,
@@ -227,7 +227,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def build(self, temporary_directory):
         if self.lint:
-            self.lint_typecript_files(temporary_directory=temporary_directory)
+            self.lint_typescript_files(temporary_directory=temporary_directory)
         js_directory = os.path.join(temporary_directory, 'js')
         os.mkdir(js_directory)
         self.make_tsconfig(js_directory)
