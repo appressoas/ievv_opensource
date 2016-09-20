@@ -25,7 +25,7 @@ sphinxcontrib-napoleon==0.3.3
 appresso_sphinx_extensions==1.0.0
 
 # Easier to work with databases during development
-django_dbdev==1.0.0
+django_dbdev==1.0.2
 
 # Better Django shell and other utils for development
 ipython==3.1.0
