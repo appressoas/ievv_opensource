@@ -7,6 +7,7 @@
         <option name="settingsModule" value="ievv_opensource/demo/project/settingsproxy.py" />
         <option name="manageScript" value="manage.py" />
         <option name="environment" value="&lt;map/&gt;" />
+        <option name="commandsToSkip" value="" />
       </configuration>
     </facet>
   </component>
@@ -22,7 +23,7 @@
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/ievv_opensource/ievv_elasticsearchbrowser/templates" />
+        <option value="$MODULE_DIR$/ievv_opensource/demo/reactjs_demo/templates" />
       </list>
     </option>
   </component>
