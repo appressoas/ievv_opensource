@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
+    'ievv_opensource.demo.reactjs_demo',
     'ievv_opensource.demo.customsqldemo',
     'ievv_opensource.demo.batchframeworkdemo.apps.BatchFrameworkDemoAppConfig',
     'ievv_opensource.ievvtasks_common',

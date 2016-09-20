@@ -27,6 +27,10 @@ class App(LogMixin):
             sourcefolder: The folder relative to the app root folder where
                 static sources (I.E.: less, coffescript, ... sources) are located.
                 Defaults to ``staticsources``.
+            keep_temporary_files (boolean): If this is ``True``, we keep the
+                temporary build directory for the app instead of deleting it.
+                This is useful during development, but not for production,
+                so it is ``False`` by default.
         """
         self.apps = None
         self.version = version

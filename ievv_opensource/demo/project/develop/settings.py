@@ -9,54 +9,85 @@ IEVVTASKS_DUMPDATA_DIRECTORY = os.path.join(THIS_DIR, 'dumps')
 
 
 IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+    # ievvbuildstatic.config.App(
+    #     appname='demoapp',
+    #     version='1.0.0',
+    #     # keep_temporary_files=False,
+    #     plugins=[
+    #         ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
+    #         ievvbuildstatic.mediacopy.Plugin(),
+    #         ievvbuildstatic.coffeebuild.Plugin(
+    #             destinationfile='coffeetest.js',
+    #             lintconfig={
+    #                 "max_line_length": {
+    #                     'value': 102,
+    #                     'level': "warn",
+    #                     'limitComments': True,
+    #                 }
+    #             }
+    #         ),
+    #         ievvbuildstatic.npminstall.Plugin(
+    #             packages={
+    #                 'uniq': None,
+    #                 'momentjs': None
+    #             }
+    #         ),
+    #         ievvbuildstatic.browserify_jsbuild.Plugin(
+    #             sourcefile='jstest.js',
+    #             destinationfile='jstest.js',
+    #         )
+    #     ]
+    # ),
+    # ievvbuildstatic.config.App(
+    #     appname='demoapp2',
+    #     version='2.0.1',
+    #     plugins=[
+    #         ievvbuildstatic.sassbuild.Plugin(
+    #             sourcefolder='styles/theme',
+    #             sourcefile='theme.scss',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.sassbuild.Plugin(
+    #             sourcefolder='styles/theme2',
+    #             sourcefile='theme2.scss',
+    #             other_sourcefolders=[
+    #                 'styles/base',
+    #             ]
+    #         ),
+    #         ievvbuildstatic.mediacopy.Plugin(),
+    #     ]
+    # ),
     ievvbuildstatic.config.App(
-        appname='demoapp',
-        version='1.0.0',
-        # keep_temporary_files=False,
+        appname='reactjs_demo',
+        version='0.1.0',
         plugins=[
-            ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
-            ievvbuildstatic.mediacopy.Plugin(),
-            ievvbuildstatic.coffeebuild.Plugin(
-                destinationfile='coffeetest.js',
-                lintconfig={
-                    "max_line_length": {
-                        'value': 102,
-                        'level': "warn",
-                        'limitComments': True,
-                    }
-                }
-            ),
             ievvbuildstatic.npminstall.Plugin(
                 packages={
-                    'uniq': None,
-                    'momentjs': None
+                    'react': None,
+                    'react-dom': None,
                 }
             ),
-            ievvbuildstatic.browserify_jsbuild.Plugin(
-                sourcefile='jstest.js',
-                destinationfile='jstest.js',
+            ievvbuildstatic.nodemodulescopy.Plugin(
+                sourcefiles=[
+                    'react/dist/react.js',
+                    'react-dom/dist/react-dom.js',
+                ]
+            ),
+            ievvbuildstatic.typescriptbuild.Plugin(
+                main_sourcefile='stuff.tsx',
+                typings_for_dependencies=[
+                    # 'dt~react',
+                    # 'dt~react-dom',
+                    # 'dt~react-global',
+                    'npm~react@15.0.1',
+                    'npm~react-dom@15.0.1',
+                ],
+                tsc_compiler_options={
+                    'jsx': 'react'
+                },
             )
-        ]
-    ),
-    ievvbuildstatic.config.App(
-        appname='demoapp2',
-        version='2.0.1',
-        plugins=[
-            ievvbuildstatic.sassbuild.Plugin(
-                sourcefolder='styles/theme',
-                sourcefile='theme.scss',
-                other_sourcefolders=[
-                    'styles/base',
-                ]
-            ),
-            ievvbuildstatic.sassbuild.Plugin(
-                sourcefolder='styles/theme2',
-                sourcefile='theme2.scss',
-                other_sourcefolders=[
-                    'styles/base',
-                ]
-            ),
-            ievvbuildstatic.mediacopy.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '

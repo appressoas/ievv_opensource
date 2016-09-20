@@ -12,6 +12,17 @@ from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellComm
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
+    """
+    TypeScript build plugin.
+
+    Examples:
+
+        Very minimal - expects the source file to be in
+        ``<root of app>/staticsources/<appname>/scripts/typescript/main.ts``::
+
+            ievvbuildstatic.typescriptbuild.Plugin()
+
+    """
     name = 'typescriptbuild'
 
     def __init__(self,
@@ -27,14 +38,37 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  lintconfig=None,
                  tsc_compiler_options=None,
                  tsc_exclude=None,
-                 typings_global_dependencies=None,
+                 typings_for_dependencies=None,
                  register_tsconfig_as_temporaryfile=True):
+        """
+
+        Args:
+            main_sourcefile (str): The main source file. Defaults to ``"main.ts"``. Required.
+            destinationfile (str): The destination file. Defaults to ``main_sourcefile`` with ``.js``.
+            sourcefile_include_patterns:
+            sourcefile_exclude_patterns:
+            sourcefolder:
+            destinationfolder:
+            extra_watchfolders:
+            with_function_wrapper:
+            lint:
+            lintconfig:
+            tsc_compiler_options:
+            tsc_exclude:
+            typings_for_dependencies (list): List of typings dependencies
+                for ``typings install``. Example: ``["dt-node", "dt-core-js"]``.
+                Defaults to ``None``, which means that no typings is installed by default.
+            register_tsconfig_as_temporaryfile (boolean): If this is ``True``,
+                the ``tsconfig.json`` file will be deleted as part of the temporary file
+                cleanup step for the :class:`~ievv_opensource.utils.ievvbuildstatic.config.App`
+                as documented in the ``keep_temporary_files`` kwarg. Defaults to ``False``.
+        """
         super(Plugin, self).__init__()
         self.destinationfile = destinationfile
         self.main_sourcefile = main_sourcefile
         self.register_tsconfig_as_temporaryfile = register_tsconfig_as_temporaryfile
         self.sourcefiles = utils.RegexFileList(
-            include_patterns=sourcefile_include_patterns or ['^.*\.ts'],
+            include_patterns=sourcefile_include_patterns or ['^.*\.(ts|tsx)'],
             exclude_patterns=sourcefile_exclude_patterns
         )
         self.destinationfolder = destinationfolder
@@ -60,7 +94,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.tsc_exclude = ['node_modules']
         else:
             self.tsc_exclude = tsc_exclude
-        self.typings_global_dependencies = typings_global_dependencies
+        self.typings_for_dependencies = typings_for_dependencies
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
@@ -170,17 +204,17 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def run_typings_install(self):
         self.get_logger().debug("Running typings install")
         executable = self.get_typings_executable()
-        for typings_install_key in self.typings_global_dependencies:
+        for typings_install_key in self.typings_for_dependencies:
             try:
                 self.run_shell_command(executable,
-                                       args=['install', typings_install_key, '--save', '--global'],
+                                       args=['install', typings_install_key, '--save'],
                                        _cwd=self.app.get_source_path())
             except ShellCommandError:
                 self.get_logger().error('typings install failed: {}'.format(typings_install_key))
                 raise
 
     def setup_typings(self):
-        if self.typings_global_dependencies is None:
+        if self.typings_for_dependencies is None:
             return
         self.run_typings_install()
 
