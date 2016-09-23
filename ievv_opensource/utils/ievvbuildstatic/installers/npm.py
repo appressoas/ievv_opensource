@@ -33,7 +33,8 @@ class NpmInstaller(AbstractInstaller):
     def create_packagejson(self):
         packagedata = {
             'name': self.app.appname,
-            'version': self.app.version,
+            # We do not care about the version. We are not building a distributable package.
+            'version': '0.0.1',
             'devDependencies': self.queued_packages
         }
         open(self.get_packagejson_path(), 'wb').write(
