@@ -8,18 +8,11 @@ from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
-    Bower install plugin --- installs bower packages.
-
-    The packages are installed when ``ievv buildstatic`` starts up.
-    The plugin creates a ``bower.json`` file, and runs ``bower install``
-    using the created ``bower.json``-file.
-
-    You will most likely want to add ``bower.json`` and ``bower_components``
-    to your VCS ignore file.
+    Browserify javascript bundler plugin.
 
     Examples:
 
-        Install bootstrap 3.1.1 and angularjs 1.4.1::
+        Simple example::
 
             IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 ievvbuildstatic.config.App(
@@ -47,7 +40,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             destinationfile: Path to destination file relative to ``destinationfolder``.
             sourcefolder: The folder where ``sourcefiles`` is located relative to
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
-                Defaults to ``scripts/coffeescript``.
+                Defaults to ``scripts/javascript``.
             destinationfolder: The folder where ``destinationfile`` is located relative to
                 the destination folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
                 Defaults to ``scripts/``.
@@ -115,7 +108,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def get_watch_folders(self):
         """
-        We only watch the folder where the coffee javascript are located,
+        We only watch the folder where the javascript is located,
         so this returns the absolute path of the ``sourcefolder``.
         """
         folders = [self.app.get_source_path(self.sourcefolder)]
