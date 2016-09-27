@@ -25,7 +25,25 @@ class NpmInstaller(AbstractInstaller):
             version = '*'
         self.get_logger().debug('Queued install of {} (version={}) for {}.'.format(
             package, version, self.app.appname))
-        self.queued_packages[package] = version
+        queue = True
+        if package in self.queued_packages:
+            queued_version = self.queued_packages[package]
+            if version == '*':
+                queue = False
+            elif queued_version == '*':
+                queue = True
+            else:
+                self.get_logger().warning(
+                    'Multiple explicit versions of the same NPM package {package} '
+                    'specified for {appname}: {version!r} and {queued_version!r}. '
+                    'Using {version!r}.'.format(
+                        package=package,
+                        version=version,
+                        queued_version=queued_version,
+                        appname=self.app.appname))
+                queue = True
+        if queue:
+            self.queued_packages[package] = version
 
     def get_packagejson_path(self):
         return self.app.get_source_path('package.json')
