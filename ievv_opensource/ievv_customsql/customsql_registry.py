@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import inspect
+import os
 from collections import OrderedDict
 
+from django import template
 from django.db import connection
-
 from ievv_opensource.utils.singleton import Singleton
 
 
@@ -25,8 +27,90 @@ class AbstractCustomSql(object):
         self.appname = appname
 
     def execute_sql(self, sql):
+        """
+        Execute the provided SQL.
+
+        Args:
+            sql (str): String of SQL.
+        """
         cursor = connection.cursor()
         cursor.execute(sql)
+
+    def get_sql_from_file(self, path):
+        """
+        Get SQL from a file as a string.
+
+        Args:
+            path (str): A path relative to a directory named the same as the module
+                where this class is located without the filename extension.
+
+                So if the file with this class is in ``path/to/customsql.py``,
+                path will be relative to ``path/to/customsql/``.
+        """
+        this_file_path = inspect.getfile(self.__class__)
+        sqldirectory = os.path.join(
+            os.path.dirname(inspect.getfile(self.__class__)),
+            os.path.splitext(this_file_path)[0])
+        full_path = os.path.join(sqldirectory, path)
+        return open(full_path, 'rb').read().decode('utf-8')
+
+    def execute_sql_from_file(self, path):
+        """
+        Execute SQL from the provided file.
+
+        Args:
+            path: See :meth:`.get_sql_from_file`.
+        """
+        self.execute_sql(self.get_sql_from_file(path))
+
+    def execute_sql_from_files(self, paths):
+        """
+        Shortcut for calling :meth:`.execute_sql_from_file`
+        with multiple files.
+
+        Calls :meth:`.execute_sql_from_file` once for each file
+        in ``paths``.
+
+        Args:
+            paths (list): A list of paths. See :meth:`.get_sql_from_file`
+                for the format of each path.
+        """
+        for path in paths:
+            self.execute_sql_from_file(path=path)
+
+    def execute_sql_from_template_file(self, path, context_data=None):
+        """
+        Execute SQL from the provided Django template file.
+
+        The SQL is retrieved from the file, then processed as a Django
+        template with the provided ``context_data``, and the result
+        is executed using :meth:`.execute_sql`.
+
+        Args:
+            path: See :meth:`.get_sql_from_file`.
+            context_data (dict): Template context data. Can be ``None``.
+        """
+        template_sql = self.get_sql_from_file(path)
+        context_data = context_data or {}
+        djangotemplate = template.Template(template_sql)
+        sql = djangotemplate.render(template.Context(context_data))
+        self.execute_sql(sql)
+
+    def execute_sql_from_template_files(self, paths, context_data=None):
+        """
+        Shortcut for calling :meth:`.execute_sql_from_template_file`
+        with multiple files.
+
+        Calls :meth:`.execute_sql_from_template_file` once for each file
+        in ``paths``.
+
+        Args:
+            paths (list): A list of paths. See :meth:`.get_sql_from_file`
+                for the format of each path.
+            context_data (dict): Forwarded to :meth:`.execute_sql_from_template_file`.
+        """
+        for path in paths:
+            self.execute_sql_from_template_file(path=path, context_data=context_data)
 
     def initialize(self):
         """
