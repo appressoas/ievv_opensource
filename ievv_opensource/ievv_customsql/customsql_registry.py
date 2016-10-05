@@ -42,15 +42,16 @@ class AbstractCustomSql(object):
 
         Args:
             path (str): A path relative to a directory named the same as the module
-                where this class is located without the filename extension.
+                where this class is located without the filename extension and suffixed
+                with ``_sqlcode``.
 
                 So if the file with this class is in ``path/to/customsql.py``,
-                path will be relative to ``path/to/customsql/``.
+                path will be relative to ``path/to/customsql_sqlcode/``.
         """
         this_file_path = inspect.getfile(self.__class__)
         sqldirectory = os.path.join(
             os.path.dirname(inspect.getfile(self.__class__)),
-            os.path.splitext(this_file_path)[0])
+            '{}_sqlcode'.format(os.path.splitext(this_file_path)[0]))
         full_path = os.path.join(sqldirectory, path)
         return open(full_path, 'rb').read().decode('utf-8')
 
