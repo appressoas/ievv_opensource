@@ -107,7 +107,6 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
            '-o', self.get_destinationfile_path(),
         ]
         args.extend(self.get_browserify_extra_args())
-
         try:
             self.run_shell_command(executable, args=args,
                                    _cwd=self.app.get_source_path())

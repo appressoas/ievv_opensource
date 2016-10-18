@@ -57,6 +57,6 @@ class Plugin(browserify_babelbuild.Plugin):
             'babel-preset-react')
 
     def get_babelify_presets(self):
-        return [
-            'react'
-        ] + super(Plugin, self).get_babelify_presets()
+        return super(Plugin, self).get_babelify_presets() + [
+            'react',
+        ]

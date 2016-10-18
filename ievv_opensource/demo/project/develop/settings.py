@@ -44,8 +44,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefile='browserify_babelbuild_demo.js',
                 destinationfile='browserify_babelbuild_demo.js',
             ),
-
-            # TODO: Make this build!
             ievvbuildstatic.browserify_reactjsbuild.Plugin(
                 sourcefolder=os.path.join('scripts', 'javascript', 'browserify_reactjsbuild_demo'),
                 sourcefile='browserify_reactjsbuild_demo.js',

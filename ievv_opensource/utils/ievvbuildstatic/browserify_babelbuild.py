@@ -72,16 +72,14 @@ class Plugin(browserify_jsbuild.Plugin):
         presets = [self.echmascript_version]
         return presets
 
-    def _build_babelify_presets_args(self):
+    def make_presets_args(self):
+        presets = self.get_babelify_presets()
         presets_args = []
-        for preset in self.get_babelify_presets():
-            presets_args.extend([
-                '[', preset, ']'
-            ])
+        if presets:
+            presets_args.extend(['--presets', '['])
+            presets_args.extend(presets)
+            presets_args.append(']')
         return presets_args
 
     def get_browserify_extra_args(self):
-        extra_args = ['-t', '[', 'babelify', '--presets']
-        extra_args.extend(self._build_babelify_presets_args())
-        extra_args.append(']')
-        return extra_args
+        return ['-t', '[', 'babelify'] + self.make_presets_args() + [']']

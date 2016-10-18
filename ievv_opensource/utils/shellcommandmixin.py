@@ -5,6 +5,12 @@ import psutil
 import sh
 
 
+try:
+    from shlex import quote as shell_quote
+except ImportError:
+    from pipes import quote as shell_quote
+
+
 class ShellCommandError(Exception):
     """
     Raised when :meth:`.LogMixin.run_shell_command` fails.
@@ -31,6 +37,31 @@ class ShellCommandMixin(object):
         """
         self.get_logger().stderr(line.rstrip())
 
+    def prettyformat_shell_command(self, executable, args=None, kwargs=None, _cwd=None):
+        output = [executable]
+        if args:
+            output.extend([shell_quote(arg) for arg in args])
+        if kwargs:
+            for key, value in kwargs.items():
+                if value:
+                    if len(key) == 1:
+                        prefix = '-'
+                    else:
+                        prefix = '--'
+                    if value is True:
+                        formatted_value = ''
+                    else:
+                        formatted_value = '={}'.format(value)
+                    output.append('{prefix}{key}{formatted_value}'.format(
+                        prefix=prefix,
+                        key=key,
+                        formatted_value=formatted_value
+                    ))
+        if _cwd:
+            output.insert(0, '[CWD={}]'.format(_cwd))
+
+        return ' '.join(output)
+
     def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None):
         """
         Run a shell command.
@@ -43,11 +74,14 @@ class ShellCommandMixin(object):
         Raises:
             ShellCommandError: When the command fails. See :class:`.ShellCommandError`.
         """
+        self.get_logger().debug('Execute: {}'.format(self.prettyformat_shell_command(
+            executable=executable, args=args, kwargs=kwargs, _cwd=_cwd)))
         command = sh.Command(executable)
         args = args or []
         kwargs = kwargs or {}
         if _cwd:
             kwargs['_cwd'] = _cwd
+
         try:
             return command(*args,
                            _out=self.log_shell_command_stdout,
