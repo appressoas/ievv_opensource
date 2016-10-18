@@ -164,6 +164,12 @@ Details
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild
 
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_babelbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_babelbuild
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_reactjsbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_reactjsbuild
+
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
 

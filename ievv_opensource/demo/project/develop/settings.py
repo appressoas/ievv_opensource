@@ -29,13 +29,28 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.npminstall.Plugin(
                 packages={
                     'uniq': None,
-                    'momentjs': None
+                    'momentjs': None,
+                    'react': None,
+                    'react-dom': None,
                 }
             ),
             ievvbuildstatic.browserify_jsbuild.Plugin(
-                sourcefile='jstest.js',
-                destinationfile='jstest.js',
-            )
+                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_jsbuild_demo'),
+                sourcefile='browserify_jsbuild_demo.js',
+                destinationfile='browserify_jsbuild_demo.js',
+            ),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_babelbuild_demo'),
+                sourcefile='browserify_babelbuild_demo.js',
+                destinationfile='browserify_babelbuild_demo.js',
+            ),
+
+            # TODO: Make this build!
+            ievvbuildstatic.browserify_reactjsbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_reactjsbuild_demo'),
+                sourcefile='browserify_reactjsbuild_demo.js',
+                destinationfile='browserify_reactjsbuild_demo.js',
+            ),
         ]
     ),
     ievvbuildstatic.config.App(

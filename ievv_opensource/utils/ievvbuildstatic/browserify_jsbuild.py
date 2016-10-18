@@ -26,14 +26,29 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                     ]
                 )
             )
+
+        Custom source folder example::
+
+            IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
+                ievvbuildstatic.config.App(
+                    appname='demoapp',
+                    version='1.0.0',
+                    plugins=[
+                        ievvbuildstatic.browserify_jsbuild.Plugin(
+                            sourcefolder=os.path.join('scripts', 'javascript', 'api'),
+                            sourcefile='api.js',
+                            destinationfile='api.js',
+                        ),
+                    ]
+                )
+            )
     """
     name = 'browserify_jsbuild'
 
     def __init__(self, sourcefile, destinationfile,
                  sourcefolder=os.path.join('scripts', 'javascript'),
                  destinationfolder=os.path.join('scripts'),
-                 extra_watchfolders=None,
-                 transform_es2015=False):
+                 extra_watchfolders=None):
         """
         Parameters:
             sourcefile: The source file relative to ``sourcefolder``.
@@ -54,7 +69,6 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
-        self.transform_es2015 = transform_es2015
 
     def get_sourcefile_path(self):
         return self.app.get_source_path(self.sourcefolder, self.sourcefile)
@@ -62,20 +76,22 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def get_destinationfile_path(self):
         return self.app.get_destination_path(self.destinationfolder, self.destinationfile)
 
-    def get_browserify_version(self):
-        return None
-
     def install(self):
+        """
+        Installs the ``browserify`` NPM package.
+
+        The package is installed with no version specified, so you
+        probably want to freeze the version using the
+        :class:`ievv_opensource.utils.ievvbuildstatic.npminstall.Plugin` plugin.
+        """
         self.app.get_installer(NpmInstaller).queue_install(
-            'browserify', version=self.get_browserify_version())
-        if self.transform_es2015:
-            self.app.get_installer(NpmInstaller).queue_install(
-                'babel-preset-es2015', version='^6.6.0')
-            self.app.get_installer(NpmInstaller).queue_install(
-                'babelify', version='^7.3.0')
+            'browserify')
 
     def get_browserify_executable(self):
         return self.app.get_installer(NpmInstaller).find_executable('browserify')
+
+    def get_browserify_extra_args(self):
+        return []
 
     def run(self):
         self.get_logger().command_start(
@@ -90,10 +106,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
            self.get_sourcefile_path(),
            '-o', self.get_destinationfile_path(),
         ]
-        if self.transform_es2015:
-            args.extend([
-                '-t', '[', 'babelify', '--presets', '[', 'es2015', ']', ']'
-            ])
+        args.extend(self.get_browserify_extra_args())
 
         try:
             self.run_shell_command(executable, args=args,
