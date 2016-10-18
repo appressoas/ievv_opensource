@@ -24,7 +24,7 @@ class Command(BaseCommand):
             ))
         output.extend([
             '    }',
-            ']'
+            ')'
         ])
         return '\n'.join(output)
 
