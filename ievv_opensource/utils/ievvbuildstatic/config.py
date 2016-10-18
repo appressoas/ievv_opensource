@@ -178,6 +178,9 @@ class App(LogMixin):
                 watchconfigs.append(watchconfig)
         return watchconfigs
 
+    def iterinstallers(self):
+        return self.installers.values()
+
     def get_installer(self, installerclass):
         """
         Get an instance of the given ``installerclass``.
@@ -260,12 +263,18 @@ class Apps(LogMixin):
         if self.help_header:
             self.get_logger().infobox(self.help_header)
 
+    def iterapps(self):
+        """
+        Get an interator over the apps.
+        """
+        return self.apps.values()
+
     def run(self):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
-        for app in self.apps.values():
+        for app in self.iterapps():
             app.run()
 
     def watch(self):

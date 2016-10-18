@@ -1,7 +1,16 @@
 import json
+import os
 
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
+
+
+class NpmInstallerError(Exception):
+    pass
+
+
+class PackageJsonDoesNotExist(NpmInstallerError):
+    pass
 
 
 class NpmInstaller(AbstractInstaller):
@@ -88,3 +97,23 @@ class NpmInstaller(AbstractInstaller):
         if 'npm WARN package.json' in line:
             return
         super(NpmInstaller, self).log_shell_command_stderr(line)
+
+    def get_package_json_dict_for_package(self, package_name):
+        package_json_path = self.app.get_source_path(
+            'node_modules', package_name, 'package.json')
+        package_json_string = open(package_json_path).read()
+        package_json_dict = json.loads(package_json_string)
+        return package_json_dict
+
+    def get_package_version(self, package_name):
+        return self.get_package_json_dict_for_package(package_name)['version']
+
+    def get_installed_package_names(self):
+        if not os.path.exists(self.get_packagejson_path()):
+            raise PackageJsonDoesNotExist()
+        package_json_string = open(self.get_packagejson_path()).read()
+        package_json_dict = json.loads(package_json_string)
+        package_names = []
+        for package_name, version in package_json_dict.get('devDependencies', {}).items():
+            package_names.append(package_name)
+        return package_names
