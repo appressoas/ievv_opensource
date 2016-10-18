@@ -18,7 +18,7 @@ class Command(BaseCommand):
             '    packages={'
         ]
         for package_name in npm.get_installed_package_names():
-            output.append('        {package_name}={version!r}'.format(
+            output.append('        {package_name!r}: {version!r},'.format(
                 package_name=package_name,
                 version=npm.get_package_version(package_name=package_name)
             ))
