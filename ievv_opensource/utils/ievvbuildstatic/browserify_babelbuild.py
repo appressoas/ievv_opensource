@@ -69,6 +69,14 @@ class Plugin(browserify_jsbuild.Plugin):
             'babel-preset-{}'.format('es2015'))
 
     def get_babelify_presets(self):
+        """
+        Get a list of babelify presets.
+
+        This is the presets that go into ``<HERE>`` in
+        ``babelify -t [ babelify --presets [ <HERE> ] ]``.
+
+        Defaults to ``["<the echmascript_version kwarg>"].
+        """
         presets = [self.echmascript_version]
         return presets
 

@@ -48,7 +48,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def __init__(self, sourcefile, destinationfile,
                  sourcefolder=os.path.join('scripts', 'javascript'),
                  destinationfolder=os.path.join('scripts'),
-                 extra_watchfolders=None):
+                 extra_watchfolders=None,
+                 sourcemap=False):
         """
         Parameters:
             sourcefile: The source file relative to ``sourcefolder``.
@@ -69,6 +70,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
+        self.sourcemap = sourcemap
 
     def get_sourcefile_path(self):
         return self.app.get_source_path(self.sourcefolder, self.sourcefile)
@@ -91,7 +93,36 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return self.app.get_installer(NpmInstaller).find_executable('browserify')
 
     def get_browserify_extra_args(self):
+        """
+        Get extra browserify args.
+
+        Override this in subclasses to add transforms and such.
+        """
         return []
+
+    def make_browserify_args(self):
+        """
+        Make browserify args list.
+
+        Adds the following in the listed order:
+
+        - ``-d`` if the ``sourcemap`` kwarg is ``True``.
+        - the source file.
+        - ``-d <destination file path>``.
+        - whatever :meth:`.get_browserify_extra_args` returns.
+
+        Should normally not be extended. Extend :meth:`.get_browserify_extra_args`
+        instead.
+        """
+        args = []
+        if self.sourcemap:
+            args.append('-d')
+        args.extend([
+           self.get_sourcefile_path(),
+           '-o', self.get_destinationfile_path(),
+        ])
+        args.extend(self.get_browserify_extra_args())
+        return args
 
     def run(self):
         self.get_logger().command_start(
@@ -102,13 +133,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         destination_folder = self.app.get_destination_path(self.destinationfolder)
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
-        args = [
-           self.get_sourcefile_path(),
-           '-o', self.get_destinationfile_path(),
-        ]
-        args.extend(self.get_browserify_extra_args())
         try:
-            self.run_shell_command(executable, args=args,
+            self.run_shell_command(executable, args=self.make_browserify_args(),
                                    _cwd=self.app.get_source_path())
         except ShellCommandError:
             self.get_logger().command_error('browserify build FAILED!')
@@ -128,8 +154,21 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             folders.extend(self.get_extra_watchfolder_paths())
         return folders
 
+    def get_watch_extensions(self):
+        """
+        Returns a list of the extensions to watch for in watch mode.
+
+        Defaults to ``['js']``.
+
+        Unless you have complex needs, it is probably easier to override
+        this than overriding
+        :meth:`~ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.get_watch_regexes`.
+        """
+        return ['js']
+
     def get_watch_regexes(self):
-        return ['^.+[.]js']
+        return ['^.+[.]({extensions})'.format(
+            extensions='|'.join(self.get_watch_extensions()))]
 
     def __str__(self):
         return '{}({})'.format(super(Plugin, self).__str__(), self.sourcefolder)

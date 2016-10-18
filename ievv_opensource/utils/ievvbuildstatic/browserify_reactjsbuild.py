@@ -57,6 +57,15 @@ class Plugin(browserify_babelbuild.Plugin):
             'babel-preset-react')
 
     def get_babelify_presets(self):
+        """
+        Adds ``react`` to the babelify presets added by
+        :meth:`ievv_opensource.utils.ievvbuildstatic.browserify_babelbuild.Plugin.get_babelify_presets`.
+        """
         return super(Plugin, self).get_babelify_presets() + [
             'react',
+        ]
+
+    def get_watch_extensions(self):
+        return super(Plugin, self).get_watch_extensions() + [
+            '.jsx'
         ]
