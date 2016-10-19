@@ -83,8 +83,8 @@ class AbstractNpmInstaller(AbstractInstaller):
     def packagejson_exists(self):
         return os.path.exists(self.get_packagejson_path())
 
-    def packagejson_created_by_ievv_buildstatic(self):
-        return 'ievv_buildstatic' in self.get_packagejson_dict()
+    # def packagejson_created_by_ievv_buildstatic(self):
+    #     return 'ievv_buildstatic' in self.get_packagejson_dict()
 
     def create_packagejson(self):
         packagedata = {
@@ -160,7 +160,7 @@ class AbstractNpmInstaller(AbstractInstaller):
     def install(self):
         self.get_logger().command_start(
             'Installing npm packages for {}'.format(self.app.get_source_path()))
-        if self.packagejson_exists() and self.packagejson_created_by_ievv_buildstatic():
+        if self.packagejson_exists():
             self.install_packages_from_packagejson()
         else:
             self.create_packagejson()

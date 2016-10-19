@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin
 
@@ -45,7 +45,7 @@ class App(LogMixin):
     def _make_installers_config(self, installers_config_overrides):
         installers_config = {
             'npm': {
-                'installer_class': NpmInstaller
+                'installer_class': YarnInstaller
             },
         }
         installers_config_overrides = installers_config_overrides or {}

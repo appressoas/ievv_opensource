@@ -13,11 +13,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='demoapp',
         version='1.0.0',
         # keep_temporary_files=False,
-        installers_config={
-            'npm': {
-                'installer_class': ievvbuildstatic.installers.yarn.YarnInstaller
-            }
-        },
         plugins=[
             ievvbuildstatic.lessbuild.Plugin(sourcefile='theme.less'),
             ievvbuildstatic.mediacopy.Plugin(),
@@ -59,6 +54,11 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
     ievvbuildstatic.config.App(
         appname='demoapp2',
         version='2.0.1',
+        installers_config={
+            'npm': {
+                'installer_class': ievvbuildstatic.installers.npm.NpmInstaller
+            }
+        },
         plugins=[
             ievvbuildstatic.sassbuild.Plugin(
                 sourcefolder='styles/theme',
