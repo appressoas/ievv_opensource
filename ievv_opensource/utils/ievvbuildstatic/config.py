@@ -5,7 +5,6 @@ import time
 from collections import OrderedDict
 
 from django.apps import apps
-
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
@@ -50,7 +49,7 @@ class App(LogMixin):
             },
         }
         installers_config_overrides = installers_config_overrides or {}
-        for alias, config in installers_config_overrides:
+        for alias, config in installers_config_overrides.items():
             overrides = installers_config_overrides.get(alias, {})
             if alias not in installers_config:
                 installers_config[alias] = {}

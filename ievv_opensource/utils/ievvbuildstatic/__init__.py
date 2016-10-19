@@ -1,4 +1,5 @@
 from . import utils  # noqa
+from . import installers  # noqa
 from . import filepath  # noqa
 from . import config  # noqa
 from . import cssbuildbaseplugin  # noqa
