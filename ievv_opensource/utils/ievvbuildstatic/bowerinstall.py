@@ -72,9 +72,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         try:
             self.run_shell_command(bower_executable,
                                    args=['install'],
-                                   kwargs={
-                                       '_cwd': self.app.get_source_path()
-                                   })
+                                   _cwd=self.app.get_source_path())
         except ShellCommandError:
             self.get_logger().command_error('bower install FAILED!')
             raise SystemExit()

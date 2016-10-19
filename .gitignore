@@ -41,8 +41,10 @@ bower_components/
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
 ievv_opensource/demo/demoapp/staticsources/demoapp/package.json
+ievv_opensource/demo/demoapp/staticsources/demoapp/yarn.lock
 ievv_opensource/demo/demoapp2/staticsources/demoapp2/package.json
 ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
+ievv_opensource/demo/demoapp2/staticsources/demoapp2/yarn.lock
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_build_directory
 

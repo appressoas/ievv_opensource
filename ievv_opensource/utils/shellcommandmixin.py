@@ -62,7 +62,8 @@ class ShellCommandMixin(object):
 
         return ' '.join(output)
 
-    def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None):
+    def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None,
+                          _out=None, _err=None):
         """
         Run a shell command.
 
@@ -82,10 +83,13 @@ class ShellCommandMixin(object):
         if _cwd:
             kwargs['_cwd'] = _cwd
 
+        _out = _out or self.log_shell_command_stdout
+        _err = _err or self.log_shell_command_stderr
+
         try:
             return command(*args,
-                           _out=self.log_shell_command_stdout,
-                           _err=self.log_shell_command_stderr,
+                           _out=_out,
+                           _err=_err,
                            **kwargs)
         except sh.ErrorReturnCode:
             # We do not need to show any more errors here - they
