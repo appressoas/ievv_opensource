@@ -31,9 +31,9 @@ class Plugin(LogMixin):
             Install an npm package::
 
                 def install(self):
-                    self.app.get_installer(NpmInstaller).install(
+                    self.app.get_installer('npm').install(
                         'somepackage')
-                    self.app.get_installer(NpmInstaller).install(
+                    self.app.get_installer('npm').install(
                         'otherpackage', version='~1.0.0')
         """
 

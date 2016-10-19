@@ -87,27 +87,27 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return None
 
     def install(self):
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'typescript', version=self.get_typescript_version())
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'typings', version=self.get_typings_version())
         if self.lint:
-            self.app.get_installer(NpmInstaller).queue_install(
+            self.app.get_installer('npm').queue_install(
                 'tslint', version=self.get_tslint_version())
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'browserify', version=self.get_browserify_version())
 
     def post_install(self):
         self.setup_typings()
 
     def get_tsc_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('tsc')
+        return self.app.get_installer('npm').find_executable('tsc')
 
     def get_tslint_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('tslint')
+        return self.app.get_installer('npm').find_executable('tslint')
 
     def get_typings_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('typings')
+        return self.app.get_installer('npm').find_executable('typings')
 
     def get_all_sourcefiles(self, absolute_paths=False):
         return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path(),
@@ -197,7 +197,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.get_logger().debug('TypeScript build of {!r} successful :)'.format(sourcefolder_path))
 
     def get_browserify_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('browserify')
+        return self.app.get_installer('npm').find_executable('browserify')
 
     def merge_javascript_files(self, js_directory):
         self.get_logger().command_start(

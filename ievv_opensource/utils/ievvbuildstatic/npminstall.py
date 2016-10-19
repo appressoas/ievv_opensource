@@ -39,5 +39,5 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def install(self):
         for package, version in self.packages.items():
-            self.app.get_installer(NpmInstaller).queue_install(
+            self.app.get_installer('npm').queue_install(
                 package, version=version)

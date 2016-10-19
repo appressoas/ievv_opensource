@@ -61,14 +61,14 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return None
 
     def install(self):
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'bower', version=self.get_bower_version())
 
     def run(self):
         self.get_logger().command_start('Running bower install for {}'.format(
             self.app.get_source_path()))
         self.create_bowerjson()
-        bower_executable = self.app.get_installer(NpmInstaller).find_executable('bower')
+        bower_executable = self.app.get_installer('npm').find_executable('bower')
         try:
             self.run_shell_command(bower_executable,
                                    args=['install'],

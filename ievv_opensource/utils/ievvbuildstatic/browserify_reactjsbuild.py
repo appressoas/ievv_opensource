@@ -53,7 +53,7 @@ class Plugin(browserify_babelbuild.Plugin):
         :class:`ievv_opensource.utils.ievvbuildstatic.npminstall.Plugin` plugin.
         """
         super(Plugin, self).install()
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'babel-preset-react')
 
     def get_babelify_presets(self):

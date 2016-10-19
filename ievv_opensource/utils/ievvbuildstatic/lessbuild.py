@@ -97,12 +97,12 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return None
 
     def install(self):
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'less', version=self.get_less_version())
 
     def run(self):
         self.get_logger().command_start('Building {}.'.format(self.get_sourcefile_path()))
-        executable = self.app.get_installer(NpmInstaller).find_executable('lessc')
+        executable = self.app.get_installer('npm').find_executable('lessc')
         kwargs = {}
         less_include_paths = self.format_less_include_paths()
         if less_include_paths:

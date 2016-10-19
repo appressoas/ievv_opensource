@@ -7,6 +7,7 @@ from collections import OrderedDict
 from django.apps import apps
 
 from ievv_opensource.utils.ievvbuildstatic import filepath
+from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin
 
@@ -18,7 +19,8 @@ class App(LogMixin):
     def __init__(self, appname, version, plugins,
                  sourcefolder='staticsources',
                  destinationfolder='static',
-                 keep_temporary_files=False):
+                 keep_temporary_files=False,
+                 installers_config=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -36,8 +38,24 @@ class App(LogMixin):
         self.installers = {}
         self.plugins = []
         self.keep_temporary_files = keep_temporary_files
+        self.installers_config = self._make_installers_config(
+            installers_config_overrides=installers_config)
         for plugin in plugins:
             self.add_plugin(plugin)
+
+    def _make_installers_config(self, installers_config_overrides):
+        installers_config = {
+            'npm': {
+                'installer_class': NpmInstaller
+            },
+        }
+        installers_config_overrides = installers_config_overrides or {}
+        for alias, config in installers_config_overrides:
+            overrides = installers_config_overrides.get(alias, {})
+            if alias not in installers_config:
+                installers_config[alias] = {}
+            installers_config[alias].update(overrides)
+        return installers_config
 
     def add_plugin(self, plugin):
         """
@@ -181,18 +199,22 @@ class App(LogMixin):
     def iterinstallers(self):
         return self.installers.values()
 
-    def get_installer(self, installerclass):
+    def get_installer(self, alias):
         """
-        Get an instance of the given ``installerclass``.
+        Get an instance of the installer configured with the provided ``alias``.
 
         Parameters:
-            installerclass: A subclass of
-                :class:`ievv_opensource.utils.ievvbuildstatic.installers.base.AbstractInstaller`.
+            alias: A subclass of
+                .
+        Returns:
+            ievv_opensource.utils.ievvbuildstatic.installers.base.AbstractInstaller: An instance
+                of the requested installer.
         """
-        if installerclass.name not in self.installers:
-            installer = installerclass(app=self)
-            self.installers[installerclass.name] = installer
-        return self.installers[installerclass.name]
+        installer_class = self.installers_config[alias]['installer_class']
+        if installer_class.name not in self.installers:
+            installer = installer_class(app=self)
+            self.installers[installer_class.name] = installer
+        return self.installers[installer_class.name]
 
     def get_logger_name(self):
         return '{}.{}'.format(self.apps.get_logger_name(), self.appname)

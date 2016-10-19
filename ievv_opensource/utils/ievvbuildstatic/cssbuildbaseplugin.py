@@ -79,16 +79,16 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
 
     def install(self):
         if self.requires_postcss():
-            self.app.get_installer(NpmInstaller).queue_install(
+            self.app.get_installer('npm').queue_install(
                 'postcss-cli', version=self.get_postcss_cli_version())
             if self.autoprefix:
-                self.app.get_installer(NpmInstaller).queue_install(
+                self.app.get_installer('npm').queue_install(
                     'autoprefixer', version=self.get_autoprefixer_version())
             if self.minify:
-                self.app.get_installer(NpmInstaller).queue_install(
+                self.app.get_installer('npm').queue_install(
                     'cssnano', version=self.get_cssnano_version())
         if self.lint:
-            self.app.get_installer(NpmInstaller).queue_install(
+            self.app.get_installer('npm').queue_install(
                 'stylelint', version=self.get_stylelint_version())
 
     def build_css(self):
@@ -125,7 +125,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
         ])
         try:
             self.run_shell_command(
-                self.app.get_installer(NpmInstaller).find_executable('postcss'),
+                self.app.get_installer('npm').find_executable('postcss'),
                 args=args)
         except ShellCommandError:
             self.get_logger().error('postcss failed!')
@@ -159,7 +159,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
         ]
         try:
             self.run_shell_command(
-                self.app.get_installer(NpmInstaller).find_executable('stylelint'),
+                self.app.get_installer('npm').find_executable('stylelint'),
                 args=args)
         except ShellCommandError:
             self.get_logger().error('Stylesheet linting failed!')

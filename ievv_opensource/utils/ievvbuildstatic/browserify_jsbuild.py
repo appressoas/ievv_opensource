@@ -86,11 +86,11 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         probably want to freeze the version using the
         :class:`ievv_opensource.utils.ievvbuildstatic.npminstall.Plugin` plugin.
         """
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'browserify')
 
     def get_browserify_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('browserify')
+        return self.app.get_installer('npm').find_executable('browserify')
 
     def get_browserify_extra_args(self):
         """

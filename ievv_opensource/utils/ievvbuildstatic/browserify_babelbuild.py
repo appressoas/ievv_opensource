@@ -63,9 +63,9 @@ class Plugin(browserify_jsbuild.Plugin):
         :class:`ievv_opensource.utils.ievvbuildstatic.npminstall.Plugin` plugin.
         """
         super(Plugin, self).install()
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'babelify')
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'babel-preset-{}'.format('es2015'))
 
     def get_babelify_presets(self):

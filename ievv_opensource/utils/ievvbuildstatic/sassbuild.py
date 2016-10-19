@@ -96,7 +96,7 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
 
     def install(self):
         super(Plugin, self).install()
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'postcss-scss')
 
     def get_sourcefolder_path(self):

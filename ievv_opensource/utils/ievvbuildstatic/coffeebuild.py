@@ -161,17 +161,17 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return None
 
     def install(self):
-        self.app.get_installer(NpmInstaller).queue_install(
+        self.app.get_installer('npm').queue_install(
             'coffee-script', version=self.get_coffee_version())
         if self.lint:
-            self.app.get_installer(NpmInstaller).queue_install(
+            self.app.get_installer('npm').queue_install(
                 'coffeelint', version=self.get_coffeelint_version())
 
     def get_coffee_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('coffee')
+        return self.app.get_installer('npm').find_executable('coffee')
 
     def get_coffeelint_executable(self):
-        return self.app.get_installer(NpmInstaller).find_executable('coffeelint')
+        return self.app.get_installer('npm').find_executable('coffeelint')
 
     def get_all_sourcefiles(self):
         return self.sourcefiles.get_files_as_list(rootfolder=self.get_sourcefolder_path())

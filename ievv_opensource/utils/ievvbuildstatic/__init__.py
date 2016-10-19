@@ -1,5 +1,4 @@
 from . import utils  # noqa
-from . import installers  # noqa
 from . import filepath  # noqa
 from . import config  # noqa
 from . import cssbuildbaseplugin  # noqa
@@ -17,7 +16,6 @@ from . import nodemodulescopy  #noqa
 
 __all__ = [
     'utils',
-    'installers',
     'filepath',
     'config',
     'cssbuildbaseplugin',
