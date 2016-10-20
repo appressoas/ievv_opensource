@@ -95,7 +95,11 @@ class AbstractNpmInstaller(AbstractInstaller):
             'version': '0.0.1',
         }
         open(self.get_packagejson_path(), 'wb').write(
-            json.dumps(packagedata, indent=2).encode('utf-8'))
+            json.dumps(
+                packagedata,
+                indent=2,
+                sort_keys=True
+            ).encode('utf-8'))
 
     def __get_packagejson_dict(self):
         package_json_string = open(self.get_packagejson_path()).read()

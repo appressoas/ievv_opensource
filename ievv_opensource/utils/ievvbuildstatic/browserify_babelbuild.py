@@ -1,3 +1,6 @@
+import json
+import os
+
 from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from . import browserify_jsbuild
 
@@ -42,14 +45,16 @@ class Plugin(browserify_jsbuild.Plugin):
     """
     name = 'browserify_babelbuild'
 
-    def __init__(self, echmascript_version='es2015', **kwargs):
+    def __init__(self, echmascript_version='es2015', autocreate_babelrc=True, **kwargs):
         """
         Parameters:
-            babel_preset: The babel preset to use
+            echmascript_version: The echmascript version to use. Defaults to ``"es2015"``.
+            autocreate_babelrc (bool):
             **kwargs: Kwargs for
                 :class:`ievv_opensource.utils.ievvbuildstatic.browserify_jsbuild.Plugin`.
         """
         self.echmascript_version = echmascript_version
+        self.autocreate_babelrc = autocreate_babelrc
         super(Plugin, self).__init__(**kwargs)
 
     def install(self):
@@ -66,9 +71,9 @@ class Plugin(browserify_jsbuild.Plugin):
         self.app.get_installer('npm').queue_install(
             'babelify')
         self.app.get_installer('npm').queue_install(
-            'babel-preset-{}'.format('es2015'))
+            'babel-preset-{}'.format(self.echmascript_version))
 
-    def get_babelify_presets(self):
+    def get_babel_presets(self):
         """
         Get a list of babelify presets.
 
@@ -80,14 +85,34 @@ class Plugin(browserify_jsbuild.Plugin):
         presets = [self.echmascript_version]
         return presets
 
-    def make_presets_args(self):
-        presets = self.get_babelify_presets()
-        presets_args = []
-        if presets:
-            presets_args.extend(['--presets', '['])
-            presets_args.extend(presets)
-            presets_args.append(']')
-        return presets_args
-
     def get_browserify_extra_args(self):
-        return ['-t', '[', 'babelify'] + self.make_presets_args() + [']']
+        return ['-t', '[', 'babelify', ']']
+
+    def get_babelrc_path(self):
+        return self.app.get_source_path('.babelrc')
+
+    def babelrc_exists(self):
+        return os.path.exists(self.get_babelrc_path())
+
+    def make_babelrc_dict(self):
+        return {
+            "presets": self.get_babel_presets()
+        }
+
+    def create_babelrc(self):
+        open(self.get_babelrc_path(), 'w').write(
+            json.dumps(
+                self.make_babelrc_dict(),
+                indent=2,
+                sort_keys=True
+            ))
+
+    def post_run(self):
+        if self.autocreate_babelrc:
+            self.create_babelrc()
+        elif not self.babelrc_exists():
+            self.get_logger().command_error(
+                '{babelrc_path} does not exist.'
+                'When configured with autocreate_babelrc=False, we expect '
+                'you to create the .babelrc.'.format(babelrc_path=self.get_babelrc_path()))
+            raise SystemExit()

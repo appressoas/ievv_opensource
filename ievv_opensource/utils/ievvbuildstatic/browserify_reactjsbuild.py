@@ -56,12 +56,12 @@ class Plugin(browserify_babelbuild.Plugin):
         self.app.get_installer('npm').queue_install(
             'babel-preset-react')
 
-    def get_babelify_presets(self):
+    def get_babel_presets(self):
         """
         Adds ``react`` to the babelify presets added by
-        :meth:`ievv_opensource.utils.ievvbuildstatic.browserify_babelbuild.Plugin.get_babelify_presets`.
+        :meth:`ievv_opensource.utils.ievvbuildstatic.browserify_babelbuild.Plugin.get_babel_presets`.
         """
-        return super(Plugin, self).get_babelify_presets() + [
+        return super(Plugin, self).get_babel_presets() + [
             'react',
         ]
 

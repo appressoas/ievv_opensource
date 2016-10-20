@@ -148,11 +148,22 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         })
         return environment
 
+    def post_run(self):
+        """
+        Called at the start of run(), after the initial command start logmessage,
+        but before any other code is executed.
+
+        Does nothing by default, but subclasses can hook in
+        configuration code here if they need to generate config
+        files, perform validation of file structure, etc.
+        """
+
     def run(self):
         self.get_logger().command_start(
             'Running browserify with {sourcefile} as input and {destinationfile} as output'.format(
                 sourcefile=self.get_sourcefile_path(),
                 destinationfile=self.get_destinationfile_path()))
+        self.post_run()
         executable = self.get_browserify_executable()
         destination_folder = self.app.get_destination_path(self.destinationfolder)
         if not os.path.exists(destination_folder):
