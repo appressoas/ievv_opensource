@@ -272,33 +272,41 @@ class Apps(LogMixin):
         """
         return self.apps[appname]
 
-    def install(self):
+    def install(self, appnames=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
-        for app in self.apps.values():
+        for app in self.iterapps(appnames=appnames):
             app.install()
 
     def log_help_header(self):
         if self.help_header:
             self.get_logger().infobox(self.help_header)
 
-    def iterapps(self):
+    def validate_appnames(self, appnames):
+        for appname in appnames:
+            if appname not in self.apps:
+                raise ValueError('Invalid appname: {}'.format(appname))
+
+    def iterapps(self, appnames=None):
         """
         Get an interator over the apps.
         """
-        return self.apps.values()
+        for app in self.apps.values():
+            include = appnames is None or app.appname in appnames
+            if include:
+                yield app
 
-    def run(self):
+    def run(self, appnames=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
-        for app in self.iterapps():
+        for app in self.iterapps(appnames=appnames):
             app.run()
 
-    def watch(self):
+    def watch(self, appnames=None):
         """
         Start watcher threads for all folders that at least one
         :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
@@ -307,7 +315,7 @@ class Apps(LogMixin):
         Blocks until ``CTRL-c`` is pressed.
         """
         watchconfigpool = WatchConfigPool()
-        for app in self.apps.values():
+        for app in self.iterapps(appnames=appnames):
             watchconfigpool.extend(app.watch())
         all_observers = watchconfigpool.watch()
         try:
