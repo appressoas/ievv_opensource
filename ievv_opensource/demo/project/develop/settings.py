@@ -82,6 +82,7 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         version='1.0.0',
         plugins=[
             ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsbase'),
                 sourcefile='ievv_jsbase.js',
                 destinationfile='ievv_jsbase.js',
             ),

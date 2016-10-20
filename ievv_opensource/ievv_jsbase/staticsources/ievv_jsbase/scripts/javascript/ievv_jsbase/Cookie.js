@@ -1,4 +1,4 @@
-export class Cookie {
+class Cookie {
     constructor(cookieName) {
         this.cookieName = cookieName;
     }
@@ -19,3 +19,5 @@ export class Cookie {
         return cookieValue;
     }
 }
+
+export default Cookie;
