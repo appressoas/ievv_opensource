@@ -77,6 +77,16 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.mediacopy.Plugin(),
         ]
     ),
+    ievvbuildstatic.config.App(
+        appname='ievv_jsbase',
+        version='1.0.0',
+        plugins=[
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefile='ievv_jsbase.js',
+                destinationfile='ievv_jsbase.js',
+            ),
+        ]
+    ),
     help_header='You can configure the settings for ievv buildstatic in '
                 'the IEVVTASKS_BUILDSTATIC_APPS setting in: '
                 '{configfile}'.format(configfile=__file__),
