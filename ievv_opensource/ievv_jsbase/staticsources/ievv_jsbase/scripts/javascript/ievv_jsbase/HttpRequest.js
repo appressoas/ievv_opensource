@@ -1,4 +1,4 @@
-import {getCookie} from './cookie';
+import Cookies from './Cookies.js';
 
 
 export class HttpResponse {
@@ -123,6 +123,7 @@ export class JsonHttpRequest extends HttpRequest {
 export class DjangoJsonHttpRequest extends JsonHttpRequest {
     setDefaultRequestHeaders() {
         super.setDefaultRequestHeaders();
-        this.request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        let cookies = new Cookies();
+        this.request.setRequestHeader("X-CSRFToken", cookies.getValue('csrftoken'));
     }
 }
