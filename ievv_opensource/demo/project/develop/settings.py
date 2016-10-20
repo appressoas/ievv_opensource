@@ -26,14 +26,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                     }
                 }
             ),
-            ievvbuildstatic.npminstall.Plugin(
-                packages={
-                    'uniq': None,
-                    'momentjs': None,
-                    'react': None,
-                    'react-dom': None,
-                }
-            ),
             ievvbuildstatic.browserify_jsbuild.Plugin(
                 sourcefolder=os.path.join('scripts', 'javascript', 'browserify_jsbuild_demo'),
                 sourcefile='browserify_jsbuild_demo.js',
