@@ -41,6 +41,14 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefile='browserify_reactjsbuild_demo.js',
                 destinationfile='browserify_reactjsbuild_demo.js',
             ),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_babelbuild_import_path_demo'),
+                sourcefile='browserify_babelbuild_import_path_demo.js',
+                destinationfile='browserify_babelbuild_import_path_demo.js',
+                extra_import_paths=[
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+                ]
+            ),
         ]
     ),
     ievvbuildstatic.config.App(

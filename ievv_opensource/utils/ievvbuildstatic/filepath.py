@@ -61,6 +61,10 @@ class AbstractDjangoAppPath(FilePathInterface):
     def get_approot_relative_path(self, appname, *path):
         return os.path.join(self.get_approot_path(appname=appname), *path)
 
+    @property
+    def abspath(self):
+        raise NotImplementedError()
+
 
 class SourcePath(AbstractDjangoAppPath):
     """
