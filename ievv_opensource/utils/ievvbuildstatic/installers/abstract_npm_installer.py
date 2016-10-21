@@ -3,7 +3,7 @@ import os
 from collections import OrderedDict
 
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
-from ievv_opensource.utils.shellcommandmixin import ShellCommandError
+from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
 class NpmInstallerError(Exception):
@@ -14,7 +14,7 @@ class PackageJsonDoesNotExist(NpmInstallerError):
     pass
 
 
-class AbstractNpmInstaller(AbstractInstaller):
+class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
     """
     Abstract npm installer.
 
@@ -176,3 +176,19 @@ class AbstractNpmInstaller(AbstractInstaller):
 
     def install_npm_package(self, package, properties):
         raise NotImplementedError()
+
+    def run_npm_script(self, script, args=None):
+        """
+        Exectute ``npm run <script> [args]``.
+
+        Args:
+            script: The npm script to run.
+            args (list): List of arguments.
+
+        Returns:
+
+        """
+        args = args or []
+        self.run_shell_command('npm',
+                               args=['run', script] + args,
+                               _cwd=self.app.get_source_path())

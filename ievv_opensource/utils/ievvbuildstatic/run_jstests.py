@@ -84,9 +84,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.get_logger().command_start('Running tests for {appname}'.format(
                 appname=self.app.appname))
             try:
-                self.run_shell_command('npm',
-                                       args=['run', self.get_test_script_key(), '--silent'],
-                                       _cwd=self.app.get_source_path())
+                self.app.get_installer('npm').run_npm_script(
+                    script=self.get_test_script_key(),
+                    args=['--silent'])
             except ShellCommandError:
                 self.get_logger().command_error('npm test FAILED!')
                 raise SystemExit()
