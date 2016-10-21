@@ -41,6 +41,7 @@ class HttpCookies {
         if(typeof value === 'undefined') {
             throw new HttpCookieNotFoundError(`Cookie not found: "${cookieName}".`);
         }
+        return value;
     }
 
     contains(cookieName) {

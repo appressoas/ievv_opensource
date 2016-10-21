@@ -35,7 +35,7 @@ import HttpResponse from "./HttpResponse";
 class HttpRequest {
     constructor(url) {
         this.url = url;
-        this.request = new window.XMLHttpRequest();
+        this.request = new XMLHttpRequest();
     }
 
     /**
@@ -105,6 +105,17 @@ class HttpRequest {
     }
 
     /**
+     * Shortcut for ``send("delete", data)``.
+     *
+     * Named httpdelete to avoid crash with builtin keyword ``delete``.
+     *
+     * @see {@link HttpRequest#send}
+     */
+    httpdelete(data) {
+        return this.send('delete', data);
+    }
+
+    /**
      * Make request body from the provided data.
      *
      * By default this just returns the provided data,
@@ -128,11 +139,11 @@ class HttpRequest {
     /**
      * Set a request header.
      *
-     * @param name The header name. E.g.: ``"Content-type"``.
+     * @param header The header name. E.g.: ``"Content-type"``.
      * @param value The header value.
      */
-    setRequestHeader(name, value) {
-        this.request.setRequestHeader(name, value);
+    setRequestHeader(header, value) {
+        this.request.setRequestHeader(header, value);
     }
 
     /**
