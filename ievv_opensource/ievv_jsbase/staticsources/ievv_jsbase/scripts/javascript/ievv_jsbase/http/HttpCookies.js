@@ -1,10 +1,10 @@
 import makeCustomError from "../makeCustomError";
 
 
-export let CookieNotFoundError = makeCustomError('CookieNotFoundError');
+export let HttpCookieNotFoundError = makeCustomError('HttpCookieNotFoundError');
 
 
-class Cookies {
+class HttpCookies {
     constructor(rawCookies) {
         this.rawCookies = rawCookies || document.cookie;
         this.cookies = this.__parse();
@@ -39,7 +39,7 @@ class Cookies {
     getStrict(cookieName) {
         let value = this.get(cookieName);
         if(typeof value === 'undefined') {
-            throw new CookieNotFoundError(`Cookie not found: "${cookieName}".`);
+            throw new HttpCookieNotFoundError(`Cookie not found: "${cookieName}".`);
         }
     }
 
@@ -48,4 +48,4 @@ class Cookies {
     }
 }
 
-export default Cookies;
+export default HttpCookies;
