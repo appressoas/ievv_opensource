@@ -1,0 +1,26 @@
+{
+  "opts": {
+    "encoding": "utf8",
+    "destination": "./jsdoc_output/",
+    "recurse": true
+  },
+  "source": {
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_",
+    "include": [
+      "./scripts/javascript/"
+    ]
+  },
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "plugins": [ "plugins/markdown" ],
+  "markdown": {
+    "parser": "gfm"
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  }
+}

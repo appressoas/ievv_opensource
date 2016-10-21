@@ -69,7 +69,14 @@ export class JsonHttpResponse extends HttpResponse {
     }
 }
 
-
+/**
+ * API for performing HTTP requests.
+ *
+ * Example:
+ * ```
+ * let request = new HttpRequest('http://example.com/api/users/');
+ * ```
+ */
 export class HttpRequest {
     constructor(url) {
         this.url = url;
