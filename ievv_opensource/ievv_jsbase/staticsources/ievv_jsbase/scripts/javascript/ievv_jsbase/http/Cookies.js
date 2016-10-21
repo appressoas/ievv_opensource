@@ -1,4 +1,4 @@
-import makeCustomError from "./makeCustomError";
+import makeCustomError from "../makeCustomError";
 
 
 export let CookieNotFoundError = makeCustomError('CookieNotFoundError');

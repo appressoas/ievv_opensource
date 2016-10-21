@@ -1,4 +1,4 @@
-import {HttpRequest} from '../http/HttpRequest';
+import {HttpRequest} from '../../http/HttpRequest';
 
 
 class XMLHttpRequestMock {

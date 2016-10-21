@@ -1,5 +1,5 @@
-import Cookies from '../Cookies';
-import {CookieNotFoundError} from '../Cookies';
+import Cookies from '../../http/Cookies';
+import {CookieNotFoundError} from '../../http/Cookies';
 
 
 describe('Cookies', () => {
