@@ -1,6 +1,6 @@
 import {MyClass} from "./modules/demomodule";
 import {unique} from 'uniq';
-import {Cookie} from "ievv_jsbase/Cookie";
+import Cookies from "ievv_jsbase/Cookies";
 
 new MyClass();
 console.log('unique test:', unique([1, 1, 2]));
