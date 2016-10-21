@@ -10,11 +10,13 @@
   "devDependencies": {
     "babel-jest": "^16.0.0",
     "babel-polyfill": "^6.16.0",
-    "jest": "^16.0.2"
+    "jest": "^16.0.2",
+    "jsdoc": "^3.4.2"
   },
   "scripts": {
     "test": "jest",
     "test-watch": "jest --watch",
-    "test-debug": "jest --debug"
+    "test-debug": "jest --debug",
+    "jsdoc": "jsdoc -r ./scripts/javascript/ -d ./jsdoc_output/"
   }
 }
