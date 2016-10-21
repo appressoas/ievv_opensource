@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from ievv_opensource.utils.logmixin import Logger
 
 
 class Command(BaseCommand):
@@ -29,8 +30,20 @@ class Command(BaseCommand):
                             required=False, action='append_const', const='slow-jstest',
                             help='Skip running slow javascript tests. The same as "--skip slow-jstest". '
                                  'Slow javascript tests are also skipped if you use "--skip-jstests".')
+        parser.add_argument('--loglevel', dest='loglevel',
+                            required=False, default='stdout',
+                            choices=['debug', 'stdout', 'info', 'warning', 'error'],
+                            help='Set loglevel. Can be one of: debug, stdout, info, warning or error '
+                                 '(listed in order of verbosity).')
+        parser.add_argument('-q', '--quiet', dest='loglevel',
+                            required=False, action='store_const', const='error',
+                            help='Quiet output. Same as "--loglevel error".')
+        parser.add_argument('--debug', dest='loglevel',
+                            required=False, action='store_const', const='debug',
+                            help='Verbose output. Same as "--loglevel debug".')
 
     def handle(self, *args, **options):
+        loglevel = getattr(Logger, options['loglevel'].upper())
         appnames = options['appnames']
         skipgroups = options['skipgroups']
         skipgroups = set(skipgroups or [])
@@ -45,8 +58,10 @@ class Command(BaseCommand):
             except ValueError as error:
                 self.stderr.write(str(error))
                 raise SystemExit()
+        settings.IEVVTASKS_BUILDSTATIC_APPS.configure_logging(
+            loglevel=loglevel,
+            command_error_message='Re-run with "--debug" for more details.')
         settings.IEVVTASKS_BUILDSTATIC_APPS.log_help_header()
-        settings.IEVVTASKS_BUILDSTATIC_APPS.configure_logging()
         settings.IEVVTASKS_BUILDSTATIC_APPS.install(appnames=appnames, skipgroups=skipgroups)
         settings.IEVVTASKS_BUILDSTATIC_APPS.run(appnames=appnames, skipgroups=skipgroups)
         if options['watch']:

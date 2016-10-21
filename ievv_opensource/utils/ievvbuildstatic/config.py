@@ -8,7 +8,7 @@ from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
-from ievv_opensource.utils.logmixin import LogMixin
+from ievv_opensource.utils.logmixin import LogMixin, Logger
 
 
 class App(LogMixin):
@@ -262,9 +262,17 @@ class Apps(LogMixin):
             apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
         """
         self.apps = OrderedDict()
+        self.loglevel = Logger.DEBUG
+        self.command_error_message = None
         self.help_header = help_header
         for app in apps:
             self.add_app(app)
+
+    def get_loglevel(self):
+        return self.loglevel
+
+    def get_command_error_message(self):
+        return self.command_error_message
 
     def add_app(self, app):
         """
@@ -344,19 +352,10 @@ class Apps(LogMixin):
         shlogger.addHandler(handler)
         shlogger.propagate = False
 
-    # def __configure_ievvbuild_logger(self, loglevel, handler):
-    #     logger = self.get_logger()
-    #     logger.setLevel(loglevel)
-    #     logger.addHandler(handler)
-    #     logger.propagate = False
-
-    def configure_logging(self, loglevel=logging.INFO,
-                          shlibrary_loglevel=logging.WARNING):
-        # formatter = logging.Formatter('[%(name)s:%(levelname)s] %(message)s')
+    def configure_logging(self, loglevel=None, shlibrary_loglevel=logging.WARNING,
+                          command_error_message=None):
         handler = logging.StreamHandler()
-        # handler.setFormatter(formatter)
-        # handler.setLevel(loglevel)
-        # self.__configure_ievvbuild_logger(loglevel=loglevel,
-        #                                   handler=handler)
         self.__configure_shlogger(loglevel=shlibrary_loglevel,
                                   handler=handler)
+        self.loglevel = loglevel
+        self.command_error_message = command_error_message

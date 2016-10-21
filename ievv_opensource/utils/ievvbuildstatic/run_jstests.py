@@ -1,6 +1,7 @@
 import json
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
+from ievv_opensource.utils.logmixin import Logger
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
@@ -32,6 +33,20 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                     ]
                 )
             )
+
+        If you have a NPM script named ``"test-debug"``, that will be run
+        instead of ``"test"`` when loglevel is DEBUG. This means that
+        if you add something like this to your package.json::
+
+            {
+              "scripts": {
+                "test": "jest",
+                "test-debug": "jest --debug"
+              }
+            }
+
+        and run ``ievv buildstatic --debug``, ``jest --debug`` would
+        be run instead of ``jest``.
     """
     name = 'run_jstests'
 
@@ -43,8 +58,26 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         """
         super(Plugin, self).__init__(**kwargs)
 
+    def get_script_keys(self):
+        scripts_dict = self.app.get_installer('npm').get_packagejson_dict().get('scripts', {})
+        return scripts_dict.keys()
+
+    def get_test_script_key(self):
+        if self.get_loglevel() == Logger.DEBUG:
+            script_keys = self.get_script_keys()
+            if 'test-debug' in script_keys:
+                return 'test-debug'
+        return 'test'
+
+    def log_shell_command_stderr(self, line):
+        """
+        Called by :meth:`.run_shell_command` each time the shell
+        command outputs anything to stderr.
+        """
+        super(Plugin, self).log_shell_command_stdout(line=line)
+
     def has_tests(self):
-        return 'test' in self.app.get_installer('npm').get_packagejson_dict().get('scripts', {})
+        return self.get_test_script_key() in self.get_script_keys()
 
     def run(self):
         if self.has_tests():
@@ -52,7 +85,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 appname=self.app.appname))
             try:
                 self.run_shell_command('npm',
-                                       args=['test'],
+                                       args=['run', self.get_test_script_key(), '--silent'],
                                        _cwd=self.app.get_source_path())
             except ShellCommandError:
                 self.get_logger().command_error('npm test FAILED!')

@@ -13,6 +13,7 @@
     "jest": "^16.0.2"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-debug": "jest --debug"
   }
 }

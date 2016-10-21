@@ -51,6 +51,12 @@ class Plugin(LogMixin):
         self.group = group or self.default_group
         self._temporary_files_and_directories = set()
 
+    def get_loglevel(self):
+        return self.app.apps.loglevel
+
+    def get_command_error_message(self):
+        return self.app.apps.command_error_message
+
     def install(self):
         """
         Install any packages required for this plugin.
