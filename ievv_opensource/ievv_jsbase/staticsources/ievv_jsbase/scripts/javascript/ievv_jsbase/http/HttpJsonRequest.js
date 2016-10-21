@@ -1,7 +1,8 @@
 import HttpJsonResponse from "./HttpJsonResponse";
+import HttpRequest from "./HttpRequest";
 
 
-export default class JsonHttpRequest extends HttpRequest {
+class JsonHttpRequest extends HttpRequest {
     makeRequestBody(data) {
         return JSON.stringify(data);
     }
@@ -15,3 +16,5 @@ export default class JsonHttpRequest extends HttpRequest {
         this.setRequestHeader('Content-Type', `application/json; charset=UTF-8`);
     }
 }
+
+export default JsonHttpRequest;

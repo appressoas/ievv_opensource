@@ -2,10 +2,9 @@ import HttpJsonRequest from "./HttpJsonRequest";
 import HttpCookies from "./HttpCookies";
 
 
-export default class HttpDjangoJsonRequest extends HttpJsonRequest {
+class HttpDjangoJsonRequest extends HttpJsonRequest {
     setDefaultRequestHeaders(method) {
         super.setDefaultRequestHeaders(method);
-        method = method.toUpperCase();
         let shouldAddCsrfToken = !(method === 'GET' || method == 'HEAD');
         if(shouldAddCsrfToken) {
             let cookies = new HttpCookies();
@@ -13,3 +12,5 @@ export default class HttpDjangoJsonRequest extends HttpJsonRequest {
         }
     }
 }
+
+export default HttpDjangoJsonRequest;

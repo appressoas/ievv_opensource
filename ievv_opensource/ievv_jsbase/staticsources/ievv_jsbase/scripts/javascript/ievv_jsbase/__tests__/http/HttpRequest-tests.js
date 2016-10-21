@@ -28,7 +28,7 @@ describe('HttpRequest', () => {
             throw new Error('This should not be called!');
         }, function(response) {
             expect(response.status).toBe(400);
-            expect(response.connectionRefused).toBe(false);
+            expect(response.isConnectionRefused()).toBe(false);
         });
     });
 
@@ -41,7 +41,7 @@ describe('HttpRequest', () => {
             throw new Error('This should not be called!');
         }, function(response) {
             expect(response.status).toBe(0);
-            expect(response.connectionRefused).toBe(true);
+            expect(response.isConnectionRefused()).toBe(true);
         });
     });
 
