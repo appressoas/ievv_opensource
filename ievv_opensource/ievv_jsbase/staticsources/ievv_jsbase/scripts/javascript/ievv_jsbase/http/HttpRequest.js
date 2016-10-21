@@ -1,72 +1,5 @@
-import HttpCookies from './HttpCookies.js';
+import HttpResponse from "./HttpResponse";
 
-
-export class HttpResponse {
-    constructor(request) {
-        this.request = request;
-    }
-
-    get status() {
-        return this.request.status;
-    }
-
-    get success() {
-        if(this.status) {
-            return this.status >= 200 && this.status < 400;
-        } else {
-            return false;
-        }
-    }
-
-    get connectionRefused() {
-        return this.status === 0;
-    }
-
-    get text() {
-        return this.request.responseText;
-    }
-
-    toString() {
-        if(this.connectionRefused) {
-            return "ERROR: Connection refused";
-        } else {
-            return `HTTP ${this.status}\n${this.text}`;
-        }
-    }
-
-    toPrettyString() {
-        if(this.connectionRefused) {
-            return "ERROR: Connection refused";
-        } else {
-            let prettyBody;
-            try {
-                prettyBody = JSON.stringify(this.data, null, 2);
-            } catch (SyntaxError) {
-                prettyBody = this.text;
-            }
-            return `HTTP ${this.status}\n${prettyBody}`;
-        }
-    }
-}
-
-
-export class JsonHttpResponse extends HttpResponse {
-    constructor(request, options) {
-        super(request, options);
-    }
-
-    get data() {
-        if(this.connectionRefused) {
-            return null;
-        } else {
-            return this.parseResponseTextAsJson();
-        }
-    }
-
-    parseResponseTextAsJson() {
-        return JSON.parse(this.text);
-    }
-}
 
 /**
  * API for performing HTTP requests.
@@ -87,7 +20,7 @@ export class JsonHttpResponse extends HttpResponse {
  * use {@link HttpRequest#get}, {@link HttpRequest#put},
  * {@link HttpRequest#patch} and {@link HttpRequest#head}.
  */
-export class HttpRequest {
+export default class HttpRequest {
     constructor(url) {
         this.url = url;
         this.request = new window.XMLHttpRequest();
@@ -193,35 +126,6 @@ export class HttpRequest {
             resolve(response);
         } else {
             reject(response);
-        }
-    }
-}
-
-
-export class JsonHttpRequest extends HttpRequest {
-    makeRequestBody(data) {
-        return JSON.stringify(data);
-    }
-
-    makeResponse() {
-        return new JsonHttpResponse(this.request);
-    }
-
-    setDefaultRequestHeaders(method) {
-        super.setDefaultRequestHeaders(method);
-        this.setRequestHeader('Content-Type', `application/json; charset=UTF-8`);
-    }
-}
-
-
-export class DjangoJsonHttpRequest extends JsonHttpRequest {
-    setDefaultRequestHeaders(method) {
-        super.setDefaultRequestHeaders(method);
-        method = method.toUpperCase();
-        let shouldAddCsrfToken = !(method === 'GET' || method == 'HEAD');
-        if(shouldAddCsrfToken) {
-            let cookies = new HttpCookies();
-            this.setRequestHeader("X-CSRFToken", cookies.getValue('csrftoken'));
         }
     }
 }

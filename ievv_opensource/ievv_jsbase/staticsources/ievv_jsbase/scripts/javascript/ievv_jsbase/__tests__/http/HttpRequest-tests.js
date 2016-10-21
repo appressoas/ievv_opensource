@@ -1,4 +1,4 @@
-import {HttpRequest} from '../../http/HttpRequest';
+import HttpRequest from '../../http/HttpRequest';
 
 
 class XMLHttpRequestMock {
@@ -57,14 +57,14 @@ describe('HttpRequest', () => {
         });
     });
 
-    it('Successful request text', () => {
+    it('Successful request body', () => {
         const httprequest = new HttpRequest();
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: 'test'
         });
         return httprequest.post('test').then(function(response) {
-            expect(response.text).toBe('test');
+            expect(response.body).toBe('test');
         });
     });
 });
