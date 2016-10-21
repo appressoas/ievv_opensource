@@ -86,6 +86,7 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefile='ievv_jsbase.js',
                 destinationfile='ievv_jsbase.js',
             ),
+            ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '

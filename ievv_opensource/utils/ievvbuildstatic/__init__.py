@@ -14,6 +14,7 @@ from . import browserify_babelbuild  # noqa
 from . import browserify_reactjsbuild  # noqa
 from . import typescriptbuild  # noqa
 from . import nodemodulescopy  #noqa
+from . import run_jstests  #noqa
 
 __all__ = [
     'utils',
@@ -31,4 +32,5 @@ __all__ = [
     'browserify_reactjsbuild',
     'typescriptbuild',
     'nodemodulescopy',
+    'run_jstests',
 ]

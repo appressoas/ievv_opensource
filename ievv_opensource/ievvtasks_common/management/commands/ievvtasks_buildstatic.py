@@ -34,6 +34,11 @@ class Command(BaseCommand):
         appnames = options['appnames']
         skipgroups = options['skipgroups']
         skipgroups = set(skipgroups or [])
+        if 'skip-jstests' in skipgroups:
+            skipgroups.add('skip-slow-jstests')
+        if 'skip-js' in skipgroups:
+            skipgroups.add('skip-slow-jstests')
+            skipgroups.add('skip-jstests')
         if appnames:
             try:
                 settings.IEVVTASKS_BUILDSTATIC_APPS.validate_appnames(appnames=appnames)
