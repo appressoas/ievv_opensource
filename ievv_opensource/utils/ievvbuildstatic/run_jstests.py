@@ -1,5 +1,3 @@
-import json
-
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.logmixin import Logger
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
