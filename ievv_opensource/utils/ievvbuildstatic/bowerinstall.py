@@ -38,8 +38,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
     name = 'bowerinstall'
 
-    def __init__(self, packages):
-        super(Plugin, self).__init__()
+    def __init__(self, packages, **kwargs):
+        super(Plugin, self).__init__(**kwargs)
         self.packages = packages
 
     def get_bowerjson_path(self):

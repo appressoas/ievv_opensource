@@ -1,8 +1,8 @@
 import os
 import shutil
 
-from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic import filepath
+from ievv_opensource.utils.ievvbuildstatic import pluginbase
 
 
 class Plugin(pluginbase.Plugin):
@@ -41,15 +41,16 @@ class Plugin(pluginbase.Plugin):
     """
     name = 'mediacopy'
 
-    def __init__(self, sourcefolder='media', destinationfolder=None):
+    def __init__(self, sourcefolder='media', destinationfolder=None, **kwargs):
         """
         Parameters:
             sourcefolder: The folder where media files is located relative to
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
                 You can specify a folder in another app using
                 a :class:`ievv_opensource.utils.ievvbuildstatic.filepath.SourcePath` object.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(Plugin, self).__init__()
+        super(Plugin, self).__init__(**kwargs)
         self.sourcefolder = sourcefolder
         if isinstance(sourcefolder, filepath.FilePathInterface) and destinationfolder is None:
             raise ValueError('destinationfolder must be specifed when sourcefolder is not a string.')

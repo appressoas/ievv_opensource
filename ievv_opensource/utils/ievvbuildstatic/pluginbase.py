@@ -16,8 +16,39 @@ class Plugin(LogMixin):
     #: The name of the plugin.
     name = None
 
-    def __init__(self):
+    #: The default group of the plugin
+    #: The default value for the ``group`` kwarg for :meth:`.__init__``.
+    default_group = None
+
+    def __init__(self, group=None):
+        """
+
+        Args:
+            group: The group of the plugin. Defaults to :obj:`~.Plugin.default_group`.
+                If this is ``None``, the plugin can not be skipped when building
+                an app.
+
+                You can use any value for groups, but these groups are
+                convenient because the ``ievv buildstatic`` command has
+                command line options that makes it easier to skip them:
+
+                - ``"css"``: Should be used for plugins that build css.
+                  Skipped when running ``ievv buildstatic``
+                  with ``--skip-css``.
+                - ``"js"``: Should be used for plugins that build javascript.
+                  Skipped when running ``ievv buildstatic``
+                  with ``--skip-js``.
+                - ``"jstest"``: Should be used for plugins that run automatic tests for javascript code.
+                  Should also be used for tests in languages that compile to javascript
+                  such as TypeScript and CoffeeScript.
+                  Skipped when running ``ievv buildstatic`` with ``--skip-jstests`` or ``--skip-js``.
+                - ``"slow-jstest"``: Should be used instead of ``"jstest"`` for very
+                  slow tests.
+                  Skipped when running ``ievv buildstatic`` with ``--skip-slow-jstests``,
+                  ``--skip-jstests`` or ``--skip-js``.
+        """
         self.app = None
+        self.group = group or self.default_group
         self._temporary_files_and_directories = set()
 
     def install(self):

@@ -2,7 +2,6 @@ import os
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic.filepath import AbstractDjangoAppPath
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
@@ -45,13 +44,15 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             )
     """
     name = 'browserify_jsbuild'
+    default_group = 'js'
 
     def __init__(self, sourcefile, destinationfile,
                  sourcefolder=os.path.join('scripts', 'javascript'),
                  destinationfolder=os.path.join('scripts'),
                  extra_watchfolders=None,
                  extra_import_paths=None,
-                 sourcemap=True):
+                 sourcemap=True,
+                 **kwargs):
         """
         Parameters:
             sourcefile: The source file relative to ``sourcefolder``.
@@ -65,8 +66,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             extra_watchfolders: List of extra folders to watch for changes.
                 Relative to the source folder of the
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(Plugin, self).__init__()
+        super(Plugin, self).__init__(**kwargs)
         self.sourcefile = sourcefile
         self.destinationfile = destinationfile
         self.destinationfolder = destinationfolder

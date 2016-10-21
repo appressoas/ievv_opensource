@@ -4,15 +4,14 @@ import json
 import os
 
 import sh
-
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic import utils
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
 
 
 class Plugin(pluginbase.Plugin, ShellCommandMixin):
     name = 'typescriptbuild'
+    default_group = 'js'
 
     def __init__(self,
                  main_sourcefile="main.ts",
@@ -28,8 +27,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  tsc_compiler_options=None,
                  tsc_exclude=None,
                  typings_global_dependencies=None,
-                 register_tsconfig_as_temporaryfile=True):
-        super(Plugin, self).__init__()
+                 register_tsconfig_as_temporaryfile=True,
+                 **kwargs):
+        super(Plugin, self).__init__(**kwargs)
         self.destinationfile = destinationfile
         self.main_sourcefile = main_sourcefile
         self.register_tsconfig_as_temporaryfile = register_tsconfig_as_temporaryfile

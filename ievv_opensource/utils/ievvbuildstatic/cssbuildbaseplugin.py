@@ -16,7 +16,10 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
     """
     Base class for builders that produce CSS.
     """
-    def __init__(self, lint=True, lintrules=None, lintrules_overrides=None, autoprefix=True, minify=True, browserslist='> 5%'):
+    default_group = 'css'
+
+    def __init__(self, lint=True, lintrules=None, lintrules_overrides=None, autoprefix=True, minify=True,
+                 browserslist='> 5%', **kwargs):
         """
 
         Args:
@@ -43,8 +46,9 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             browserslist (str): A string with defining supported browsers
                 for https://github.com/ai/browserslist. Used by the autoprefix
                 and cssnano (used when minify=True) commands.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(AbstractPlugin, self).__init__()
+        super(AbstractPlugin, self).__init__(**kwargs)
         self.lint = lint
         self.autoprefix = autoprefix
         self.minify = minify

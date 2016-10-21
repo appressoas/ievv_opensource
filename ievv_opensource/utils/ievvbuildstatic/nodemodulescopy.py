@@ -1,7 +1,7 @@
-from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.utils import RegexFileList
-import shutil
 import os
+import shutil
+
+from ievv_opensource.utils.ievvbuildstatic import pluginbase
 
 
 class Plugin(pluginbase.Plugin):
@@ -10,8 +10,9 @@ class Plugin(pluginbase.Plugin):
     def __init__(self,
                  sourcefiles,
                  destinationfolder=os.path.join('scripts', 'node_modules'),
-                 sourcefolder='node_modules'):
-        super(Plugin, self).__init__()
+                 sourcefolder='node_modules',
+                 **kwargs):
+        super(Plugin, self).__init__(**kwargs)
         self.sourcefiles = sourcefiles
         self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder

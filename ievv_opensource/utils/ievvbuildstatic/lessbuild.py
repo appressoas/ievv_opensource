@@ -1,7 +1,6 @@
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
 
 
@@ -57,10 +56,12 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
 
     name = 'lessbuild'
+    default_group = 'css'
 
     def __init__(self, sourcefile, sourcefolder='styles',
                  other_sourcefolders=None,
-                 less_include_paths=None):
+                 less_include_paths=None,
+                 **kwargs):
         """
         Parameters:
             sourcefile: Main source file (the one including all other less files)
@@ -69,9 +70,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
             less_include_paths: Less include paths as a list. Paths are relative
                 to the source folder of the :class:`~ievv_opensource.utils.ievvbuild.config.App`.
-
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(Plugin, self).__init__()
+        super(Plugin, self).__init__(**kwargs)
         self.sourcefolder = sourcefolder
         self.other_sourcefolders = other_sourcefolders
         self.less_include_paths = less_include_paths

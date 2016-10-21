@@ -4,10 +4,8 @@ import json
 import os
 
 import sh
-
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic import utils
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
 
 
@@ -104,6 +102,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
 
     name = 'coffeebuild'
+    default_group = 'js'
 
     def __init__(self,
                  destinationfile,
@@ -114,7 +113,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                  extra_watchfolders=None,
                  with_function_wrapper=True,
                  lint=True,
-                 lintconfig=None):
+                 lintconfig=None,
+                 **kwargs):
         """
         Parameters:
             destinationfile: Path to destination file relative to ``destinationfolder``.
@@ -134,8 +134,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
             with_function_wrapper: Include function wrapper around the resulting
                 javascript file.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(Plugin, self).__init__()
+        super(Plugin, self).__init__(**kwargs)
         self.destinationfile = destinationfile
         self.sourcefiles = utils.RegexFileList(
             include_patterns=sourcefile_include_patterns or ['^.*\.coffee$'],

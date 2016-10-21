@@ -63,24 +63,31 @@ class App(LogMixin):
         plugin.app = self
         self.plugins.append(plugin)
 
-    def run(self):
+    def iterplugins(self, skipgroups=None):
+        skipgroups = skipgroups or []
+        for plugin in self.plugins:
+            if plugin.group and plugin.group in skipgroups:
+                continue
+            yield plugin
+
+    def run(self, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within the app.
         """
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.runwrapper()
 
-    def install(self):
+    def install(self, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within the app.
         """
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.install()
         for installer in self.installers.values():
             installer.install()
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.post_install()
 
     def get_app_config(self):
@@ -184,12 +191,12 @@ class App(LogMixin):
             absolute_path = '{}{}'.format(path, new_extension)
         return absolute_path
 
-    def watch(self):
+    def watch(self, skipgroups=None):
         """
         Start a watcher thread for each plugin.
         """
         watchconfigs = []
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             watchconfig = plugin.watch()
             if watchconfig:
                 watchconfigs.append(watchconfig)
@@ -272,13 +279,13 @@ class Apps(LogMixin):
         """
         return self.apps[appname]
 
-    def install(self, appnames=None):
+    def install(self, appnames=None, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.install()
+            app.install(skipgroups=skipgroups)
 
     def log_help_header(self):
         if self.help_header:
@@ -294,19 +301,19 @@ class Apps(LogMixin):
         Get an interator over the apps.
         """
         for app in self.apps.values():
-            include = appnames is None or app.appname in appnames
+            include = not appnames or app.appname in appnames
             if include:
                 yield app
 
-    def run(self, appnames=None):
+    def run(self, appnames=None, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.run()
+            app.run(skipgroups=skipgroups)
 
-    def watch(self, appnames=None):
+    def watch(self, appnames=None, skipgroups=None):
         """
         Start watcher threads for all folders that at least one
         :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
@@ -316,7 +323,7 @@ class Apps(LogMixin):
         """
         watchconfigpool = WatchConfigPool()
         for app in self.iterapps(appnames=appnames):
-            watchconfigpool.extend(app.watch())
+            watchconfigpool.extend(app.watch(skipgroups=skipgroups))
         all_observers = watchconfigpool.watch()
         try:
             while True:

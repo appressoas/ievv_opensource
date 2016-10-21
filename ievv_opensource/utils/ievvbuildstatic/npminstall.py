@@ -33,8 +33,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
     name = 'npminstall'
 
-    def __init__(self, packages):
-        super(Plugin, self).__init__()
+    def __init__(self, packages, **kwargs):
+        super(Plugin, self).__init__(**kwargs)
         self.packages = packages
 
     def install(self):
