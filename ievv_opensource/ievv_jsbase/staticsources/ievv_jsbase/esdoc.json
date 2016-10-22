@@ -1,0 +1,14 @@
+{
+  "destination": "built_docs",
+  "excludes": [
+    "__tests__.+$",
+    "__mocks__.+$"
+  ],
+  "index": "esdoc/index.md",
+  "manual": {
+    "tutorial": [
+      "esdoc/manual/tutorial.md"
+    ]
+  },
+  "source": "scripts/javascript"
+}

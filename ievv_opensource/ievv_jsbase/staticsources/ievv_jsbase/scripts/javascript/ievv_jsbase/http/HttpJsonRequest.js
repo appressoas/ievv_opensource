@@ -2,6 +2,13 @@ import HttpJsonResponse from "./HttpJsonResponse";
 import HttpRequest from "./HttpRequest";
 
 
+/**
+ *  @module http/JsonHttpRequest
+ */
+
+/**
+ * Stuff
+ */
 class JsonHttpRequest extends HttpRequest {
     makeRequestBody(data) {
         return JSON.stringify(data);

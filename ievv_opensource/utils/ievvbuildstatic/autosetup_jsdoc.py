@@ -1,8 +1,6 @@
 import json
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.logmixin import Logger
-from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
@@ -29,14 +27,6 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         of using this plugin.
     """
     name = 'autosetup_jsdoc'
-
-    def __init__(self, **kwargs):
-        """
-
-        Args:
-            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
-        """
-        super(Plugin, self).__init__(**kwargs)
 
     def install(self):
         self.app.get_installer('npm').queue_install(

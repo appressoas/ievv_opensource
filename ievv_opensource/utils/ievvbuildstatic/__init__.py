@@ -17,6 +17,7 @@ from . import typescriptbuild  # noqa
 from . import nodemodulescopy  #noqa
 from . import run_jstests  #noqa
 from . import autosetup_jsdoc  #noqa
+from . import autosetup_esdoc  #noqa
 
 __all__ = [
     'utils',
@@ -38,4 +39,5 @@ __all__ = [
     'nodemodulescopy',
     'run_jstests',
     'autosetup_jsdoc',
+    'autosetup_esdoc',
 ]

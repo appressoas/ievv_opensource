@@ -116,6 +116,7 @@ class Command(BaseCommand, LogMixin, ShellCommandMixin):
             loglevel=self.get_loglevel(),
             command_error_message='Re-run with "--debug" for more details.')
         settings.IEVVTASKS_BUILDSTATIC_APPS.install()
+        settings.IEVVTASKS_BUILDSTATIC_APPS.run()
         settings.IEVVTASKS_BUILDSTATIC_APPS.build_docs(
             output_directory=self.__get_buildstatic_documentation_build_directory())
 

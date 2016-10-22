@@ -153,6 +153,9 @@ class App(LogMixin):
         return self._relative_or_absolute_path_to_absolute_path(relative_path_root=sourcefolder,
                                                                 pathlist=path)
 
+    def make_source_relative_path(self, *path):
+        return os.path.relpath(self.get_source_path(*path), start=self.get_source_path())
+
     def get_destination_path(self, *path, **kwargs):
         """
         Returns the absolute path to a folder within the destination

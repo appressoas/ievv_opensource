@@ -211,13 +211,17 @@ Overview
 .. autosummary::
 
    pluginbase.Plugin
+   cssbuildbaseplugin.AbstractPlugin
    sassbuild.Plugin
    lessbuild.Plugin
    mediacopy.Plugin
    bowerinstall.Plugin
    npminstall.Plugin
    browserify_jsbuild.Plugin
-   cssbuildbaseplugin.AbstractPlugin
+   browserify_babelbuild.Plugin
+   browserify_reactjsbuild.Plugin
+   autosetup_jsdoc.Plugin
+   autosetup_esdoc.Plugin
 
 
 Details
@@ -225,6 +229,9 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.pluginbase
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.sassbuild
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.sassbuild
@@ -250,8 +257,11 @@ Details
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.browserify_reactjsbuild
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.browserify_reactjsbuild
 
-.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
-.. automodule:: ievv_opensource.utils.ievvbuildstatic.cssbuildbaseplugin
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_jsdoc
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_jsdoc
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_esdoc
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_esdoc
 
 
 ************
