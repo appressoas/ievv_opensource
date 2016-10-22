@@ -65,8 +65,16 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     name = 'autosetup_esdoc'
 
     def install(self):
+        """
+        Installs the ``esdoc`` and ``esdoc-importpath-plugin``
+        npm packages as dev dependencies.
+        """
         self.app.get_installer('npm').queue_install(
             package='esdoc',
+            installtype='dev'
+        )
+        self.app.get_installer('npm').queue_install(
+            package='esdoc-importpath-plugin',
             installtype='dev'
         )
 
@@ -120,8 +128,27 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 manual_dict[section] = file_list
         return manual_dict
 
+    def make_plugins_list(self):
+        return [
+            {
+                "name": "esdoc-importpath-plugin",
+                "option": {
+                    "replaces": [
+                        {
+                            "from": "^javascript/",
+                            "to": ""
+                        },
+                        {
+                            "from": "^{appname}/".format(appname=self.app.appname),
+                            "to": ""
+                        }
+                    ]
+                }
+            }
+        ]
+
     def make_esdoc_config_dict(self):
-        return {
+        config_dict = {
             "source": self.app.make_source_relative_path("scripts", "javascript"),
             "destination": self.app.make_source_relative_path("built_docs"),
             "excludes": [
@@ -129,8 +156,14 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 "__mocks__.+$"
             ],
             "index": self.app.make_source_relative_path(self.get_esdoc_index_path()),
-            "manual": self.make_manual_dict()
         }
+        plugins_list = self.make_plugins_list()
+        if plugins_list:
+            config_dict['plugins'] = plugins_list
+        manual_dict = self.make_manual_dict()
+        if manual_dict:
+            config_dict['manual'] = manual_dict
+        return config_dict
 
     def create_esdoc_config(self):
         open(self.get_esdoc_config_path(), 'w').write(
