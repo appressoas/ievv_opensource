@@ -56,6 +56,8 @@ class NpmDocBuilder(base.AbstractDocBuilder):
     def build_docs(self, output_directory):
         self.get_logger().command_start('Building docs for {appname}'.format(
             appname=self.app.appname))
+        if os.path.exists(self.__get_staticsources_build_directory()):
+            shutil.rmtree(self.__get_staticsources_build_directory())
         self.__run_build_docs_npm_script()
         self.__verify_docs_built_in_correct_directory()
         self.__move_docs_into_output_directory(output_directory=output_directory)
