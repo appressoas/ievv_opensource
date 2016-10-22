@@ -94,7 +94,12 @@ let _instance = null;
  *
  * @example
  * let signal = new SignalHandlerSingleton();
- * signal.addReceiver();
+ * signal.addReceiver('myapp.mysignal', 'myotherapp.myreceiver', (data, signalDebugInfo) => {
+ *      console.log('Signal received');
+ *      console.log('Signal data:', data);
+ *      console.log('Signal debug info:', signalDebugInfo);
+ * });
+ * signal.send('myapp.mysignal', {'the': 'data'});
  */
 export default class SignalHandlerSingleton {
 
