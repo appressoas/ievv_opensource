@@ -16,6 +16,7 @@ from . import browserify_reactjsbuild  # noqa
 from . import typescriptbuild  # noqa
 from . import nodemodulescopy  #noqa
 from . import run_jstests  #noqa
+from . import autosetup_jsdoc  #noqa
 
 __all__ = [
     'utils',
@@ -36,4 +37,5 @@ __all__ = [
     'typescriptbuild',
     'nodemodulescopy',
     'run_jstests',
+    'autosetup_jsdoc',
 ]

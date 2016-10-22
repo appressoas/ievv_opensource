@@ -47,6 +47,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         be run instead of ``jest``.
     """
     name = 'run_jstests'
+    default_group = 'jstest'
 
     def __init__(self, **kwargs):
         """
