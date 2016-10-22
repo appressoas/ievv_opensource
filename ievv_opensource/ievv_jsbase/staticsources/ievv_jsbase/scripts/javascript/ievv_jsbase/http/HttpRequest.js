@@ -32,7 +32,7 @@ import HttpResponse from "./HttpResponse";
  * use {@link HttpRequest#get}, {@link HttpRequest#put},
  * {@link HttpRequest#patch} and {@link HttpRequest#head}.
  */
-class HttpRequest {
+export default class HttpRequest {
     constructor(url) {
         this.url = url;
         this.request = new XMLHttpRequest();
@@ -166,4 +166,3 @@ class HttpRequest {
     }
 }
 
-export default HttpRequest;

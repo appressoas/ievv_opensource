@@ -3,25 +3,32 @@ import HttpRequest from "./HttpRequest";
 
 
 /**
- *  @module http/JsonHttpRequest
+ * Extends HttpRequest with transparent JSON request/response handling.
  */
-
-/**
- * Stuff
- */
-class JsonHttpRequest extends HttpRequest {
+export default class JsonHttpRequest extends HttpRequest {
+    /**
+     * Overridden to automatically convert request data to JSON.
+     */
     makeRequestBody(data) {
         return JSON.stringify(data);
     }
 
+    /**
+     * Overridden to return the response as a
+     * {@link HttpJsonResponse} instead if a HttpResponse.
+     *
+     * @returns {HttpJsonResponse}
+     */
     makeResponse() {
         return new HttpJsonResponse(this.request);
     }
 
+    /**
+     * Overridden to ensure we send the correct content-type header for
+     * json requests.
+     */
     setDefaultRequestHeaders(method) {
         super.setDefaultRequestHeaders(method);
         this.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     }
 }
-
-export default JsonHttpRequest;

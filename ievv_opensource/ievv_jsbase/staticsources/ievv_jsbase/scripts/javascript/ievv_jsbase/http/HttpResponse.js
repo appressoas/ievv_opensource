@@ -1,10 +1,10 @@
 /**
  * HTTP response.
  *
- * Wraps a XMLHttpRequest to provide information about the
- * response from the server.
+ * Wraps a XMLHttpRequest to make it easier to get
+ * information about the response from the server.
  */
-class HttpResponse {
+export default class HttpResponse {
     /**
      *
      * @param request A XMLHttpRequest object.
@@ -62,7 +62,7 @@ class HttpResponse {
     }
 
     /**
-     * Get the request body (the responseText attribute of the XMLHttpRequest).
+     * Get the response body (the responseText attribute of the XMLHttpRequest).
      */
     get body() {
         return this.request.responseText;
@@ -107,5 +107,3 @@ class HttpResponse {
         return `${this.responseHeaderToString()}\n\n${this.getPrettyfiedBody()}`
     }
 }
-
-export default HttpResponse;

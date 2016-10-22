@@ -1,23 +1,36 @@
 import HttpResponse from "./HttpResponse";
 
 
-class HttpJsonResponse extends HttpResponse {
-    constructor(request, options) {
-        super(request, options);
-    }
+/**
+ * Extends HttpResponse with extra functionality for
+ * working with JSON response data.
+ *
+ * The most important addition is the {@link HttpJsonResponse#bodydata}
+ * property that you will want to use instead of
+ * {@link HttpResponse#body}.
+ */
+export default class HttpJsonResponse extends HttpResponse {
 
+    /**
+     * Get the response body (the responseText attribute of the XMLHttpRequest)
+     * decoded from JSON.
+     */
     get bodydata() {
         if(this.isConnectionRefused()) {
             return null;
         } else {
-            return this.parseResponseTextAsJson();
+            return this.__parseResponseTextAsJson();
         }
     }
 
-    parseResponseTextAsJson() {
+    __parseResponseTextAsJson() {
         return JSON.parse(this.body);
     }
 
+    /**
+     * Overriden to make use of JSON.stringify to produce more
+     * pretty output.
+     */
     getPrettyfiedBody() {
         let prettyBody;
         try {
@@ -28,5 +41,3 @@ class HttpJsonResponse extends HttpResponse {
         return prettyBody;
     }
 }
-
-export default HttpJsonResponse;

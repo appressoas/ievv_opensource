@@ -1240,6 +1240,10 @@ esdoc:
     minimist "1.1.1"
     taffydb "2.7.2"
 
+esdoc-importpath-plugin:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/esdoc-importpath-plugin/-/esdoc-importpath-plugin-0.0.1.tgz#d06a2af5dd043e5c674d708a8272641cd4fe4ae6"
+
 espree@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/espree/-/espree-2.2.0.tgz#01dc927a7ea5081d1a7b6d610249e624e7fef3d6"

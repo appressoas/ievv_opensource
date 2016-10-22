@@ -10,5 +10,22 @@
       "esdoc/manual/tutorial.md"
     ]
   },
+  "plugins": [
+    {
+      "name": "esdoc-importpath-plugin",
+      "option": {
+        "replaces": [
+          {
+            "from": "^javascript/",
+            "to": ""
+          },
+          {
+            "from": "^ievv_jsbase/",
+            "to": ""
+          }
+        ]
+      }
+    }
+  ],
   "source": "scripts/javascript"
 }
