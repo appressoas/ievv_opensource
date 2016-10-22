@@ -80,7 +80,7 @@ class Plugin(browserify_jsbuild.Plugin):
         This is the presets that go into ``<HERE>`` in
         ``babelify -t [ babelify --presets [ <HERE> ] ]``.
 
-        Defaults to ``["<the echmascript_version kwarg>"].
+        Defaults to ``["<the echmascript_version kwarg>"]``.
         """
         presets = [self.echmascript_version]
         return presets

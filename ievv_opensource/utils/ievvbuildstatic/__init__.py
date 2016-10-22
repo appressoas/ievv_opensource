@@ -1,5 +1,6 @@
 from . import utils  # noqa
 from . import installers  # noqa
+from . import docbuilders  # noqa
 from . import filepath  # noqa
 from . import config  # noqa
 from . import cssbuildbaseplugin  # noqa
@@ -18,6 +19,8 @@ from . import run_jstests  #noqa
 
 __all__ = [
     'utils',
+    'installers',
+    'docbuilders',
     'filepath',
     'config',
     'cssbuildbaseplugin',

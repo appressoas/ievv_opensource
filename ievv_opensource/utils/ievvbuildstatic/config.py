@@ -9,6 +9,7 @@ from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin, Logger
+from . import docbuilders
 
 
 class App(LogMixin):
@@ -19,7 +20,8 @@ class App(LogMixin):
                  sourcefolder='staticsources',
                  destinationfolder='static',
                  keep_temporary_files=False,
-                 installers_config=None):
+                 installers_config=None,
+                 docbuilder_classes=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -36,6 +38,7 @@ class App(LogMixin):
         self.destinationfolder = destinationfolder
         self.installers = {}
         self.plugins = []
+        self.docbuilder_classes = docbuilder_classes or self.get_default_docbuilder_classes()
         self.keep_temporary_files = keep_temporary_files
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
@@ -251,6 +254,31 @@ class App(LogMixin):
         if os.path.exists(base_temporary_directory) and len(os.listdir(base_temporary_directory)) == 0:
             shutil.rmtree(base_temporary_directory)
 
+    def get_default_docbuilder_classes(self):
+        return [
+            docbuilders.npm_docbuilder.NpmDocBuilder
+        ]
+
+    def get_docbuilder(self):
+        for docbuilder_class in self.docbuilder_classes:
+            docbuilder = docbuilder_class(app=self)
+            if docbuilder.is_available():
+                return docbuilder
+        return None
+
+    def build_docs(self, output_directory):
+        docbuilder = self.get_docbuilder()
+        if docbuilder:
+            docbuilder.build_docs(output_directory=os.path.join(output_directory, self.appname))
+        else:
+            self.get_logger().debug(
+                'No docbuilders found for {appname}. Tried the following docbuilders: {docbuilders}'.format(
+                    appname=self.appname,
+                    docbuilders=', '.join(
+                        docbuilder_class.name
+                        for docbuilder_class in self.docbuilder_classes)
+                ))
+
 
 class Apps(LogMixin):
     """
@@ -342,6 +370,10 @@ class Apps(LogMixin):
 
         for observer in all_observers:
             observer.join()
+
+    def build_docs(self, output_directory, appnames=None):
+        for app in self.iterapps(appnames=appnames):
+            app.build_docs(output_directory=output_directory)
 
     def get_logger_name(self):
         return 'ievvbuildstatic'

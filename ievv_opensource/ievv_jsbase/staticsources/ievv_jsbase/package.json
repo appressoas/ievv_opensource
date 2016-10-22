@@ -17,6 +17,6 @@
     "test": "jest",
     "test-debug": "jest --debug",
     "test-watch": "jest --watch",
-    "jsdoc": "jsdoc -c ./jsdoc.config.json"
+    "build-docs": "jsdoc -c ./jsdoc.config.json"
   }
 }

@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from ievv_opensource.ievvtasks_common.open_file import open_file_with_default_os_opener
 from ievv_opensource.utils import virtualenvutils
+from ievv_opensource.utils.logmixin import Logger
 
 
 class Command(BaseCommand):
@@ -46,31 +47,9 @@ class Command(BaseCommand):
         parser.add_argument('--fail-on-warning', dest='fail_on_warning',
                             required=False, action='store_true',
                             help='Fail on warning.')
-
-    def handle(self, *args, **options):
-        cleandocs = options['cleandocs']
-        build_docs = options['build_docs']
-        opendocs = options['opendocs']
-        doc2dash = options['doc2dash']
-        self.indexhtmlpath = self.__get_documentation_indexhtml_path()
-        self.fail_on_warning = options['fail_on_warning']
-
-        if not (cleandocs or opendocs or build_docs or doc2dash):
-            raise CommandError('You must specify at least one of: --build, '
-                               '--clean, --open or --dash. See --help for more info.')
-
-        if cleandocs and opendocs and not build_docs:
-            raise CommandError('Can not use --clean and --open without also using --build.')
-
-        virtualenvutils.add_virtualenv_bin_directory_to_path()
-        if cleandocs:
-            self.__cleandocs()
-        if build_docs:
-            self.__build_docs()
-        if opendocs:
-            self._opendocs()
-        if doc2dash:
-            self.__doc2dash()
+        parser.add_argument('--no-buildstatic-docs', dest='include_buildstatic_docs',
+                            action='store_false', default=True,
+                            help='Do not include ievv buildstatic docs.')
 
     def _opendocs(self):
         self.stdout.write('Opening {} in your browser.'.format(self.indexhtmlpath))
@@ -97,7 +76,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write('Built dash docs.')
 
-    def __cleandocs(self):
+    def __clean_docs(self):
         if os.path.exists(self.__get_documentation_build_directory()):
             self.stdout.write('Removing {}'.format(self.__get_documentation_build_directory()))
             shutil.rmtree(self.__get_documentation_build_directory())
@@ -113,7 +92,7 @@ class Command(BaseCommand):
     def __print_stderr(self, line):
         self.stderr.write(line.rstrip())
 
-    def __build_docs(self):
+    def __build_sphinx_docs(self):
         sphinx_build_html = sh.Command('sphinx-build')
         kwargs = {
             'b': 'html'
@@ -137,3 +116,43 @@ class Command(BaseCommand):
             pass
         else:
             self.stdout.write('Built docs. Use ``ievv docs -o`` to open them in your browser to view them.')
+
+    def __get_buildstatic_documentation_build_directory(self):
+        return os.path.join(self.__get_documentation_build_directory(), 'ievvbuildstatic')
+
+    def __build_buildstatic_docs(self, loglevel='DEBUG'):
+        loglevel = getattr(Logger, loglevel.upper())
+        settings.IEVVTASKS_BUILDSTATIC_APPS.configure_logging(
+            loglevel=loglevel,
+            command_error_message='Re-run with "--debug" for more details.')
+        settings.IEVVTASKS_BUILDSTATIC_APPS.install()
+        settings.IEVVTASKS_BUILDSTATIC_APPS.build_docs(
+            output_directory=self.__get_buildstatic_documentation_build_directory())
+
+    def handle(self, *args, **options):
+        cleandocs = options['cleandocs']
+        build_docs = options['build_docs']
+        opendocs = options['opendocs']
+        doc2dash = options['doc2dash']
+        include_buildstatic_docs = options['include_buildstatic_docs']
+        self.indexhtmlpath = self.__get_documentation_indexhtml_path()
+        self.fail_on_warning = options['fail_on_warning']
+
+        if not (cleandocs or opendocs or build_docs or doc2dash):
+            raise CommandError('You must specify at least one of: --build, '
+                               '--clean, --open or --dash. See --help for more info.')
+
+        if cleandocs and opendocs and not build_docs:
+            raise CommandError('Can not use --clean and --open without also using --build.')
+
+        virtualenvutils.add_virtualenv_bin_directory_to_path()
+        if cleandocs:
+            self.__clean_docs()
+        if build_docs:
+            self.__build_sphinx_docs()
+            if include_buildstatic_docs:
+                self.__build_buildstatic_docs()
+        if opendocs:
+            self._opendocs()
+        if doc2dash:
+            self.__doc2dash()
