@@ -38,6 +38,12 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         """
         super(Plugin, self).__init__(**kwargs)
 
+    def install(self):
+        self.app.get_installer('npm').queue_install(
+            package='jsdoc',
+            installtype='dev'
+        )
+
     def get_jsdoc_config_filename(self):
         return 'jsdoc.config.json'
 
