@@ -36,8 +36,8 @@ class Command(BaseCommand):
                             help='Set loglevel. Can be one of: debug, stdout, info, warning or error '
                                  '(listed in order of verbosity).')
         parser.add_argument('-q', '--quiet', dest='loglevel',
-                            required=False, action='store_const', const='error',
-                            help='Quiet output. Same as "--loglevel error".')
+                            required=False, action='store_const', const='warning',
+                            help='Quiet output. Same as "--loglevel warning".')
         parser.add_argument('--debug', dest='loglevel',
                             required=False, action='store_const', const='debug',
                             help='Verbose output. Same as "--loglevel debug".')

@@ -149,13 +149,14 @@ class Logger(object):
         Log the start of a command. This should be used in the beginning
         of each :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`.
         """
-        if self.level > self.DEBUG:
+        if self.level >= self.DEBUG:
             self._queue_message()
-        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE, bold=True)
+        if self.level >= self.INFO:
+            self.__colorprint(message, color=ievv_colorize.COLOR_BLUE, bold=True)
 
     def __command_end(self, message, **kwargs):
         self.__colorprint(message, **kwargs)
-        if self.level > self.DEBUG:
+        if self.level >= self.DEBUG:
             self._queue_message()
 
     def command_error(self, message):
@@ -178,10 +179,11 @@ class Logger(object):
         :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         when the task succeeds.
         """
-        self.__command_end(message, color=ievv_colorize.COLOR_GREEN, bold=True)
-        desktopnotificationapi.show_message(
-            title='SUCCESS - {}'.format(self.name),
-            message=message)
+        if self.level >= self.INFO:
+            self.__command_end(message, color=ievv_colorize.COLOR_GREEN, bold=True)
+            desktopnotificationapi.show_message(
+                title='SUCCESS - {}'.format(self.name),
+                message=message)
 
 
 class LogMixin(object):

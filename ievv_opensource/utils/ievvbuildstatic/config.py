@@ -228,6 +228,9 @@ class App(LogMixin):
     def get_logger_name(self):
         return '{}.{}'.format(self.apps.get_logger_name(), self.appname)
 
+    def get_loglevel(self):
+        return self.apps.loglevel
+
     def get_temporary_build_directory_path(self, *path):
         return self.get_source_path('ievvbuildstatic_temporary_build_directory', *path)
 
