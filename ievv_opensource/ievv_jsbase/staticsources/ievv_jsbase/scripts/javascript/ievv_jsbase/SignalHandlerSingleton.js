@@ -274,8 +274,8 @@ export default class SignalHandlerSingleton {
     constructor() {
         if(!_instance) {
             _instance = this;
+            this._signalMap = new Map();
         }
-        this._signalMap = new Map();
         return _instance;
     }
 
