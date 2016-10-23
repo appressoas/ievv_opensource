@@ -4,7 +4,7 @@ import {XMLHttpRequestMock} from "../http/HttpRequest-tests";
 
 
 class MockDOMReplaceFromUrl extends DOMReplaceFromUrl {
-    _makeRequest() {
+    _makeRequest(url) {
         let httpRequest = new HttpRequest();
         httpRequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
@@ -21,8 +21,8 @@ describe('DOMReplaceFromUrl', () => {
             <div id="id_test">
                 <p>Original</p>
             </div>`;
-        const domreplace = new MockDOMReplaceFromUrl('id_test', 'http://example.com');
-        return domreplace.replaceInnerHtml().then((htmlString) => {
+        const domreplace = new MockDOMReplaceFromUrl('id_test');
+        return domreplace.replaceInnerHtml('http://example.com').then((htmlString) => {
             expect(htmlString).toBe('<p>From server</p>');
             expect(document.body.querySelectorAll('p').length).toBe(1);
             expect(document.body.querySelectorAll('p')[0].textContent).toBe('From server');
@@ -34,8 +34,8 @@ describe('DOMReplaceFromUrl', () => {
             <div id="id_test">
                 <p>Original</p>
             </div>`;
-        const domreplace = new MockDOMReplaceFromUrl('id_test', 'http://example.com');
-        return domreplace.appendInnerHtml().then((htmlString) => {
+        const domreplace = new MockDOMReplaceFromUrl('id_test');
+        return domreplace.appendInnerHtml('http://example.com').then((htmlString) => {
             expect(htmlString).toBe('<p>From server</p>');
             expect(document.body.querySelectorAll('p').length).toBe(2);
             expect(document.body.querySelectorAll('p')[0].textContent).toBe('Original');
@@ -48,8 +48,8 @@ describe('DOMReplaceFromUrl', () => {
             <div id="id_test">
                 <p>Original</p>
             </div>`;
-        const domreplace = new MockDOMReplaceFromUrl('id_test', 'http://example.com');
-        return domreplace.prependInnerHtml().then((htmlString) => {
+        const domreplace = new MockDOMReplaceFromUrl('id_test');
+        return domreplace.prependInnerHtml('http://example.com').then((htmlString) => {
             expect(htmlString).toBe('<p>From server</p>');
             expect(document.body.querySelectorAll('p').length).toBe(2);
             expect(document.body.querySelectorAll('p')[0].textContent).toBe('From server');

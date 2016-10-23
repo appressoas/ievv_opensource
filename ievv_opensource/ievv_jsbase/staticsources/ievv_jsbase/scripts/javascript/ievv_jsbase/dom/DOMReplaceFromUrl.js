@@ -2,21 +2,24 @@ import DOMReplace from "./DOMReplace";
 import HttpRequest from "../http/HttpRequest";
 
 
+/**
+ * Extends {@link DOMReplace} adn change the methods to
+ * replace by making a request to the server.
+ */
 export default class DOMReplaceFromUrl extends DOMReplace {
-    constructor(elementId, url) {
-        super(elementId);
-        this.url = url;
+    _makeRequest(url) {
+        return new HttpRequest(url);
     }
 
-    _makeRequest() {
-        return new HttpRequest(this.url);
+    extractHtmlStringFromResponse(response) {
+        return response.body;
     }
 
-    _replaceFromUrl(callback) {
+    _replaceFromUrl(url, callback) {
         return new Promise((resolve, reject) => {
-            let request = this._makeRequest();
+            let request = this._makeRequest(url);
             request.get().then((response) => {
-                let htmlString = response.body;
+                let htmlString = this.extractHtmlStringFromResponse(response);
                 callback(htmlString);
                 resolve(htmlString, response);
             }, (response) => {
@@ -25,21 +28,21 @@ export default class DOMReplaceFromUrl extends DOMReplace {
         });
     }
 
-    replaceInnerHtml() {
-        return this._replaceFromUrl((htmlString) => {
+    replaceInnerHtml(url) {
+        return this._replaceFromUrl(url, (htmlString) => {
             super.replaceInnerHtml(htmlString);
         });
     }
 
 
-    appendInnerHtml() {
-        return this._replaceFromUrl((htmlString) => {
+    appendInnerHtml(url) {
+        return this._replaceFromUrl(url, (htmlString) => {
             super.appendInnerHtml(htmlString);
         });
     }
 
-    prependInnerHtml() {
-        return this._replaceFromUrl((htmlString) => {
+    prependInnerHtml(url) {
+        return this._replaceFromUrl(url, (htmlString) => {
             super.prependInnerHtml(htmlString);
         });
     }
