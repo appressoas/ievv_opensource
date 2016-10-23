@@ -28,20 +28,8 @@ export class XMLHttpRequestMock {
 }
 
 describe('HttpRequest', () => {
-    it('Unsuccessful request that reached server', () => {
-        const httprequest = new HttpRequest();
-        httprequest.request = new XMLHttpRequestMock('onload', {
-            status: 400
-        });
-        return httprequest.post('test').then(function(response) {
-            throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(400);
-            expect(response.isConnectionRefused()).toBe(false);
-        });
-    });
 
-    it('Unsuccessful request that did not reach server', () => {
+    it('Connection error', () => {
         const httprequest = new HttpRequest();
         httprequest.request = new XMLHttpRequestMock('onerror', {
             status: 0
@@ -54,6 +42,45 @@ describe('HttpRequest', () => {
         });
     });
 
+    it('5xx response', () => {
+        const httprequest = new HttpRequest();
+        httprequest.request = new XMLHttpRequestMock('onload', {
+            status: 500
+        });
+        return httprequest.post('test').then(function(response) {
+            throw new Error('This should not be called!');
+        }, function(response) {
+            expect(response.status).toBe(500);
+            expect(response.isServerError()).toBe(true);
+        });
+    });
+
+    it('4xx response', () => {
+        const httprequest = new HttpRequest();
+        httprequest.request = new XMLHttpRequestMock('onload', {
+            status: 400
+        });
+        return httprequest.post('test').then(function(response) {
+            throw new Error('This should not be called!');
+        }, function(response) {
+            expect(response.status).toBe(400);
+            expect(response.isClientError()).toBe(true);
+        });
+    });
+
+    it('3xx response', () => {
+        const httprequest = new HttpRequest();
+        httprequest.request = new XMLHttpRequestMock('onload', {
+            status: 301
+        });
+        return httprequest.post('test').then(function(response) {
+            throw new Error('This should not be called!');
+        }, function(response) {
+            expect(response.status).toBe(301);
+            expect(response.isRedirect()).toBe(true);
+        });
+    });
+
     it('Successful request', () => {
         const httprequest = new HttpRequest();
         httprequest.request = new XMLHttpRequestMock('onload', {
@@ -61,8 +88,21 @@ describe('HttpRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             expect(response.status).toBe(200);
+            expect(response.isSuccess()).toBe(true);
         }, function(response) {
             throw new Error('This should not be called!');
+        });
+    });
+
+    it('3xx response treatRedirectResponseAsError=false', () => {
+        const httprequest = new HttpRequest(null, false);
+        httprequest.request = new XMLHttpRequestMock('onload', {
+            status: 301
+        });
+        return httprequest.post('test').then(function(response) {
+            expect(response.status).toBe(301);
+            expect(response.isRedirect()).toBe(true);
+        }, function(response) {
         });
     });
 

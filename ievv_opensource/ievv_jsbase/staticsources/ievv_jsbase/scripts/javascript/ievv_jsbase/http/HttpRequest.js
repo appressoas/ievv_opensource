@@ -7,7 +7,7 @@ import HttpResponse from "./HttpResponse";
  * Example - make a POST request:
  * ```
  * let request = new HttpRequest('http://example.com/api/users/');
- * request.post('Hello world').then(function(response) {
+ * request.post('Hello world').then((response) => {
  *     // Success - response is a HttpResponse object.
  *     console.log(response.toPrettyString());
  *     if(response.isSuccess()) {
@@ -15,10 +15,15 @@ import HttpResponse from "./HttpResponse";
  *     } else if (response.isRedirect) {
  *         console.log('Hmm strange, we got a redirect instead of a 2xx response.');
  *     }
- * }, function(response) {
+ * }, (response) => {
  *     // Error - response is a HttpResponse object.
  *     console.error(response.toPrettyString());
- *     if(response.isClientError()) {
+ *     if(response.isRedirect()) {
+ *         // Yes - redirect is treated as an error by default.
+ *         // you can change this by supplying an extra argument
+ *         // to HttpResponse()
+ *         console.log('We got a 3xx response!', response.body);
+ *     } else if(response.isClientError()) {
  *         console.log('We got a 4xx response!', response.body);
  *     } else if (response.isServerError()) {
  *         console.log('We got a 5xx response!', response.body);
@@ -33,8 +38,21 @@ import HttpResponse from "./HttpResponse";
  * {@link HttpRequest#patch} and {@link HttpRequest#head}.
  */
 export default class HttpRequest {
-    constructor(url) {
+    /**
+     *
+     * @param {string} url The URL to request.
+     * @param {bool} treatRedirectResponseAsError Treat 3xx responses as
+     *      errors? Defaults to ``true``. We default to ``true`` because
+     *      one rarely wants to work with redirects when communicating
+     *      with APIs.
+     */
+    constructor(url, treatRedirectResponseAsError) {
         this.url = url;
+        if(typeof treatRedirectResponseAsError === 'undefined') {
+            this.treatRedirectResponseAsError = true;
+        } else {
+            this.treatRedirectResponseAsError = treatRedirectResponseAsError;
+        }
         this.request = new XMLHttpRequest();
     }
 
@@ -158,7 +176,13 @@ export default class HttpRequest {
 
     _onComplete(resolve, reject) {
         let response = this.makeResponse();
-        if(response.isSuccess() || response.isRedirect()) {
+        let isSuccess = false;
+        if(this.treatRedirectResponseAsError) {
+            isSuccess = response.isSuccess();
+        } else {
+            isSuccess = response.isSuccess() || response.isRedirect();
+        }
+        if(isSuccess) {
             resolve(response);
         } else {
             reject(response);
