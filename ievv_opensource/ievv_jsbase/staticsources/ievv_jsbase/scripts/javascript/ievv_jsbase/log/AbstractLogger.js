@@ -1,13 +1,12 @@
 /**
  */
 export default class AbstractLogger {
-    LEVEL_DEBUG = 4;
-    LEVEL_LOG = 3;
-    LEVEL_WARN = 2;
-    LEVEL_ERROR = 1;
-    LEVEL_SILENT = 0;
-
     constructor() {
+        this.LEVEL_DEBUG = 4;
+        this.LEVEL_LOG = 3;
+        this.LEVEL_WARN = 2;
+        this.LEVEL_ERROR = 1;
+        this.LEVEL_SILENT = 0;
         this.logLevel = this.LEVEL_ERROR;
     }
 
