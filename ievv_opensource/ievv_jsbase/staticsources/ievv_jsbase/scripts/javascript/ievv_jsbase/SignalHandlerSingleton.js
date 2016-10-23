@@ -126,7 +126,7 @@ export class SentSignalInfo {
         if(prefix) {
             infostring = `${prefix}: ${infostring}`;
         }
-        console.log(infostring, this.data);
+        console.log(infostring);
     }
 }
 
