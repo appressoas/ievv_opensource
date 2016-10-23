@@ -45,7 +45,7 @@ export class ReceivedSignalInfo {
      * @param {string} prefix An optional prefix for the log message.
      */
     logDebugInfo(prefix) {
-        let infostring = `signalName="${this.signalName}", receiverName="${receiverName}", data=`;
+        let infostring = `signalName="${this.signalName}", receiverName="${this.receiverName}", data=`;
         if(prefix) {
             infostring = `${prefix}: ${infostring}`;
         }
