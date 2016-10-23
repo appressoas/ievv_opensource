@@ -34,7 +34,7 @@ export default class HttpJsonResponse extends HttpResponse {
     getPrettyfiedBody() {
         let prettyBody;
         try {
-            prettyBody = JSON.stringify(this.data, null, 2);
+            prettyBody = JSON.stringify(this.bodydata, null, 2);
         } catch (SyntaxError) {
             prettyBody = this.body;
         }
