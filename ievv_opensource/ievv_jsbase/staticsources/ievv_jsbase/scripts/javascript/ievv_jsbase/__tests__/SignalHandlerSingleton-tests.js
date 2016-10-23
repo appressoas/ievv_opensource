@@ -114,7 +114,7 @@ describe('SignalHandlerSingleton', () => {
         signalHandler.send('testsignal', 'testdata');
         jest.runAllTimers();
         expect(callback.mock.calls.length).toBe(1);
-        expect(callback.mock.calls[0][0]).toBe('testdata');
+        expect(callback.mock.calls[0][0].data).toBe('testdata');
     });
 
     it('send() sends info to callback', () => {
@@ -123,7 +123,20 @@ describe('SignalHandlerSingleton', () => {
         signalHandler.addReceiver('testsignal', 'testreceiver', callback);
         signalHandler.send('testsignal');
         jest.runAllTimers();
-        expect(callback.mock.calls[0][1].signalName).toBe('testsignal');
-        expect(callback.mock.calls[0][1].receiverName).toBe('testreceiver');
+        expect(callback.mock.calls[0][0].signalName).toBe('testsignal');
+        expect(callback.mock.calls[0][0].receiverName).toBe('testreceiver');
+    });
+
+    it('send() sends SignalInfo to infoCallback', () => {
+        let signalHandler = new SignalHandlerSingleton();
+        let infoCallback = jest.fn();
+        signalHandler.addReceiver('testsignal', 'testreceiver1', jest.fn());
+        signalHandler.addReceiver('testsignal', 'testreceiver2', jest.fn());
+        signalHandler.send('testsignal', 'testdata', infoCallback);
+        expect(infoCallback).toBeCalled();
+        expect(infoCallback.mock.calls[0][0].signalName).toBe('testsignal');
+        expect(infoCallback.mock.calls[0][0].triggeredReceiverNames.length).toBe(2);
+        expect(infoCallback.mock.calls[0][0].triggeredReceiverNames).toContain('testreceiver1');
+        expect(infoCallback.mock.calls[0][0].triggeredReceiverNames).toContain('testreceiver2');
     });
 });
