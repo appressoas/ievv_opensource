@@ -28,6 +28,19 @@ export default class DOMReplaceFromUrl extends DOMReplace {
         });
     }
 
+    /**
+     * Replace innerHTML of the element with data from a GET request
+     * to an URL.
+     *
+     * The actual replace of the innerHTML is done using
+     * {@link DOMReplace#replaceInnerHtml}.
+     *
+     * @param {string} url The URL to get the HTML from.
+     * @return {Promise} A promise. The resolve callback is called
+     *      with the html string as first argument and the {@link HttpResponse}
+     *      as the second argument. The reject callback is called with
+     *      one argument - the {@link HttpResponse}.
+     */
     replaceInnerHtml(url) {
         return this._replaceFromUrl(url, (htmlString) => {
             super.replaceInnerHtml(htmlString);
@@ -35,12 +48,38 @@ export default class DOMReplaceFromUrl extends DOMReplace {
     }
 
 
+    /**
+     * Append to the innerHTML of the element with data from a GET request
+     * to an URL.
+     *
+     * The actual append of the innerHTML is done using
+     * {@link DOMReplace#appendInnerHtml}.
+     *
+     * @param {string} url The URL to get the HTML from.
+     * @return {Promise} A promise. The resolve callback is called
+     *      with the html string as first argument and the {@link HttpResponse}
+     *      as the second argument. The reject callback is called with
+     *      one argument - the {@link HttpResponse}.
+     */
     appendInnerHtml(url) {
         return this._replaceFromUrl(url, (htmlString) => {
             super.appendInnerHtml(htmlString);
         });
     }
 
+    /**
+     * Prepend to the innerHTML of the element with data from a GET request
+     * to an URL.
+     *
+     * The actual prepend of the innerHTML is done using
+     * {@link DOMReplace#prependInnerHtml}.
+     *
+     * @param {string} url The URL to get the HTML from.
+     * @return {Promise} A promise. The resolve callback is called
+     *      with the html string as first argument and the {@link HttpResponse}
+     *      as the second argument. The reject callback is called with
+     *      one argument - the {@link HttpResponse}.
+     */
     prependInnerHtml(url) {
         return this._replaceFromUrl(url, (htmlString) => {
             super.prependInnerHtml(htmlString);

@@ -13,12 +13,27 @@ export default class DOMReplace {
      * @param {string} elementId The ID of the element to replace.
      */
     constructor(elementId) {
+        /**
+         * The element DOM ID.
+         *
+         * @type {string}
+         */
         this.elementId = elementId;
+
+        /**
+         * The DOM element.
+         *
+         * @type {Element}
+         */
         this.element = document.getElementById(elementId);
     }
 
     /**
      * Replace innerHTML of the element.
+     *
+     * Sends a signal named ``ievv_jsbase.DOMReplace.replaceInnerHtml``
+     * when the replace is done. The signal is send with this object
+     * as the data.
      *
      * @param {string} htmlString The HTML to set as innerHTML of the element.
      */
@@ -31,6 +46,10 @@ export default class DOMReplace {
     /**
      * Append innerHTML to the element.
      *
+     * Sends a signal named ``ievv_jsbase.DOMReplace.appendInnerHtml``
+     * when the append is done. The signal is send with this object
+     * as the data.
+     *
      * @param {string} htmlString The HTML to append to the innerHTML of the element.
      */
     appendInnerHtml(htmlString) {
@@ -41,6 +60,10 @@ export default class DOMReplace {
 
     /**
      * Prepend innerHTML to the element.
+     *
+     * Sends a signal named ``ievv_jsbase.DOMReplace.prependInnerHtml``
+     * when the prepend is done. The signal is send with this object
+     * as the data.
      *
      * @param {string} htmlString The HTML to prepend to the innerHTML of the element.
      */
