@@ -34,32 +34,32 @@ describe('DOMReplaceWithSameElementFromUrl', () => {
             expect(document.body.querySelectorAll('p')[0].textContent).toBe('From server');
         });
     });
-    //
-    // it('DOMReplaceWithSameElementFromUrl.appendInnerHtml()', () => {
-    //     document.body.innerHTML = `
-    //         <div id="id_test">
-    //             <p>Original</p>
-    //         </div>`;
-    //     const domreplace = new MockDOMReplaceWithSameElementFromUrl('id_test');
-    //     return domreplace.appendInnerHtml('http://example.com').then((htmlString) => {
-    //         expect(htmlString).toBe('<p>From server</p>');
-    //         expect(document.body.querySelectorAll('p').length).toBe(2);
-    //         expect(document.body.querySelectorAll('p')[0].textContent).toBe('Original');
-    //         expect(document.body.querySelectorAll('p')[1].textContent).toBe('From server');
-    //     });
-    // });
-    //
-    // it('DOMReplaceWithSameElementFromUrl.prependInnerHtml()', () => {
-    //     document.body.innerHTML = `
-    //         <div id="id_test">
-    //             <p>Original</p>
-    //         </div>`;
-    //     const domreplace = new MockDOMReplaceWithSameElementFromUrl('id_test');
-    //     return domreplace.prependInnerHtml('http://example.com').then((htmlString) => {
-    //         expect(htmlString).toBe('<p>From server</p>');
-    //         expect(document.body.querySelectorAll('p').length).toBe(2);
-    //         expect(document.body.querySelectorAll('p')[0].textContent).toBe('From server');
-    //         expect(document.body.querySelectorAll('p')[1].textContent).toBe('Original');
-    //     });
-    // });
+
+    it('DOMReplaceWithSameElementFromUrl.appendInnerHtml()', () => {
+        document.body.innerHTML = `
+            <div id="id_test">
+                <p>Original</p>
+            </div>`;
+        const domreplace = new MockDOMReplaceWithSameElementFromUrl('id_test');
+        return domreplace.appendInnerHtml('http://example.com').then((htmlString) => {
+            expect(htmlString).toBe('<p>From server</p>');
+            expect(document.body.querySelectorAll('p').length).toBe(2);
+            expect(document.body.querySelectorAll('p')[0].textContent).toBe('Original');
+            expect(document.body.querySelectorAll('p')[1].textContent).toBe('From server');
+        });
+    });
+
+    it('DOMReplaceWithSameElementFromUrl.prependInnerHtml()', () => {
+        document.body.innerHTML = `
+            <div id="id_test">
+                <p>Original</p>
+            </div>`;
+        const domreplace = new MockDOMReplaceWithSameElementFromUrl('id_test');
+        return domreplace.prependInnerHtml('http://example.com').then((htmlString) => {
+            expect(htmlString).toBe('<p>From server</p>');
+            expect(document.body.querySelectorAll('p').length).toBe(2);
+            expect(document.body.querySelectorAll('p')[0].textContent).toBe('From server');
+            expect(document.body.querySelectorAll('p')[1].textContent).toBe('Original');
+        });
+    });
 });

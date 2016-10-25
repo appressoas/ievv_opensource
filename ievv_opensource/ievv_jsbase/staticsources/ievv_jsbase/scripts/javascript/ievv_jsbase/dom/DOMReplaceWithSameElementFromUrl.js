@@ -1,5 +1,5 @@
 import DOMReplaceFromUrl from "./DOMReplaceFromUrl";
-import parseHtml from "./parseHtml";
+import HtmlParser from "./HtmlParser";
 
 
 /**
@@ -45,8 +45,8 @@ export default class DOMReplaceWithSameElementFromUrl extends DOMReplaceFromUrl 
      * @returns {string} The extracted HTML string.
      */
     extractHtmlStringFromResponse(response) {
-        let serverDocument = parseHtml(response.body);
-        let serverElement = serverDocument.querySelector(`#${this.elementId}`);
+        let htmlParser = new HtmlParser(response.body);
+        let serverElement = htmlParser.querySelector(`#${this.elementId}`);
         return serverElement.innerHTML.trim();
     }
 }
