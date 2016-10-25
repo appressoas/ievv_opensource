@@ -3,6 +3,9 @@
  *
  * Makes an old style prototype based error class.
  *
+ * @example
+ * export let NotFoundError = makeCustomError('NotFoundError');
+ *
  * @param name The name of the error class.
  * @returns {Error} The created error class.
  */

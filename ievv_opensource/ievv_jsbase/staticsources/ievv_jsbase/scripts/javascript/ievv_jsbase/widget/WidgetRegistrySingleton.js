@@ -1,32 +1,246 @@
+import makeCustomError from "../makeCustomError";
+
 /**
  * The instance of the {@link WidgetRegistrySingleton}.
  */
 let _instance = null;
 
 
+/**
+ * Exception thrown when an element where we expect the
+ * ``data-ievv-jsbase-widget-instanceid`` attribute does
+ * not have this attribute.
+ *
+ * @type {Error}
+ */
+export let ElementHasNoWidgetInstanceIdError = makeCustomError('ElementHasNoWidgetInstanceIdError');
+
+
+/**
+ * Exception thrown when an element that we expect to have
+ * the ``data-ievv-jsbase-widget`` attribute does not have
+ * this attribute.
+ *
+ * @type {Error}
+ */
+export let ElementIsNotWidgetError = makeCustomError('ElementIsNotWidgetError');
+
+
+/**
+ * Exception thrown when an element has a
+ * ``data-ievv-jsbase-widget`` with a value that
+ * is not an alias registered in the {@link WidgetRegistrySingleton}.
+ *
+ * @type {Error}
+ */
+export let InvalidWidgetAliasError = makeCustomError('InvalidWidgetAliasError');
+
+
+/**
+ * Exception thrown when an element with the
+ * ``data-ievv-jsbase-widget-instanceid=<widgetInstanceId>`` attribute is not in
+ * the {@link WidgetRegistrySingleton} with ``<widgetInstanceId>``.
+ *
+ * @type {Error}
+ */
+export let ElementIsNotInitializedAsWidget = makeCustomError('ElementIsNotInitializedAsWidget');
+
+
+/**
+ * A very lightweight widget system.
+ *
+ * @example <caption>Create an register a very simple widget</caption>
+ *
+ * // In OpenMenuWidget.js
+ * export default class OpenMenuWidget {
+ *     constructor(element) {
+ *          super(element);
+ *          this.element.addEventListener('click', this.onClick);
+ *     }
+ *
+ *     onClick = (e) => {
+ *          e.preventDefault();
+ *          console.log('Clicked');
+ *     }
+ *
+ *     destroy() {
+ *          this.element.removeEventListener('click', this.onClick);
+ *     }
+ * }
+ *
+ *
+ * // Somewhere that is called on page load
+ * import WidgetRegistrySingleton from 'ievv_jsbase/widget/WidgetRegistrySingleton';
+ * import OpenMenuWidget from 'path/to/OpenMenuWidget';
+ * let widgetRegistry = new WidgetRegistrySingleton();
+ * widgetRegistry.registerWidgetClass('open-menu-button', OpenMenuWidget);
+ *
+ * @example <caption>Use the widget</caption>
+ * <button data-ievv-jsbase-widget="open-menu-button" type="button">
+ *     Open menu
+ * </button>
+ */
 export default class WidgetRegistrySingleton {
     constructor() {
         if (!_instance) {
             _instance = this;
-            this._widgetMap = new Map();
+            this._initialize();
         }
         return _instance;
     }
 
-    clearAllWidgets() {
-        this._widgetMap.clear();
+    _initialize() {
+        this._widgetAttribute = 'data-ievv-jsbase-widget';
+        this._widgetInstanceIdAttribute = 'data-ievv-jsbase-widget-instanceid';
+        this._widgetClassMap = new Map();
+        this._widgetInstanceMap = new Map();
+        this._widgetInstanceCounter = 0;
     }
 
-    setWidget(alias, WidgetClass) {
-        this._widgetMap.set(alias, WidgetClass);
+    clear() {
+        // TODO: Call destroyAllWidgetsWithinDocumentBody()
+        this._widgetClassMap.clear();
+        this._widgetInstanceMap.clear();
+        this._widgetInstanceCounter = 0;
     }
 
-    removeWidget(alias) {
-        this._widgetMap.delete(alias);
+    /**
+     * Register a widget class in the registry.
+     *
+     * @param {string} alias The alias for the widget. This is the string that
+     *      is used as the attribute value with the ``data-ievv-jsbase-widget``
+     *      DOM element attribute.
+     * @param {AbstractWidget} WidgetClass The widget class.
+     */
+    registerWidgetClass(alias, WidgetClass) {
+        this._widgetClassMap.set(alias, WidgetClass);
     }
 
-    initializeWidget(alias, element) {
-        let WidgetClass = this._widgetMap.get(alias);
-        return new WidgetClass(element);
+    /**
+     * Remove widget class from registry.
+     *
+     * @param alias The alias that the widget class was registered with
+     *      by using {@link WidgetRegistrySingleton#registerWidgetClass}.
+     */
+    removeWidgetClass(alias) {
+        this._widgetClassMap.delete(alias);
+    }
+
+    /**
+     * Initialize the provided element as a widget.
+     *
+     * @param {Element} element The DOM element to initalize as a widget.
+     *
+     * @throws {ElementIsNotWidgetError} If the element does not have
+     *      the ``data-ievv-jsbase-widget`` attribute.
+     * @throws {InvalidWidgetAliasError} If the widget alias is not in this registry.
+     */
+    initializeWidget(element) {
+        let alias = element.getAttribute(this._widgetAttribute);
+        if(!alias) {
+            throw new ElementIsNotWidgetError(
+                `The\n\n${element.outerHTML}\n\nelement has no or empty` +
+                `${this._widgetAttribute} attribute.`);
+        }
+        if(!this._widgetClassMap.has(alias)) {
+            throw new InvalidWidgetAliasError(`No WidgetClass registered with the "${alias}" alias.`);
+        }
+        let WidgetClass = this._widgetClassMap.get(alias);
+        let widget = new WidgetClass(element);
+        this._widgetInstanceCounter ++;
+        let widgetInstanceId = this._widgetInstanceCounter.toString();
+        this._widgetInstanceMap.set(widgetInstanceId, widget);
+        element.setAttribute(this._widgetInstanceIdAttribute, widgetInstanceId);
+        return widget;
+    }
+
+    _getAllWidgetElementsWithinElement(element) {
+        return element.querySelectorAll(`[${this._widgetAttribute}]`);
+    }
+
+    /**
+     * Initialize all widgets within the provided element.
+     *
+     * @param {Element} element A DOM element.
+     */
+    initializeAllWidgetsWithinElement(element) {
+        for(let widgetElement of this._getAllWidgetElementsWithinElement(element)) {
+            this.initializeWidget(widgetElement);
+        }
+    }
+
+    /**
+     * Get the value of the ``data-ievv-jsbase-widget-instanceid`` attribute
+     * of the provided element.
+     *
+     * @param {Element} element A DOM element.
+     * @returns {null|string}
+     */
+    getWidgetInstanceIdFromElement(element) {
+        return element.getAttribute(this._widgetInstanceIdAttribute);
+    }
+
+    /**
+     * Get a widget instance by its widget instance id.
+     *
+     * @param widgetInstanceId A widget instance id.
+     * @returns {AbstractWidget} A widget instance or ``null``.
+     */
+    getWidgetInstanceByInstanceId(widgetInstanceId) {
+        return this._widgetInstanceMap.get(widgetInstanceId);
+    }
+
+    /**
+     * Destroy the widget on the provided element.
+     *
+     * @param {Element} element A DOM element that has been initialized by
+     *      {@link WidgetRegistrySingleton#initializeWidget}.
+     *
+     * @throws {ElementHasNoWidgetInstanceIdError} If the element has
+     *      no ``data-ievv-jsbase-widget-instanceid`` attribute or the
+     *      attribute value is empty. This normally means that
+     *      the element is not a widget, or that the widget
+     *      is not initialized.
+     * @throws {ElementIsNotInitializedAsWidget} If the element
+     *      has the ``data-ievv-jsbase-widget-instanceid`` attribute
+     *      but the value of the attribute is not a valid widget instance
+     *      id. This should not happen unless you manipulate the
+     *      attribute manually or use the private members of this registry.
+     */
+    destroyWidget(element) {
+        let widgetInstanceId = this.getWidgetInstanceIdFromElement(element);
+        if(widgetInstanceId) {
+            let widgetInstance = this.getWidgetInstanceByInstanceId(widgetInstanceId);
+            if(widgetInstance) {
+                widgetInstance.destroy();
+                this._widgetInstanceMap.delete(widgetInstanceId);
+                element.removeAttribute(this._widgetInstanceIdAttribute);
+            } else {
+                throw new ElementIsNotInitializedAsWidget(
+                    `Element\n\n${element.outerHTML}\n\nhas the ` +
+                    `${this._widgetInstanceIdAttribute} attribute, but the id is ` +
+                    `not in the widget registry.`);
+                }
+        } else {
+            throw new ElementHasNoWidgetInstanceIdError(
+                `Element\n\n${element.outerHTML}\n\nhas no or empty ` +
+                `${this._widgetInstanceIdAttribute} attribute.`);
+        }
+    }
+
+    _getAllInstanciatedWidgetElementsWithinElement(element) {
+        return element.querySelectorAll(`[${this._widgetInstanceIdAttribute}]`);
+    }
+
+    /**
+     * Destroy all widgets within the provided element.
+     * Only destroys widgets on elements that is a child of the element.
+     *
+     * @param {Element} element The DOM Element.
+     */
+    destroyAllWidgetsWithinElement(element) {
+        for(let widgetElement of this._getAllInstanciatedWidgetElementsWithinElement(element)) {
+            this.destroyWidget(widgetElement);
+        }
     }
 }
