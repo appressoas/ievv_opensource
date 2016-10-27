@@ -1,60 +1,62 @@
+import LOGLEVEL from "./loglevel";
+
+
 /**
  */
 export default class AbstractLogger {
-    constructor() {
-        this.LEVEL_DEBUG = 4;
-        this.LEVEL_LOG = 3;
-        this.LEVEL_WARN = 2;
-        this.LEVEL_ERROR = 1;
-        this.LEVEL_SILENT = 0;
-        this.logLevel = this.LEVEL_ERROR;
-    }
-
     getLogLevel() {
         throw new Error('Must be overridden in subclasses.');
     }
 
-    /**
-     * Send a message to one of the target loggers.
-     *
-     * @param targetLog Must be one of ``log``, ``warn`` or ``error``.
-     * @param args Arguments for the logger.
-     *
-     * @example
-     * let data = {a: 10};
-     * message('error', 'This is a test. Data:', data);
-     */
-    message(targetLog, ...args) {
-        this[targetLog](...args);
+    _noOutput() {
+
     }
 
     /**
-     * exposes console.log. Will only print if current level is higher than LEVEL_LOG
-     * @returns {any} console.log
+     * Exposes console.log. Will only print if current level is
+     * higher than {@link LogLevels#DEBUG}.
+     * @returns {Function} console.log
      */
-    get log() {
-        if (this.logLevel >= this.LEVEL_LOG) {
+    get debug() {
+        if (this.getLogLevel() >= LOGLEVEL.DEBUG) {
             return console.log.bind(console);
         }
+        return this._noOutput;
     }
 
     /**
-     * exposes console.warn. Will only print if current level is higher than LEVEL_WARN
-     * @returns {any} console.warn
+     * Exposes console.log. Will only print if current level is
+     * higher than {@link LogLevels#INFO}.
+     * @returns {Function} console.log
      */
-    get warn() {
-        if(this.logLevel >= this.LEVEL_WARN) {
+    get info() {
+        if (this.getLogLevel() >= LOGLEVEL.INFO) {
+            return console.log.bind(console);
+        }
+        return this._noOutput;
+    }
+
+    /**
+     * Exposes console.warn. Will only print if current level is
+     * higher than {@link LogLevels#WARNING}.
+     * @returns {Function} console.warn
+     */
+    get warning() {
+        if(this.getLogLevel() >= LOGLEVEL.WARNING) {
             return console.warn.bind(console);
         }
+        return this._noOutput;
     }
 
     /**
-     * exposes console.error. Will only print if current level is higher than LEVEL_ERROR
-     * @returns {any} console.error
+     * Exposes console.error. Will only print if current level is
+     * higher than {@link LogLevels#ERROR}.
+     * @returns {Function} console.error
      */
     get error() {
-        if (this.logLevel >= this.LEVEL_ERROR) {
+        if (this.getLogLevel() >= LOGLEVEL.ERROR) {
             return console.error.bind(console);
         }
+        return this._noOutput;
     }
 }

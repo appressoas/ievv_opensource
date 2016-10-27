@@ -52,7 +52,7 @@ export let ElementIsNotInitializedAsWidget = makeCustomError('ElementIsNotInitia
  * @example <caption>Create an register a very simple widget</caption>
  *
  * // In OpenMenuWidget.js
- * export default class OpenMenuWidget {
+ * export default class OpenMenuWidget extends AbstractWidget {
  *     constructor(element) {
  *          super(element);
  *          this.element.addEventListener('click', this.onClick);
