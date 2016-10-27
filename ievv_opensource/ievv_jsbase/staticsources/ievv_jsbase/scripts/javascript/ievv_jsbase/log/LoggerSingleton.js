@@ -24,6 +24,13 @@ let _instance = null;
  * new LoggerSingleton().getLogger('mylogger').setLoglevel(LOGLEVEL.DEBUG);
  */
 export default class LoggerSingleton {
+    /**
+     * Get an instance of the singleton.
+     *
+     * The first time this is called, we create a new instance.
+     * For all subsequent calls, we return the instance that was
+     * created on the first call.
+     */
     constructor() {
         if(!_instance) {
             _instance = this;
