@@ -1,10 +1,10 @@
 import HttpJsonRequest from '../../http/HttpJsonRequest';
-import {XMLHttpRequestMock} from "./HttpRequest-tests";
+import {XMLHttpRequestMock} from "../../__testhelpers__/XMLHttpRequestMock";
 
 
 describe('HttpJsonRequest', () => {
     it('Unsuccessful request that reached server', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 400
         });
@@ -17,7 +17,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('Unsuccessful request that did not reach server', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onerror', {
             status: 0
         });
@@ -30,7 +30,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('Successful request', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -42,7 +42,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('Successful request body', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: 'test'
@@ -53,7 +53,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('Successful request bodydata', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: '{"a": 10}'
@@ -64,7 +64,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('Sets content-type', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -78,7 +78,7 @@ describe('HttpJsonRequest', () => {
     });
 
     it('JSON encodes input data', () => {
-        const httprequest = new HttpJsonRequest();
+        const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });

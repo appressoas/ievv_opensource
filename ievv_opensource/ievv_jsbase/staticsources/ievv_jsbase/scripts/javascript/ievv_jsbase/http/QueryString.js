@@ -12,6 +12,22 @@ export default class QueryString {
         }
     }
 
+    /**
+     * Returns ``true`` if the querystring is empty, otherwise ``false``.
+     *
+     * @returns {boolean}
+     */
+    isEmpty() {
+        return this._queryStringMap.size === 0;
+    }
+
+    /**
+     * Remove all keys and values from the QueryString.
+     */
+    clear() {
+        this._queryStringMap.clear();
+    }
+
     _parseQueryStringItem(querystringItem) {
         const splitPair = querystringItem.split('=');
         const key = decodeURIComponent(splitPair[0]);

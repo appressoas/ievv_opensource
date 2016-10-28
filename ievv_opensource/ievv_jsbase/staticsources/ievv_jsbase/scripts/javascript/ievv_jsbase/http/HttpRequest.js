@@ -1,12 +1,13 @@
 import HttpResponse from "./HttpResponse";
+import QueryString from "./QueryString";
+import {UrlParser} from "./UrlParser";
 
 
 /**
  * API for performing HTTP requests.
- *
- * Example - make a POST request:
- * ```
- * let request = new HttpRequest('http://example.com/api/users/');
+
+ * @example <caption>Make a POST request</caption>
+ * const request = new HttpRequest('http://example.com/api/users/');
  * request.post('Hello world').then((response) => {
  *     // Success - response is a HttpResponse object.
  *     console.log(response.toPrettyString());
@@ -31,29 +32,66 @@ import HttpResponse from "./HttpResponse";
  *         console.log('Connection refused.');
  *     }
  * });
- * ```
  *
- * It works exactly the same for GET, PUT, PATCH and HEAD requests, just
- * use {@link HttpRequest#get}, {@link HttpRequest#put},
- * {@link HttpRequest#patch} and {@link HttpRequest#head}.
+ * @example <caption>Make a GET request with a querystring</caption>
+ * const request = new HttpRequest('http://example.com/api/users/');
+ * request.urlParser.queryString.set('search', 'doe');
+ * request.get().then((response) => {
+ *     // Success - response is a HttpResponse object.
+ *     console.log(response.toPrettyString());
+ * }, (response) => {
+ *     // Error - response is a HttpResponse object.
+ *     console.error(response.toPrettyString());
+ * });
  */
 export default class HttpRequest {
     /**
-     *
      * @param {string} url The URL to request.
-     * @param {bool} treatRedirectResponseAsError Treat 3xx responses as
-     *      errors? Defaults to ``true``. We default to ``true`` because
-     *      one rarely wants to work with redirects when communicating
-     *      with APIs.
+     *      If this is supplied, it is passed to
+     *      {@link HttpRequest#setUrl}
      */
-    constructor(url, treatRedirectResponseAsError) {
-        this.url = url;
-        if(typeof treatRedirectResponseAsError === 'undefined') {
-            this.treatRedirectResponseAsError = true;
-        } else {
-            this.treatRedirectResponseAsError = treatRedirectResponseAsError;
-        }
+    constructor(url) {
+        this._treatRedirectResponseAsError = true;
         this.request = new XMLHttpRequest();
+        this._urlParser = null;
+        if(typeof url !== 'undefined') {
+            this.setUrl(url);
+        }
+    }
+
+    /**
+     * Get the parsed URL of the request.
+     *
+     * @returns {UrlParser} The UrlParser for the parsed URL.
+     */
+    get urlParser() {
+        return this._urlParser;
+    }
+
+    /**
+     * Set the URL of the request.
+     *
+     * @param {String} url The URL.
+     */
+    setUrl(url) {
+        this._urlParser = new UrlParser(url);
+    }
+
+    /**
+     * Set how we treat 3xx responses.
+     *
+     * By default they are treated as errors, but you can change
+     * this behavior by calling this function.
+     *
+     * @param {bool} treatRedirectResponseAsError Treat 3xx responses as
+     *      errors?
+     *
+     * @example <caption>Do not treat 3xx responses as error</caption>
+     * const request = HttpRequest('http://example.com/api/');
+     * request.setTreatRedirectResponseAsError(false);
+     */
+    setTreatRedirectResponseAsError(treatRedirectResponseAsError) {
+        this._treatRedirectResponseAsError = treatRedirectResponseAsError;
     }
 
     /**
@@ -62,14 +100,16 @@ export default class HttpRequest {
      * @param method The HTTP method. I.e.: "get", "post", ...
      * @param data Request body data. This is sent through
      *      {@link HttpRequest#makeRequestBody} before it
-     *      is sent.
-     *
+     *      is sent.*
      * @return A Promise where both the
      */
     send(method, data) {
         method = method.toUpperCase();
+        if(this._urlParser === null) {
+            throw new TypeError('Can not call send() without an url.');
+        }
         return new Promise((resolve, reject) => {
-            this.request.open(method, this.url, true);
+            this.request.open(method, this.urlParser.buildUrl(), true);
             this.setDefaultRequestHeaders(method);
             this.request.onload  = () => this._onComplete(resolve, reject);
             this.request.onerror = () => this._onComplete(resolve, reject);
@@ -177,7 +217,7 @@ export default class HttpRequest {
     _onComplete(resolve, reject) {
         let response = this.makeResponse();
         let isSuccess = false;
-        if(this.treatRedirectResponseAsError) {
+        if(this._treatRedirectResponseAsError) {
             isSuccess = response.isSuccess();
         } else {
             isSuccess = response.isSuccess() || response.isRedirect();

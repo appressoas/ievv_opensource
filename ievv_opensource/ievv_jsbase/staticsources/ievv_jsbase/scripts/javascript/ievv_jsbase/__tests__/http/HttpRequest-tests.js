@@ -1,36 +1,21 @@
 import HttpRequest from '../../http/HttpRequest';
+import {XMLHttpRequestMock} from "../../__testhelpers__/XMLHttpRequestMock";
+import QueryString from "../../http/QueryString";
 
-
-export class XMLHttpRequestMock {
-    constructor(requestEventMethodName, resultingRequest) {
-        this.requestEventMethodName = requestEventMethodName;
-        this.onerror = null;
-        this.onload = null;
-        this.headers = [];
-        this.sentData = null;
-        this.resultingRequest = resultingRequest;
-    }
-
-    open() {}
-
-    setRequestHeader(header, value) {
-        this.headers.push({
-            header: header,
-            value: value
-        });
-    }
-
-    send(data) {
-        this.sentData = data;
-        Object.assign(this, this.resultingRequest);
-        this[this.requestEventMethodName]();
-    }
-}
 
 describe('HttpRequest', () => {
+    it('constructor without querystring', () => {
+        const httprequest = new HttpRequest('http://example.com/api/people');
+        expect(httprequest.urlParser.queryString.isEmpty()).toBe(true);
+    });
+
+    it('constructor with querystring', () => {
+        const httprequest = new HttpRequest('http://example.com/api/people?name=Jane');
+        expect(httprequest.urlParser.queryString.urlencode()).toBe('name=Jane');
+    });
 
     it('Connection error', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onerror', {
             status: 0
         });
@@ -43,7 +28,7 @@ describe('HttpRequest', () => {
     });
 
     it('5xx response', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 500
         });
@@ -56,7 +41,7 @@ describe('HttpRequest', () => {
     });
 
     it('4xx response', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 400
         });
@@ -69,7 +54,7 @@ describe('HttpRequest', () => {
     });
 
     it('3xx response', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 301
         });
@@ -81,8 +66,22 @@ describe('HttpRequest', () => {
         });
     });
 
+    it('3xx response treatRedirectResponseAsError=false', () => {
+        const httprequest = new HttpRequest('http://example.com');
+        httprequest.setTreatRedirectResponseAsError(false);
+        httprequest.request = new XMLHttpRequestMock('onload', {
+            status: 301
+        });
+        return httprequest.post('test').then(function(response) {
+            expect(response.status).toBe(301);
+            expect(response.isRedirect()).toBe(true);
+        }, function(response) {
+            throw new Error('This should not be called!');
+        });
+    });
+
     it('Successful request', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -94,20 +93,8 @@ describe('HttpRequest', () => {
         });
     });
 
-    it('3xx response treatRedirectResponseAsError=false', () => {
-        const httprequest = new HttpRequest(null, false);
-        httprequest.request = new XMLHttpRequestMock('onload', {
-            status: 301
-        });
-        return httprequest.post('test').then(function(response) {
-            expect(response.status).toBe(301);
-            expect(response.isRedirect()).toBe(true);
-        }, function(response) {
-        });
-    });
-
     it('Successful request body', () => {
-        const httprequest = new HttpRequest();
+        const httprequest = new HttpRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: 'test'

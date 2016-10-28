@@ -1,5 +1,5 @@
 import HttpDjangoJsonRequest from '../../http/HttpDjangoJsonRequest';
-import {XMLHttpRequestMock} from "./HttpRequest-tests";
+import {XMLHttpRequestMock} from "../../__testhelpers__/XMLHttpRequestMock";
 
 
 describe('HttpDjangoJsonRequest', () => {
@@ -8,7 +8,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Unsuccessful request that reached server', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 400
         });
@@ -21,7 +21,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Unsuccessful request that did not reach server', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onerror', {
             status: 0
         });
@@ -34,7 +34,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Successful request', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -46,7 +46,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Successful request body', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: 'test'
@@ -57,7 +57,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Successful request bodydata', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: '{"a": 10}'
@@ -68,7 +68,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('JSON encodes input data', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -78,7 +78,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Sets Content-Type header', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -91,7 +91,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Does not set CSRF header on GET', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -101,7 +101,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Does not set CSRF header on HEAD', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -111,7 +111,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Sets CSRF header on POST', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -125,7 +125,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Sets CSRF header on PUT', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -139,7 +139,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Sets CSRF header on PATCH', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
@@ -153,7 +153,7 @@ describe('HttpDjangoJsonRequest', () => {
     });
 
     it('Sets CSRF header on DELETE', () => {
-        const httprequest = new HttpDjangoJsonRequest();
+        const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });

@@ -3,6 +3,21 @@ import QueryString from '../../http/QueryString';
 
 describe('QueryString', () => {
 
+    it('QueryString.isEmpty()', () => {
+        const querystring = new QueryString();
+        expect(querystring.isEmpty()).toBe(true);
+        querystring._queryStringMap.set('a', ['value']);
+        expect(querystring.isEmpty()).toBe(false);
+    });
+
+    it('QueryString.clear()', () => {
+        const querystring = new QueryString();
+        querystring._queryStringMap.set('a', ['value']);
+        expect(querystring._queryStringMap.size).toBe(1);
+        querystring.clear();
+        expect(querystring._queryStringMap.size).toBe(0);
+    });
+
     it('QueryString.set key not string', () => {
         const querystring = new QueryString();
         expect(() => querystring.set(10, 'a')).toThrowError(TypeError);
@@ -122,6 +137,11 @@ describe('QueryString', () => {
         const querystring = new QueryString();
         querystring.set('name', 'Jane');
         expect(querystring.urlencode()).toEqual('name=Jane');
+    });
+
+    it('QueryString.urlencode empty', () => {
+        const querystring = new QueryString();
+        expect(querystring.urlencode()).toEqual('');
     });
 
     it('QueryString.urlencode multiple', () => {

@@ -1,11 +1,11 @@
 import DOMReplaceFromUrl from '../../dom/DOMReplaceFromUrl.js';
 import HttpRequest from "../../http/HttpRequest";
-import {XMLHttpRequestMock} from "../http/HttpRequest-tests";
+import {XMLHttpRequestMock} from "../../__testhelpers__/XMLHttpRequestMock";
 
 
 class MockDOMReplaceFromUrl extends DOMReplaceFromUrl {
     _makeRequest(url) {
-        let httpRequest = new HttpRequest();
+        let httpRequest = new HttpRequest(url);
         httpRequest.request = new XMLHttpRequestMock('onload', {
             status: 200,
             responseText: '<p>From server</p>'
