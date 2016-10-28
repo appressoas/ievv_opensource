@@ -1,7 +1,32 @@
 /**
  * Query-string creator and parser.
+ *
+ * @example <caption>Basics - build a querystring</caption>
+ * const querystring = new QueryString();
+ * querystring.set('name', 'Peter');
+ * querystring.setIterable('tags', ['person', 'male']);
+ * const encodedQuerystring = querystring.urlencode();
+ * // encodedQuerystring === 'name=Peter&tags=person&tags=male'  // order may vary
+ *
+ * @example <caption>Parse a querystring</caption>
+ * const querystring = new QueryString('name=Peter&tags=person&tags=male');
+ * const name = querystring.get('name');
+ * const tags = querystring.getArray('tags');
+ * const firstTag = querystring.get('tags');
+ *
+ * @example <caption>Parse and modify a querystring</caption>
+ * const querystring = new QueryString('name=Peter&tags=person&tags=male');
+ * querystring.set('name', 'John');
+ * querystring.append('tags', 'important');
+ * // querystring.urlencode() === 'name=John&tags=person&tags=male&tags=important'
+ * querystring.setIterable('tags', ['male']);
+ * // querystring.urlencode() === 'name=John&tags=male'
  */
 export default class QueryString {
+    /**
+     *
+     * @param {string} querystring Optional input querystring to parse.
+     */
     constructor(querystring) {
         this._queryStringMap = new Map();
         if(typeof querystring !== 'undefined') {
@@ -110,6 +135,18 @@ export default class QueryString {
         }
     }
 
+    /**
+     * Append a value to a key.
+     *
+     * @param {string} key The key to append a value to.
+     * @param {string} value The value to append.
+     *
+     * @example
+     * const querystring = QueryString();
+     * querystring.append('names', 'Jane');
+     * querystring.append('names', 'Joe');
+     * // querystring.urlencode() === 'names=Jane&names=Joe'
+     */
     append(key, value) {
         if (!this._queryStringMap.has(key)) {
             this._setKeyToEmptyArray(key);
