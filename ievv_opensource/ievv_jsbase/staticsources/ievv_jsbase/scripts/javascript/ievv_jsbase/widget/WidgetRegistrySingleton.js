@@ -49,36 +49,42 @@ export let ElementIsNotInitializedAsWidget = makeCustomError('ElementIsNotInitia
 /**
  * A very lightweight widget system.
  *
- * @example <caption>Create an register a very simple widget</caption>
+ * Basic example below - see {@link AbstractWidget} for more examples.
  *
- * // In OpenMenuWidget.js
+ * @example <caption>Create a very simple widget</caption>
  * export default class OpenMenuWidget extends AbstractWidget {
  *     constructor(element) {
  *          super(element);
- *          this.element.addEventListener('click', this.onClick);
+ *          this._onClickBound = (...args) => {
+ *              this._onClick(...args);
+ *          };
+ *          this.element.addEventListener('click', this._onClickBound);
  *     }
  *
- *     onClick = (e) => {
+ *     _onClick = (e) => {
  *          e.preventDefault();
- *          console.log('Clicked');
+ *          console.log('I should have opened the menu here');
  *     }
  *
  *     destroy() {
- *          this.element.removeEventListener('click', this.onClick);
+ *          this.element.removeEventListener('click', this._onClickBound);
  *     }
  * }
- *
- *
- * // Somewhere that is called on page load
- * import WidgetRegistrySingleton from 'ievv_jsbase/widget/WidgetRegistrySingleton';
- * import OpenMenuWidget from 'path/to/OpenMenuWidget';
- * let widgetRegistry = new WidgetRegistrySingleton();
- * widgetRegistry.registerWidgetClass('open-menu-button', OpenMenuWidget);
  *
  * @example <caption>Use the widget</caption>
  * <button data-ievv-jsbase-widget="open-menu-button" type="button">
  *     Open menu
  * </button>
+ *
+ * @example <caption>Register and load widgets</caption>
+ * // Somewhere that is called after all the widgets are rendered
+ * // - typically at the end of the <body>
+ * import WidgetRegistrySingleton from 'ievv_jsbase/widget/WidgetRegistrySingleton';
+ * import OpenMenuWidget from 'path/to/OpenMenuWidget';
+ * const widgetRegistry = new WidgetRegistrySingleton();
+ * widgetRegistry.registerWidgetClass('open-menu-button', OpenMenuWidget);
+ * widgetRegistry.initializeAllWidgetsWithinElement(document.body);
+ *
  */
 export default class WidgetRegistrySingleton {
     constructor() {
