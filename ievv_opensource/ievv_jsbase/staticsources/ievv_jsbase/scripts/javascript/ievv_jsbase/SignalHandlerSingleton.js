@@ -1,4 +1,5 @@
 import makeCustomError from "./makeCustomError";
+import PrettyFormat from "./utils/PrettyFormat";
 
 /**
  * Exception raised by {@link HttpCookies#getStrict} when the cookie is not found.
@@ -40,16 +41,13 @@ export class ReceivedSignalInfo {
     }
 
     /**
-     * Log debug information about the received signal.
-     *
-     * @param {string} prefix An optional prefix for the log message.
+     * Get a string with debug information about the received signal.
      */
-    logDebugInfo(prefix) {
-        let infostring = `signalName="${this.signalName}", receiverName="${this.receiverName}", data=`;
-        if(prefix) {
-            infostring = `${prefix}: ${infostring}`;
-        }
-        console.log(infostring, this.data);
+    toString() {
+        let prettyData = new PrettyFormat(this.data).toString(2);
+        return `signalName="${this.signalName}", ` +
+            `receiverName="${this.receiverName}", ` +
+            `data=${prettyData}`;
     }
 }
 
@@ -114,19 +112,6 @@ export class SentSignalInfo {
             receivers = 'NO RECEIVERS';
         }
         return `Signal: ${this.signalName} was sent do: ${receivers}`;
-    }
-
-    /**
-     * Log debug information about the sent signal.
-     *
-     * @param {string} prefix An optional prefix for the log message.
-     */
-    logDebugInfo(prefix) {
-        let infostring = this.toString();
-        if(prefix) {
-            infostring = `${prefix}: ${infostring}`;
-        }
-        console.log(infostring);
     }
 }
 
@@ -262,10 +247,10 @@ let _instance = null;
  * @example <caption>Debugging</caption>
  * let signalHandler = new SignalHandlerSingleton();
  * signalHandler.addReceiver('mysignal', 'MyReceiver', (receivedSignalInfo) => {
- *     receivedSignalInfo.logDebugInfo();
+ *     console.log('received signal:', receivedSignalInfo.toString());
  * });
  * signalHandler.send('myapp.mysignal', {'the': 'data'}, (sentSignalInfo) => {
- *     sentSignalInfo.logDebugInfo();
+ *     console.log('sent signal info:', sentSignalInfo.toString());
  * });
  *
  */
