@@ -10,6 +10,15 @@
  * LOGLEVEL.validateLogLevel(10);
  */
 export class LogLevels {
+    constructor() {
+        this._prettyLogLevelNames = {};
+        this._prettyLogLevelNames[this.DEBUG] = 'DEBUG';
+        this._prettyLogLevelNames[this.INFO] = 'INFO';
+        this._prettyLogLevelNames[this.WARNING] = 'WARNING';
+        this._prettyLogLevelNames[this.ERROR] = 'ERROR';
+        this._prettyLogLevelNames[this.SILENT] = 'SILENT';
+    }
+
     /**
      * Get the number for log level DEBUG.
      * @returns {number}
@@ -71,6 +80,20 @@ export class LogLevels {
                 `Invalid log level: ${logLevel}, must be between ` +
                 `${this.SILENT} (SILENT) and ${this.DEBUG} (DEBUG)`);
         }
+    }
+
+    /**
+     * Get the textual name for a log level.
+     *
+     * @param {number} logLevel The log level to get a textual name for.
+     * @returns {string}
+     *
+     * @example
+     * const infoText = LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.INFO);
+     * // infoText === 'INFO'
+     */
+    getTextualNameForLogLevel(logLevel) {
+        return this._prettyLogLevelNames[logLevel];
     }
 }
 

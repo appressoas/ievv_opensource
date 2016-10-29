@@ -41,4 +41,36 @@ describe('Logger', () => {
         let logger = new Logger('test');
         expect(() => logger.setLogLevel(10)).toThrowError(RangeError);
     });
+
+    it('Logger().getTextualNameForLogLevel() no logLevel', () => {
+        let loggerSingleton = jest.fn();
+        loggerSingleton.getTextualNameForDefaultLogLevel = jest.fn(() => {
+            return 'MOCK';
+        });
+        let logger = new Logger('test', loggerSingleton);
+        expect(logger.getTextualNameForLogLevel()).toEqual(
+            '[default for LoggerSingleton - MOCK]');
+    });
+
+    it('Logger().getTextualNameForLogLevel() with logLevel', () => {
+        let logger = new Logger('test');
+        logger.setLogLevel(LOGLEVEL.DEBUG);
+        expect(logger.getTextualNameForLogLevel()).toEqual('DEBUG');
+    });
+
+    it('Logger().getDebugInfoString() no logLevel', () => {
+        let loggerSingleton = jest.fn();
+        loggerSingleton.getTextualNameForDefaultLogLevel = jest.fn(() => {
+            return 'MOCK';
+        });
+        let logger = new Logger('test', loggerSingleton);
+        expect(logger.getDebugInfoString()).toEqual(
+            'test: [default for LoggerSingleton - MOCK]');
+    });
+
+    it('Logger().getDebugInfoString() with logLevel', () => {
+        let logger = new Logger('test');
+        logger.setLogLevel(LOGLEVEL.DEBUG);
+        expect(logger.getDebugInfoString()).toEqual('test: DEBUG');
+    });
 });

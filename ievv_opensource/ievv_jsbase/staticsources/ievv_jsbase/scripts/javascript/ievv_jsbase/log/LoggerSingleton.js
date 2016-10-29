@@ -41,6 +41,16 @@ export default class LoggerSingleton {
     }
 
     /**
+     * Get the number of loggers registered using
+     * {@link getLogger}.
+     *
+     * @returns {number} The number of loggers.
+     */
+    getLoggerCount() {
+        return this._loggerMap.size;
+    }
+
+    /**
      * Reset to default log level, and clear all
      * custom loggers.
      */
@@ -95,5 +105,52 @@ export default class LoggerSingleton {
             this._loggerMap.set(name, new Logger(name, this));
         }
         return this._loggerMap.get(name);
+    }
+
+    /**
+     * Get the names of all the registered loggers.
+     *
+     * @returns {Array} Sorted array with the same of the loggers.
+     */
+    getLoggerNameArray() {
+        let loggerNames = Array.from(this._loggerMap.keys());
+        loggerNames.sort();
+        return loggerNames;
+    }
+
+    /**
+     * Get textual name for the default log level.
+     *
+     * Intended for debugging. The format of the string may change.
+     *
+     * @returns {string}
+     */
+    getTextualNameForDefaultLogLevel() {
+        return LOGLEVEL.getTextualNameForLogLevel(this.getDefaultLogLevel());
+    }
+
+    /**
+     * Get a string that summarize information about all the
+     * loggers. The string has a list of loglevels with
+     * their loglevel. Perfect for debugging.
+     *
+     * Intended for debugging. The format of the string may change.
+     *
+     * @returns {string}
+     */
+    getDebugInfoString() {
+        let loggerInfoString = `Default logLevel: ` +
+            `${this.getTextualNameForDefaultLogLevel()}\n` +
+            `Loggers:\n`;
+        if(this.getLoggerCount() === 0) {
+            loggerInfoString += '(no loggers)\n';
+        } else {
+            for (let loggerName of this.getLoggerNameArray()) {
+                let logger = this.getLogger(loggerName);
+                loggerInfoString +=
+                    ` - ${logger.getDebugInfoString()}\n`;
+            }
+        }
+        return loggerInfoString;
     }
 }

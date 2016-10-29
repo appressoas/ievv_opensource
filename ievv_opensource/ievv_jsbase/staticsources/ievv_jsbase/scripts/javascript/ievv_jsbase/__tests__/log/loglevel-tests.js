@@ -41,4 +41,25 @@ describe('LOGLEVEL', () => {
             'Invalid log level: 5, must be between ' +
             '0 (SILENT) and 4 (DEBUG)');
     });
+
+    it('LOGLEVEL.getTextualNameForLogLevel DEBUG', () => {
+        expect(LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.DEBUG)).toEqual('DEBUG');
+    });
+
+    it('LOGLEVEL.getTextualNameForLogLevel INFO', () => {
+        expect(LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.INFO)).toEqual('INFO');
+    });
+
+    it('LOGLEVEL.getTextualNameForLogLevel WARNING', () => {
+        expect(LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.WARNING)).toEqual('WARNING');
+    });
+
+    it('LOGLEVEL.getTextualNameForLogLevel ERROR', () => {
+        expect(LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.ERROR)).toEqual('ERROR');
+    });
+
+    it('LOGLEVEL.getTextualNameForLogLevel SILENT', () => {
+        expect(LOGLEVEL.getTextualNameForLogLevel(LOGLEVEL.SILENT)).toEqual('SILENT');
+    });
+
 });

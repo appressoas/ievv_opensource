@@ -45,9 +45,32 @@ export default class Logger extends AbstractLogger {
      * @returns {int}
      */
     getLogLevel() {
-        if(this._logLevel != null) {
-            return this._logLevel;
+        if(this._logLevel == null) {
+            return this._loggerSingleton.getDefaultLogLevel();
         }
-        return this._loggerSingleton.getDefaultLogLevel();
+        return this._logLevel;
+    }
+
+    /**
+     * Get textual name for the log level. If the logger
+     * does not have a logLevel (if it inherits it from the LoggerSingleton)
+     * a string with information about this and the default logLevel for the
+     * LoggerSingleton is returned.
+     *
+     * Intended for debugging. The format of the string may change.
+     *
+     * @returns {string}
+     */
+
+    getTextualNameForLogLevel() {
+        if(this._logLevel == null) {
+            return '[default for LoggerSingleton - ' +
+                `${this._loggerSingleton.getTextualNameForDefaultLogLevel()}]`;
+        }
+        return LOGLEVEL.getTextualNameForLogLevel(this.getLogLevel());
+    }
+
+    getDebugInfoString() {
+        return `${this.name}: ${this.getTextualNameForLogLevel()}`;
     }
 }
