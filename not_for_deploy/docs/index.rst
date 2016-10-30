@@ -32,6 +32,7 @@ Apps
    ievv_batchframework
    ievv_elasticsearch
    ievv_customsql
+   ievv_jsbase
 
 
 ********

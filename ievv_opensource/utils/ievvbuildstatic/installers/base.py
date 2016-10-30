@@ -31,3 +31,9 @@ class AbstractInstaller(LogMixin, ShellCommandMixin):
 
     def get_logger_name(self):
         return '{}.{}'.format(self.app.get_logger_name(), self.name)
+
+    def get_loglevel(self):
+        return self.app.apps.loglevel
+
+    def get_command_error_message(self):
+        return self.app.apps.command_error_message

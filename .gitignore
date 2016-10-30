@@ -39,12 +39,6 @@ bower_components/
 /.tox/
 /dist/
 
-ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
-ievv_opensource/demo/demoapp/staticsources/demoapp/package.json
-ievv_opensource/demo/demoapp/staticsources/demoapp/yarn.lock
-ievv_opensource/demo/demoapp2/staticsources/demoapp2/package.json
-ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
-ievv_opensource/demo/demoapp2/staticsources/demoapp2/yarn.lock
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_build_directory
 
@@ -55,5 +49,9 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 /.idea/dataSources.local.xml
 /.idea/dataSources.ids
 
+/ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
+/ievv_opensource/demo/demoapp2/staticsources/demoapp2/package.json
+/ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
 /ievv_opensource/demo/demoapp/static/
 /ievv_opensource/demo/demoapp2/static/
+/ievv_opensource/ievv_jsbase/static/

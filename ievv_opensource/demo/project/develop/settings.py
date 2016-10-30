@@ -26,14 +26,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                     }
                 }
             ),
-            ievvbuildstatic.npminstall.Plugin(
-                packages={
-                    'uniq': None,
-                    'momentjs': None,
-                    'react': None,
-                    'react-dom': None,
-                }
-            ),
             ievvbuildstatic.browserify_jsbuild.Plugin(
                 sourcefolder=os.path.join('scripts', 'javascript', 'browserify_jsbuild_demo'),
                 sourcefile='browserify_jsbuild_demo.js',
@@ -48,6 +40,14 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefolder=os.path.join('scripts', 'javascript', 'browserify_reactjsbuild_demo'),
                 sourcefile='browserify_reactjsbuild_demo.js',
                 destinationfile='browserify_reactjsbuild_demo.js',
+            ),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_babelbuild_import_path_demo'),
+                sourcefile='browserify_babelbuild_import_path_demo.js',
+                destinationfile='browserify_babelbuild_import_path_demo.js',
+                extra_import_paths=[
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+                ]
             ),
         ]
     ),
@@ -75,6 +75,19 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 ]
             ),
             ievvbuildstatic.mediacopy.Plugin(),
+        ]
+    ),
+    ievvbuildstatic.config.App(
+        appname='ievv_jsbase',
+        version='1.0.0',
+        plugins=[
+            ievvbuildstatic.autosetup_esdoc.Plugin(),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsbase'),
+                sourcefile='ievv_jsbase.js',
+                destinationfile='ievv_jsbase.js',
+            ),
+            ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '

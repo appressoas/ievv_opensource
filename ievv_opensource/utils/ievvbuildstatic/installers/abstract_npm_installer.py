@@ -3,7 +3,7 @@ import os
 from collections import OrderedDict
 
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
-from ievv_opensource.utils.shellcommandmixin import ShellCommandError
+from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
 class NpmInstallerError(Exception):
@@ -14,7 +14,7 @@ class PackageJsonDoesNotExist(NpmInstallerError):
     pass
 
 
-class AbstractNpmInstaller(AbstractInstaller):
+class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
     """
     Abstract npm installer.
 
@@ -86,26 +86,66 @@ class AbstractNpmInstaller(AbstractInstaller):
     # def packagejson_created_by_ievv_buildstatic(self):
     #     return 'ievv_buildstatic' in self.get_packagejson_dict()
 
-    def create_packagejson(self):
-        packagedata = {
-            'name': self.app.appname,
-            'private': True,
-            'ievv_buildstatic': {},
-            # We do not care about the version. We are not building a distributable package.
-            'version': '0.0.1',
-        }
-        open(self.get_packagejson_path(), 'wb').write(
-            json.dumps(packagedata, indent=2).encode('utf-8'))
-
     def __get_packagejson_dict(self):
         package_json_string = open(self.get_packagejson_path()).read()
         package_json_dict = json.loads(package_json_string)
         return package_json_dict
 
     def get_packagejson_dict(self):
+        """
+        Get ``package.json`` as a dict.
+
+        This is cached, so calling it many times only requires
+        one read from the disk.
+        """
         if not hasattr(self, '_packagejson_dict'):
             self._packagejson_dict = self.__get_packagejson_dict()
         return self._packagejson_dict
+
+    def save_packagejson_dict(self):
+        """
+        Save the dict returned by :meth:`.get_packagejson_dict`
+        to ``package.json``.
+
+        You must call this if you change the dict returned
+        by :meth:`.get_packagejson_dict`.
+        """
+        open(self.get_packagejson_path(), 'wb').write(
+            json.dumps(
+                self._packagejson_dict,
+                indent=2,
+                sort_keys=True
+            ).encode('utf-8'))
+
+    def create_packagejson(self):
+        """
+        Create initial ``package.json``.
+        """
+        package_json_dict = {
+            'name': self.app.appname,
+            'private': True,
+            'ievv_buildstatic': {},
+            # We do not care about the version. We are not building a distributable package.
+            'version': '0.0.1',
+        }
+        self._packagejson_dict = package_json_dict
+        self.save_packagejson_dict()
+
+    def add_npm_script(self, scriptname, script):
+        """
+        Add a script to the ``"scripts"`` property of ``package.json``.
+
+        Overwrites any existing script named ``scriptname``.
+
+        Args:
+            scriptname: The key in the ``"scripts"`` object/dict.
+            script: The value in in the ``"scripts"`` object/dict.
+        """
+        package_json_dict = self.get_packagejson_dict()
+        scripts = self.get_packagejson_dict().get('scripts', {})
+        scripts[scriptname] = script
+        package_json_dict['scripts'] = scripts
+        self.save_packagejson_dict()
 
     def get_packagejson_key_from_installtype(self, installtype):
         if installtype is None:
@@ -172,3 +212,19 @@ class AbstractNpmInstaller(AbstractInstaller):
 
     def install_npm_package(self, package, properties):
         raise NotImplementedError()
+
+    def run_npm_script(self, script, args=None):
+        """
+        Exectute ``npm run <script> [args]``.
+
+        Args:
+            script: The npm script to run.
+            args (list): List of arguments.
+
+        Returns:
+
+        """
+        args = args or []
+        self.run_shell_command('npm',
+                               args=['run', script] + args,
+                               _cwd=self.app.get_source_path())

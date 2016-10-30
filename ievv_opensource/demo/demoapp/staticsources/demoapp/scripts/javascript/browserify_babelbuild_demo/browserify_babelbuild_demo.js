@@ -1,3 +1,5 @@
-import {theVariable} from "./modules/demomodule";
+import {MyClass} from "./modules/demomodule";
+import {unique} from 'uniq';
 
-console.log('theVariable:', theVariable);
+new MyClass();
+console.log('unique test:', unique([1, 1, 2]));

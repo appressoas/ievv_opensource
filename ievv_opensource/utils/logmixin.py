@@ -14,9 +14,14 @@ class Logger(object):
     """
     loggers = {}
     messagelock = threading.Lock()
+    DEBUG = 5
+    STDOUT = 4
+    INFO = 3
+    WARNING = 2
+    ERROR = 1
 
     @classmethod
-    def get_instance(cls, name):
+    def get_instance(cls, name, level=None, command_error_message=None):
         """
         Get an instance of the logger by the given name.
 
@@ -25,17 +30,25 @@ class Logger(object):
         """
         if name not in cls.loggers:
             cls.loggers[name] = cls(name=name)
+        cls.loggers[name].set_level(level=level)
+        cls.loggers[name].set_command_error_message(command_error_message=command_error_message)
         return cls.loggers[name]
 
-    def __init__(self, name):
+    def __init__(self, name, level=None):
         """
         Parameters:
             name: The name of the logger.
         """
         self.name = name
+        self.level = level or self.DEBUG
         self._has_messagelock = False
         self._messagelocktimer = None
-        # self._messagequeue = []
+
+    def set_level(self, level):
+        self.level = level or self.DEBUG
+
+    def set_command_error_message(self, command_error_message):
+        self.command_error_message = command_error_message
 
     def _acquire_messagelock(self):
         if not self._has_messagelock:
@@ -71,13 +84,15 @@ class Logger(object):
         """
         Use this to redirecting sys.stdout when running shell commands.
         """
-        self._queue_message(line.rstrip())
+        if self.level >= self.STDOUT:
+            self._queue_message(line.rstrip())
 
     def stderr(self, line):
         """
         Use this to redirecting sys.stderr when running shell commands.
         """
-        self._queue_message(line.rstrip())
+        if self.level >= self.ERROR:
+            self._queue_message(line.rstrip())
 
     def __colorize(self, message, **kwargs):
         return ievv_colorize.colorize(message, **kwargs)
@@ -86,54 +101,63 @@ class Logger(object):
         self._queue_message(self.__colorize(message, **kwargs))
 
     def infobox(self, message):
-        message = textwrap.fill(message, width=70)
-        message = '\n{line}\n\n{message}\n\n{line}\n'.format(
-            message=message,
-            line='*' * 70
-        )
-        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
+        if self.level >= self.INFO:
+            message = textwrap.fill(message, width=70)
+            message = '\n{line}\n{message}\n{line}\n'.format(
+                message=message,
+                line='*' * 70
+            )
+            self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
 
     def info(self, message):
         """
         Log an info message.
         """
-        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
+        if self.level >= self.INFO:
+            self.__colorprint(message, color=ievv_colorize.COLOR_BLUE)
 
     def success(self, message):
         """
         Log a success message.
         """
-        self.__colorprint(message, color=ievv_colorize.COLOR_GREEN)
+        if self.level >= self.INFO:
+            self.__colorprint(message, color=ievv_colorize.COLOR_GREEN)
 
     def warning(self, message):
         """
         Log a warning message.
         """
-        self.__colorprint(message, color=ievv_colorize.COLOR_YELLOW)
+        if self.level >= self.WARNING:
+            self.__colorprint(message, color=ievv_colorize.COLOR_YELLOW)
 
     def error(self, message):
         """
         Log a warning message.
         """
-        self.__colorprint(message, color=ievv_colorize.COLOR_RED)
+        if self.level >= self.ERROR:
+            self.__colorprint(message, color=ievv_colorize.COLOR_RED)
 
     def debug(self, message):
         """
         Log a debug message.
         """
-        self.__colorprint(message, color=ievv_colorize.COLOR_GREY)
+        if self.level >= self.DEBUG:
+            self.__colorprint(message, color=ievv_colorize.COLOR_GREY)
 
     def command_start(self, message):
         """
         Log the start of a command. This should be used in the beginning
         of each :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`.
         """
-        self._queue_message()
-        self.__colorprint(message, color=ievv_colorize.COLOR_BLUE, bold=True)
+        if self.level >= self.DEBUG:
+            self._queue_message()
+        if self.level >= self.INFO:
+            self.__colorprint(message, color=ievv_colorize.COLOR_BLUE, bold=True)
 
     def __command_end(self, message, **kwargs):
         self.__colorprint(message, **kwargs)
-        self._queue_message()
+        if self.level >= self.DEBUG:
+            self._queue_message()
 
     def command_error(self, message):
         """
@@ -142,6 +166,9 @@ class Logger(object):
         when the task fails.
         """
         self.__command_end(message, color=ievv_colorize.COLOR_RED, bold=True)
+        if self.level < self.DEBUG and self.command_error_message:
+            self.__colorprint(self.command_error_message,
+                              color=ievv_colorize.COLOR_GREY, bold=True)
         desktopnotificationapi.show_message(
             title='ERROR - {}'.format(self.name),
             message=message)
@@ -152,10 +179,11 @@ class Logger(object):
         :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         when the task succeeds.
         """
-        self.__command_end(message, color=ievv_colorize.COLOR_GREEN, bold=True)
-        desktopnotificationapi.show_message(
-            title='SUCCESS - {}'.format(self.name),
-            message=message)
+        if self.level >= self.INFO:
+            self.__command_end(message, color=ievv_colorize.COLOR_GREEN, bold=True)
+            desktopnotificationapi.show_message(
+                title='SUCCESS - {}'.format(self.name),
+                message=message)
 
 
 class LogMixin(object):
@@ -172,12 +200,19 @@ class LogMixin(object):
         """
         raise NotImplementedError()
 
+    def get_loglevel(self):
+        return Logger.DEBUG
+
+    def get_command_error_message(self):
+        return None
+
     def get_logger(self):
         """
         Get an instance of :meth:`.Logger` with :meth:`.get_logger_name`
         as the logger name.
         """
-        return Logger.get_instance(name=self.get_logger_name())
+        return Logger.get_instance(name=self.get_logger_name(), level=self.get_loglevel(),
+                                   command_error_message=self.get_command_error_message())
 
 
 if __name__ == '__main__':

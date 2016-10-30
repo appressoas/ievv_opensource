@@ -1,10 +1,9 @@
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import cssbuildbaseplugin
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic import utils
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
-from ievv_opensource.utils.ievvbuildstatic import filepath
 
 
 class Plugin(cssbuildbaseplugin.AbstractPlugin):

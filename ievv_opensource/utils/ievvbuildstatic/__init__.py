@@ -1,5 +1,6 @@
 from . import utils  # noqa
 from . import installers  # noqa
+from . import docbuilders  # noqa
 from . import filepath  # noqa
 from . import config  # noqa
 from . import cssbuildbaseplugin  # noqa
@@ -14,9 +15,14 @@ from . import browserify_babelbuild  # noqa
 from . import browserify_reactjsbuild  # noqa
 from . import typescriptbuild  # noqa
 from . import nodemodulescopy  #noqa
+from . import run_jstests  #noqa
+from . import autosetup_jsdoc  #noqa
+from . import autosetup_esdoc  #noqa
 
 __all__ = [
     'utils',
+    'installers',
+    'docbuilders',
     'filepath',
     'config',
     'cssbuildbaseplugin',
@@ -31,4 +37,7 @@ __all__ = [
     'browserify_reactjsbuild',
     'typescriptbuild',
     'nodemodulescopy',
+    'run_jstests',
+    'autosetup_jsdoc',
+    'autosetup_esdoc',
 ]

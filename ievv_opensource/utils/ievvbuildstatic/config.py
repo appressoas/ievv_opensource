@@ -8,7 +8,8 @@ from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
-from ievv_opensource.utils.logmixin import LogMixin
+from ievv_opensource.utils.logmixin import LogMixin, Logger
+from . import docbuilders
 
 
 class App(LogMixin):
@@ -19,7 +20,8 @@ class App(LogMixin):
                  sourcefolder='staticsources',
                  destinationfolder='static',
                  keep_temporary_files=False,
-                 installers_config=None):
+                 installers_config=None,
+                 docbuilder_classes=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -36,6 +38,7 @@ class App(LogMixin):
         self.destinationfolder = destinationfolder
         self.installers = {}
         self.plugins = []
+        self.docbuilder_classes = docbuilder_classes or self.get_default_docbuilder_classes()
         self.keep_temporary_files = keep_temporary_files
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
@@ -63,24 +66,31 @@ class App(LogMixin):
         plugin.app = self
         self.plugins.append(plugin)
 
-    def run(self):
+    def iterplugins(self, skipgroups=None):
+        skipgroups = skipgroups or []
+        for plugin in self.plugins:
+            if plugin.group and plugin.group in skipgroups:
+                continue
+            yield plugin
+
+    def run(self, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within the app.
         """
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.runwrapper()
 
-    def install(self):
+    def install(self, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within the app.
         """
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.install()
         for installer in self.installers.values():
             installer.install()
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.post_install()
 
     def get_app_config(self):
@@ -143,6 +153,9 @@ class App(LogMixin):
         return self._relative_or_absolute_path_to_absolute_path(relative_path_root=sourcefolder,
                                                                 pathlist=path)
 
+    def make_source_relative_path(self, *path):
+        return os.path.relpath(self.get_source_path(*path), start=self.get_source_path())
+
     def get_destination_path(self, *path, **kwargs):
         """
         Returns the absolute path to a folder within the destination
@@ -184,12 +197,12 @@ class App(LogMixin):
             absolute_path = '{}{}'.format(path, new_extension)
         return absolute_path
 
-    def watch(self):
+    def watch(self, skipgroups=None):
         """
         Start a watcher thread for each plugin.
         """
         watchconfigs = []
-        for plugin in self.plugins:
+        for plugin in self.iterplugins(skipgroups=skipgroups):
             watchconfig = plugin.watch()
             if watchconfig:
                 watchconfigs.append(watchconfig)
@@ -218,6 +231,9 @@ class App(LogMixin):
     def get_logger_name(self):
         return '{}.{}'.format(self.apps.get_logger_name(), self.appname)
 
+    def get_loglevel(self):
+        return self.apps.loglevel
+
     def get_temporary_build_directory_path(self, *path):
         return self.get_source_path('ievvbuildstatic_temporary_build_directory', *path)
 
@@ -244,6 +260,31 @@ class App(LogMixin):
         if os.path.exists(base_temporary_directory) and len(os.listdir(base_temporary_directory)) == 0:
             shutil.rmtree(base_temporary_directory)
 
+    def get_default_docbuilder_classes(self):
+        return [
+            docbuilders.npm_docbuilder.NpmDocBuilder
+        ]
+
+    def get_docbuilder(self):
+        for docbuilder_class in self.docbuilder_classes:
+            docbuilder = docbuilder_class(app=self)
+            if docbuilder.is_available():
+                return docbuilder
+        return None
+
+    def build_docs(self, output_directory):
+        docbuilder = self.get_docbuilder()
+        if docbuilder:
+            docbuilder.build_docs(output_directory=os.path.join(output_directory, self.appname))
+        else:
+            self.get_logger().debug(
+                'No docbuilders found for {appname}. Tried the following docbuilders: {docbuilders}'.format(
+                    appname=self.appname,
+                    docbuilders=', '.join(
+                        docbuilder_class.name
+                        for docbuilder_class in self.docbuilder_classes)
+                ))
+
 
 class Apps(LogMixin):
     """
@@ -255,9 +296,17 @@ class Apps(LogMixin):
             apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
         """
         self.apps = OrderedDict()
+        self.loglevel = Logger.DEBUG
+        self.command_error_message = None
         self.help_header = help_header
         for app in apps:
             self.add_app(app)
+
+    def get_loglevel(self):
+        return self.loglevel
+
+    def get_command_error_message(self):
+        return self.command_error_message
 
     def add_app(self, app):
         """
@@ -272,13 +321,13 @@ class Apps(LogMixin):
         """
         return self.apps[appname]
 
-    def install(self, appnames=None):
+    def install(self, appnames=None, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.install()
+            app.install(skipgroups=skipgroups)
 
     def log_help_header(self):
         if self.help_header:
@@ -294,19 +343,19 @@ class Apps(LogMixin):
         Get an interator over the apps.
         """
         for app in self.apps.values():
-            include = appnames is None or app.appname in appnames
+            include = not appnames or app.appname in appnames
             if include:
                 yield app
 
-    def run(self, appnames=None):
+    def run(self, appnames=None, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.run()
+            app.run(skipgroups=skipgroups)
 
-    def watch(self, appnames=None):
+    def watch(self, appnames=None, skipgroups=None):
         """
         Start watcher threads for all folders that at least one
         :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
@@ -316,7 +365,7 @@ class Apps(LogMixin):
         """
         watchconfigpool = WatchConfigPool()
         for app in self.iterapps(appnames=appnames):
-            watchconfigpool.extend(app.watch())
+            watchconfigpool.extend(app.watch(skipgroups=skipgroups))
         all_observers = watchconfigpool.watch()
         try:
             while True:
@@ -328,6 +377,10 @@ class Apps(LogMixin):
         for observer in all_observers:
             observer.join()
 
+    def build_docs(self, output_directory, appnames=None):
+        for app in self.iterapps(appnames=appnames):
+            app.build_docs(output_directory=output_directory)
+
     def get_logger_name(self):
         return 'ievvbuildstatic'
 
@@ -337,19 +390,10 @@ class Apps(LogMixin):
         shlogger.addHandler(handler)
         shlogger.propagate = False
 
-    # def __configure_ievvbuild_logger(self, loglevel, handler):
-    #     logger = self.get_logger()
-    #     logger.setLevel(loglevel)
-    #     logger.addHandler(handler)
-    #     logger.propagate = False
-
-    def configure_logging(self, loglevel=logging.INFO,
-                          shlibrary_loglevel=logging.WARNING):
-        # formatter = logging.Formatter('[%(name)s:%(levelname)s] %(message)s')
+    def configure_logging(self, loglevel=None, shlibrary_loglevel=logging.WARNING,
+                          command_error_message=None):
         handler = logging.StreamHandler()
-        # handler.setFormatter(formatter)
-        # handler.setLevel(loglevel)
-        # self.__configure_ievvbuild_logger(loglevel=loglevel,
-        #                                   handler=handler)
         self.__configure_shlogger(loglevel=shlibrary_loglevel,
                                   handler=handler)
+        self.loglevel = loglevel
+        self.command_error_message = command_error_message

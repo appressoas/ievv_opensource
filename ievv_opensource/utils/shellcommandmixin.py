@@ -63,7 +63,7 @@ class ShellCommandMixin(object):
         return ' '.join(output)
 
     def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None,
-                          _out=None, _err=None):
+                          _out=None, _err=None, _env=None):
         """
         Run a shell command.
 
@@ -82,6 +82,8 @@ class ShellCommandMixin(object):
         kwargs = kwargs or {}
         if _cwd:
             kwargs['_cwd'] = _cwd
+        if _env:
+            kwargs['_env'] = _env
 
         _out = _out or self.log_shell_command_stdout
         _err = _err or self.log_shell_command_stderr

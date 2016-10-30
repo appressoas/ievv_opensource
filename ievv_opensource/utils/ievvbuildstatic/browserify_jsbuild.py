@@ -1,7 +1,7 @@
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.ievvbuildstatic.filepath import AbstractDjangoAppPath
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
@@ -44,12 +44,15 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             )
     """
     name = 'browserify_jsbuild'
+    default_group = 'js'
 
     def __init__(self, sourcefile, destinationfile,
                  sourcefolder=os.path.join('scripts', 'javascript'),
                  destinationfolder=os.path.join('scripts'),
                  extra_watchfolders=None,
-                 sourcemap=False):
+                 extra_import_paths=None,
+                 sourcemap=True,
+                 **kwargs):
         """
         Parameters:
             sourcefile: The source file relative to ``sourcefolder``.
@@ -63,20 +66,36 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             extra_watchfolders: List of extra folders to watch for changes.
                 Relative to the source folder of the
                 :class:`~ievv_opensource.utils.ievvbuild.config.App`.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
-        super(Plugin, self).__init__()
+        super(Plugin, self).__init__(**kwargs)
         self.sourcefile = sourcefile
         self.destinationfile = destinationfile
         self.destinationfolder = destinationfolder
         self.sourcefolder = sourcefolder
         self.extra_watchfolders = extra_watchfolders or []
         self.sourcemap = sourcemap
+        self.extra_import_paths = extra_import_paths or []
 
     def get_sourcefile_path(self):
         return self.app.get_source_path(self.sourcefolder, self.sourcefile)
 
     def get_destinationfile_path(self):
         return self.app.get_destination_path(self.destinationfolder, self.destinationfile)
+
+    def get_default_import_paths(self):
+        return ['node_modules']
+
+    def get_import_paths(self):
+        return self.get_default_import_paths() + self.extra_import_paths
+
+    def _get_import_paths_as_strlist(self):
+        import_paths = []
+        for path in self.get_import_paths():
+            if isinstance(path, AbstractDjangoAppPath):
+                path = path.abspath
+            import_paths.append(path)
+        return import_paths
 
     def install(self):
         """
@@ -124,18 +143,37 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         args.extend(self.get_browserify_extra_args())
         return args
 
+    def make_browserify_executable_environment(self):
+        environment = os.environ.copy()
+        environment.update({
+            'NODE_PATH': ':'.join(self._get_import_paths_as_strlist())
+        })
+        return environment
+
+    def post_run(self):
+        """
+        Called at the start of run(), after the initial command start logmessage,
+        but before any other code is executed.
+
+        Does nothing by default, but subclasses can hook in
+        configuration code here if they need to generate config
+        files, perform validation of file structure, etc.
+        """
+
     def run(self):
         self.get_logger().command_start(
             'Running browserify with {sourcefile} as input and {destinationfile} as output'.format(
                 sourcefile=self.get_sourcefile_path(),
                 destinationfile=self.get_destinationfile_path()))
+        self.post_run()
         executable = self.get_browserify_executable()
         destination_folder = self.app.get_destination_path(self.destinationfolder)
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
         try:
             self.run_shell_command(executable, args=self.make_browserify_args(),
-                                   _cwd=self.app.get_source_path())
+                                   _cwd=self.app.get_source_path(),
+                                   _env=self.make_browserify_executable_environment())
         except ShellCommandError:
             self.get_logger().command_error('browserify build FAILED!')
         else:
