@@ -84,8 +84,8 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.autosetup_esdoc.Plugin(),
             ievvbuildstatic.browserify_babelbuild.Plugin(
                 sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsbase'),
-                sourcefile='ievv_jsbase.js',
-                destinationfile='ievv_jsbase.js',
+                sourcefile='ievv_jsbase_core.js',
+                destinationfile='ievv_jsbase_core.js',
             ),
             ievvbuildstatic.run_jstests.Plugin(),
         ]
