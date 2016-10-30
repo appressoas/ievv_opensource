@@ -16,3 +16,4 @@ prune ievv_opensource/demo
 prune ievv_opensource/ievv_jsbase/staticsources/ievv_jsbase/node_modules
 prune ievv_opensource/demo/demoapp2/staticsources/demoapp/node_modules
 prune ievv_opensource/demo/demoapp2/staticsources/demoapp2/node_modules
+prune ievv_opensource/ievv_jsbase/staticsources/ievv_jsbase/built_docs
