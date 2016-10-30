@@ -1,4 +1,5 @@
 from django_cradmin import javascriptregistry
+from ievv_opensource import ievv_jsbase
 
 
 class IevvJsBaseCoreComponent(javascriptregistry.component.AbstractJsComponent):
@@ -16,6 +17,8 @@ class IevvJsBaseCoreComponent(javascriptregistry.component.AbstractJsComponent):
         ]
 
     def get_sourceurls(self):
-        return self._versioned_static_urls([
-            'ievv_jsbase/{version}/scripts/ievv_jsbase_core.js'
-        ])
+        return [
+            self.get_static_url('ievv_jsbase/{version}/scripts/ievv_jsbase_core.js'.format(
+                version=ievv_jsbase.__version__)),
+
+        ]

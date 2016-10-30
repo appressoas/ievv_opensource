@@ -1,3 +1,4 @@
+from ievv_opensource import ievv_jsbase
 from ievv_opensource.demo.project.default.settings import *  # noqa
 from ievv_opensource.utils import ievvbuildstatic
 from ievv_opensource.utils import ievvdevrun
@@ -79,7 +80,7 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
     ),
     ievvbuildstatic.config.App(
         appname='ievv_jsbase',
-        version='1.0.0',
+        version=ievv_jsbase.__version__,
         plugins=[
             ievvbuildstatic.autosetup_esdoc.Plugin(),
             ievvbuildstatic.browserify_babelbuild.Plugin(
