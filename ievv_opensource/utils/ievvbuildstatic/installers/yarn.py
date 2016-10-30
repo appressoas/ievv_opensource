@@ -19,8 +19,6 @@ class YarnInstaller(AbstractNpmInstaller):
     name = 'yarninstall'
 
     def yarn_json_output_handler(self, outputdict):
-        messagetype = outputdict.get('type')
-        data = outputdict.get('data', {})
         ignored_messagetypes = {
             'progressTick',
             'step',
@@ -29,12 +27,18 @@ class YarnInstaller(AbstractNpmInstaller):
             'Saved 0 new dependencies.',
             'Saved lockfile.',
         }
-        if isinstance(data, dict):
-            message = data.get('message')
-        elif isinstance(data, str):
-            message = data
+        if isinstance(outputdict, dict):
+            messagetype = outputdict.get('type')
+            data = outputdict.get('data', {})
+            if isinstance(data, dict):
+                message = data.get('message')
+            elif isinstance(data, str):
+                message = data
+            else:
+                message = None
         else:
-            message = None
+            message = str(outputdict)
+            messagetype = 'unknown'
         if message and messagetype and message not in ignored_messages:
             if messagetype == 'error':
                 super(YarnInstaller, self).log_shell_command_stderr(line=message)
