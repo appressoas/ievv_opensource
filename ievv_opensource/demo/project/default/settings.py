@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django_cradmin.apps.cradmin_authenticate',
     'django_cradmin.apps.cradmin_temporaryfileuploadstore',
     'ievv_opensource.ievv_tagframework',
-    'ievv_opensource.ievv_batchframework.apps.BatchOperationAppConfig',
+    'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
     'ievv_opensource.demo.demoapp2',
     'ievv_opensource.demo.customsqldemo',
