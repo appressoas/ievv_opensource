@@ -17,6 +17,10 @@ export class XMLHttpRequestMock {
         });
     }
 
+    getAllResponseHeaders() {
+        return '';
+    }
+
     send(data) {
         this.sentData = data;
         Object.assign(this, this.resultingRequest);

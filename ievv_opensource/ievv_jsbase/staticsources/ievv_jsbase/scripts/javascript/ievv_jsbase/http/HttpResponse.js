@@ -1,3 +1,15 @@
+import makeCustomError from "../makeCustomError";
+
+
+/**
+ * Error class created by {@link HttpResponse#toError}.
+ *
+ * @type {Error}
+ */
+export let HttpResponseError = makeCustomError('HttpResponseError');
+
+
+
 /**
  * HTTP response.
  *
@@ -80,10 +92,15 @@ export default class HttpResponse {
     }
 
     /**
-     * Format as a string suitable for debugging.
+     * Create a {@link HttpResponseError} from this HttpResponse.
+     *
+     * @returns {HttpResponseError} An HttpResponseError with this HttpResponse
+     *      as the ``response`` property.
      */
-    toString() {
-        return `${this.responseHeaderToString()}\n\n${this.body}`
+    toError() {
+        return new HttpResponseError(this.toString(), {
+            response: this
+        });
     }
 
     /**
@@ -98,12 +115,9 @@ export default class HttpResponse {
     }
 
     /**
-     * Format as a prettified string suitable for debugging.
-     *
-     * Same format as  the same as {@link HttpResponse#toString}
-     * except that the body is formatted using {@link HttpResponse#getPrettyfiedBody}.
+     * Format as a string suitable for debugging.
      */
-    toPrettyString() {
+    toString() {
         return `${this.responseHeaderToString()}\n\n${this.getPrettyfiedBody()}`
     }
 }

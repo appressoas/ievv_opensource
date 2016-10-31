@@ -22,8 +22,9 @@ export default class DOMReplaceFromUrl extends DOMReplace {
                 let htmlString = this.extractHtmlStringFromResponse(response);
                 callback(htmlString);
                 resolve(htmlString, response);
-            }, (response) => {
-                reject(response);
+            })
+            .catch((error) => {
+                reject(error);
             });
         });
     }

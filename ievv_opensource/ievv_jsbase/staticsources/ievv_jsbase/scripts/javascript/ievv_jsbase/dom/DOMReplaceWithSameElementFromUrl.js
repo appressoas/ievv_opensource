@@ -27,13 +27,15 @@ import HtmlParser from "./HtmlParser";
  *
  * ```
  * let domReplace = new DOMReplaceWithSameElementFromUrl('id_something');
- * domReplace.replaceInnerHtml('/pages/test').then((htmlString, response) => {
- *    console.log(
- *        `successfully replaced the current content of id_something with: ${htmlString}`);
- *    console.log(`The full response from the server was: ${response.toPrettyString()}`);
- * }, (response) => {
- *    console.error(`An error occurred: ${response.toPrettyString()}`);
- * });
+ * domReplace.replaceInnerHtml('/pages/test')
+ *     .then((htmlString, response) => {
+ *        console.log(
+ *            `successfully replaced the current content of id_something with: ${htmlString}`);
+ *        console.log(`The full response from the server was: ${response.toString()}`);
+ *     })
+ *     .catch((error) => {
+ *        console.error(`An error occurred: ${error.toString()}`);
+ *     });
  * ```
  */
 export default class DOMReplaceWithSameElementFromUrl extends DOMReplaceFromUrl {

@@ -8,41 +8,43 @@ import {UrlParser} from "./UrlParser";
 
  * @example <caption>Make a POST request</caption>
  * const request = new HttpRequest('http://example.com/api/users/');
- * request.post('Hello world').then((response) => {
- *     // Success - response is a HttpResponse object.
- *     console.log(response.toPrettyString());
- *     if(response.isSuccess()) {
- *         console.log('Success: ', response.body);
- *     } else if (response.isRedirect) {
- *         console.log('Hmm strange, we got a redirect instead of a 2xx response.');
- *     }
- * }, (response) => {
- *     // Error - response is a HttpResponse object.
- *     console.error(response.toPrettyString());
- *     if(response.isRedirect()) {
- *         // Yes - redirect is treated as an error by default.
- *         // you can change this by supplying an extra argument
- *         // to HttpResponse()
- *         console.log('We got a 3xx response!', response.body);
- *     } else if(response.isClientError()) {
- *         console.log('We got a 4xx response!', response.body);
- *     } else if (response.isServerError()) {
- *         console.log('We got a 5xx response!', response.body);
- *     } else if (response.isConnectionRefused()) {
- *         console.log('Connection refused.');
- *     }
- * });
+ * request.post('Hello world')
+ *     .then((response) => {
+ *         // Success - response is a HttpResponse object.
+ *         console.log(response.toString());
+ *         if(response.isSuccess()) {
+ *             console.log('Success: ', response.body);
+ *         } else if (response.isRedirect) {
+ *             console.log('Hmm strange, we got a redirect instead of a 2xx response.');
+ *         }
+ *     })
+ *     .catch((error) => {
+ *         // Error - response is an HttpError object.
+ *         console.error(response.toString());
+ *         if(error.response.isRedirect()) {
+ *             // Yes - redirect is treated as an error by default.
+ *             // you can change this by supplying an extra argument
+ *             // to HttpResponse()
+ *             console.log('We got a 3xx response!', error.response.body);
+ *         } else if(error.response.isClientError()) {
+ *             console.log('We got a 4xx response!', error.response.body);
+ *         } else if (error.response.isServerError()) {
+ *             console.log('We got a 5xx response!', error.response.body);
+ *         } else if (error.response.isConnectionRefused()) {
+ *             console.log('Connection refused.');
+ *         }
+ *     });
  *
  * @example <caption>Make a GET request with a querystring</caption>
  * const request = new HttpRequest('http://example.com/api/users/');
  * request.urlParser.queryString.set('search', 'doe');
- * request.get().then((response) => {
- *     // Success - response is a HttpResponse object.
- *     console.log(response.toPrettyString());
- * }, (response) => {
- *     // Error - response is a HttpResponse object.
- *     console.error(response.toPrettyString());
- * });
+ * request.get()
+ *     .then((response) => {
+ *         console.log('Success!', response.toString());
+ *     })
+ *     .catch((error) => {
+ *         console.error('Error:', error.toString());
+ *     });
  */
 export default class HttpRequest {
     /**
@@ -101,7 +103,15 @@ export default class HttpRequest {
      * @param data Request body data. This is sent through
      *      {@link HttpRequest#makeRequestBody} before it
      *      is sent.*
-     * @return A Promise where both the
+     * @return A Promise.
+     *
+     *      The resolve function argument is an
+     *      an object of whatever {@link HttpRequest#makeResponse}
+     *      returns.
+     *
+     *      The reject function argument is a
+     *      {@link HttpResponseError} object created using
+     *      {@link HttpResponse#toError}.
      */
     send(method, data) {
         method = method.toUpperCase();
@@ -225,8 +235,7 @@ export default class HttpRequest {
         if(isSuccess) {
             resolve(response);
         } else {
-            reject(response);
+            reject(response.toError());
         }
     }
 }
-

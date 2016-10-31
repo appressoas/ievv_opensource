@@ -21,9 +21,9 @@ describe('HttpRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(0);
-            expect(response.isConnectionRefused()).toBe(true);
+        }, function(error) {
+            expect(error.response.status).toBe(0);
+            expect(error.response.isConnectionRefused()).toBe(true);
         });
     });
 
@@ -34,9 +34,9 @@ describe('HttpRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(500);
-            expect(response.isServerError()).toBe(true);
+        }, function(error) {
+            expect(error.response.status).toBe(500);
+            expect(error.response.isServerError()).toBe(true);
         });
     });
 
@@ -47,9 +47,9 @@ describe('HttpRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(400);
-            expect(response.isClientError()).toBe(true);
+        }, function(error) {
+            expect(error.response.status).toBe(400);
+            expect(error.response.isClientError()).toBe(true);
         });
     });
 
@@ -60,9 +60,9 @@ describe('HttpRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(301);
-            expect(response.isRedirect()).toBe(true);
+        }, function(error) {
+            expect(error.response.status).toBe(301);
+            expect(error.response.isRedirect()).toBe(true);
         });
     });
 
@@ -75,7 +75,7 @@ describe('HttpRequest', () => {
         return httprequest.post('test').then(function(response) {
             expect(response.status).toBe(301);
             expect(response.isRedirect()).toBe(true);
-        }, function(response) {
+        }, function(error) {
             throw new Error('This should not be called!');
         });
     });
@@ -88,7 +88,7 @@ describe('HttpRequest', () => {
         return httprequest.post('test').then(function(response) {
             expect(response.status).toBe(200);
             expect(response.isSuccess()).toBe(true);
-        }, function(response) {
+        }, function(error) {
             throw new Error('This should not be called!');
         });
     });

@@ -10,10 +10,11 @@
  * @returns {Error} The created error class.
  */
 export default function makeCustomError(name) {
-    let CustomError = function(message) {
+    let CustomError = function(message, properties) {
         this.message = message;
         var last_part = new Error().stack.match(/[^\s]+$/);
         this.stack = `${this.name} at ${last_part}`;
+        Object.assign(this, properties);
     };
     Object.setPrototypeOf(CustomError, Error);
     CustomError.prototype = Object.create(Error.prototype);

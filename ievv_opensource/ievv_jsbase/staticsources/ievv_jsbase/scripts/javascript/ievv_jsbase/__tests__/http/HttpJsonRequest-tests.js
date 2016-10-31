@@ -10,9 +10,9 @@ describe('HttpJsonRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(400);
-            expect(response.isConnectionRefused()).toBe(false);
+        }, function(error) {
+            expect(error.response.status).toBe(400);
+            expect(error.response.isConnectionRefused()).toBe(false);
         });
     });
 
@@ -23,9 +23,9 @@ describe('HttpJsonRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             throw new Error('This should not be called!');
-        }, function(response) {
-            expect(response.status).toBe(0);
-            expect(response.isConnectionRefused()).toBe(true);
+        }, function(error) {
+            expect(error.response.status).toBe(0);
+            expect(error.response.isConnectionRefused()).toBe(true);
         });
     });
 
@@ -36,7 +36,7 @@ describe('HttpJsonRequest', () => {
         });
         return httprequest.post('test').then(function(response) {
             expect(response.status).toBe(200);
-        }, function(response) {
+        }, function(error) {
             throw new Error('This should not be called!');
         });
     });
