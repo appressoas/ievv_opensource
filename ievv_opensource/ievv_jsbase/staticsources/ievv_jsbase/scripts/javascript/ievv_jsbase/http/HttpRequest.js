@@ -20,7 +20,7 @@ import {UrlParser} from "./UrlParser";
  *     })
  *     .catch((error) => {
  *         // Error - response is an HttpError object.
- *         console.error(response.toString());
+ *         console.error(error.toString());
  *         if(error.response.isRedirect()) {
  *             // Yes - redirect is treated as an error by default.
  *             // you can change this by supplying an extra argument
