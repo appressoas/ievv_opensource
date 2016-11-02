@@ -27,5 +27,6 @@
       }
     }
   ],
-  "source": "scripts/javascript"
+  "source": "scripts/javascript",
+  "title": "ievv_jsbase"
 }

@@ -64,6 +64,17 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     """
     name = 'autosetup_esdoc'
 
+    def __init__(self, title=None, **kwargs):
+        """
+
+        Args:
+            title (str): The title of the docs. Falls back to the app name
+                if not specified.
+            **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
+        """
+        super(Plugin, self).__init__(**kwargs)
+        self.title = title
+
     def install(self):
         """
         Installs the ``esdoc`` and ``esdoc-importpath-plugin``
@@ -149,6 +160,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def make_esdoc_config_dict(self):
         config_dict = {
+            "title": self.title or self.app.appname,
             "source": self.app.make_source_relative_path("scripts", "javascript"),
             "destination": self.app.make_source_relative_path("built_docs"),
             "excludes": [
