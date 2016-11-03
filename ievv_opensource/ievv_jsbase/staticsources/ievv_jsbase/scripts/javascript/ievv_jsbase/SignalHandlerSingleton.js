@@ -111,7 +111,7 @@ export class SentSignalInfo {
         if(receivers === '') {
             receivers = 'NO RECEIVERS';
         }
-        return `Signal: ${this.signalName} was sent do: ${receivers}`;
+        return `Signal: ${this.signalName} was sent to: ${receivers}`;
     }
 }
 
