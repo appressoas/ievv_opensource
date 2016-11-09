@@ -99,3 +99,46 @@ export function objectHasOwnValueCheckAll(givenObject, ...args) {
 export function objectHasOwnValue(givenObject, ...args) {
     return _hasOwnValue(givenObject, false, false, ...args);
 }
+
+
+
+  /**
+   * uses {@link objectHasOwnValueCheckAll} to lookup given args in given objectToBeValidated.
+   * This ensures the lookup is not null, undefined, empty object, or empty string.
+   * If this test fails, given fallbackValue is returned.
+   *
+   * @example
+   *  // to validate myObject.foo.bar, and get "helloworld" back as default if it is empty:
+   *  validateSingleValue("helloworld", myObject, "foo", "bar")
+   *
+   * @param fallbackValue         what to return if empty
+   * @param objectToBeValidated   object to do lookup in
+   * @param args                  indices used for lookup in object
+   * @returns {*}                 the looked-up value from objectToBeValidated if it exists, fallbackValue if not.
+   */
+export function validateSingleValue(fallbackValue, objectToBeValidated, ...args) {
+    if (!objectHasOwnValueCheckAll(objectToBeValidated, ...args)) {
+        return fallbackValue;
+    }
+    for (let arg of args) {
+        objectToBeValidated = objectToBeValidated[arg];
+    }
+    return objectToBeValidated;
+}
+
+/**
+* Utilityfunction to simplify validation! uses {@link validateSingleValue} for validation, and throws an
+* Error with provided message if it fails.
+*
+* @param errorMessage          the message to use in new Error(errorMessage)
+* @param objectToBeValidated   the object to validate args in
+* @param args                  args for lookup. see {@link validateSingleValue}
+* @returns {*}                 the looked-up value from objectToBeValidated if it exists
+*/
+export function validateSingleValueOrThrowError(errorMessage, objectToBeValidated, ...args) {
+    const validatedValue = validateSingleValue(null, objectToBeValidated, ...args);
+    if (validatedValue == null) {
+        throw new Error(errorMessage);
+    }
+    return validatedValue;
+}
