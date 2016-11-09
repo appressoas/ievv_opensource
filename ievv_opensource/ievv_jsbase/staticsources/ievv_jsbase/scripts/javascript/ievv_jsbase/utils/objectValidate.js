@@ -38,7 +38,7 @@ const _hasOwnValue = function (givenObject, emptyObject, emptyString, ...args) {
     }
 
     return true;
-}
+};
 
 /**
  * Validate that an object and nested keys are not null, undefined or empty string "".
@@ -100,22 +100,20 @@ export function objectHasOwnValue(givenObject, ...args) {
     return _hasOwnValue(givenObject, false, false, ...args);
 }
 
-
-
-  /**
-   * uses {@link objectHasOwnValueCheckAll} to lookup given args in given objectToBeValidated.
-   * This ensures the lookup is not null, undefined, empty object, or empty string.
-   * If this test fails, given fallbackValue is returned.
-   *
-   * @example
-   *  // to validate myObject.foo.bar, and get "helloworld" back as default if it is empty:
-   *  validateSingleValue("helloworld", myObject, "foo", "bar")
-   *
-   * @param fallbackValue         what to return if empty
-   * @param objectToBeValidated   object to do lookup in
-   * @param args                  indices used for lookup in object
-   * @returns {*}                 the looked-up value from objectToBeValidated if it exists, fallbackValue if not.
-   */
+/**
+* uses {@link objectHasOwnValueCheckAll} to lookup given args in given objectToBeValidated.
+* This ensures the lookup is not null, undefined, empty object, or empty string.
+* If this test fails, given fallbackValue is returned.
+*
+* @example
+*  // to validate myObject.foo.bar, and get "helloworld" back as default if it is empty:
+*  validateSingleValue("helloworld", myObject, "foo", "bar")
+*
+* @param fallbackValue         what to return if empty
+* @param objectToBeValidated   object to do lookup in
+* @param args                  indices used for lookup in object
+* @returns {*}                 the looked-up value from objectToBeValidated if it exists, fallbackValue if not.
+*/
 export function validateSingleValue(fallbackValue, objectToBeValidated, ...args) {
     if (!objectHasOwnValueCheckAll(objectToBeValidated, ...args)) {
         return fallbackValue;
