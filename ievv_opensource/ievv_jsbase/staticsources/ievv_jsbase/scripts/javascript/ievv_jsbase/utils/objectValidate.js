@@ -101,19 +101,19 @@ export function objectHasOwnValue(givenObject, ...args) {
 }
 
 /**
-* uses {@link objectHasOwnValueCheckAll} to lookup given args in given objectToBeValidated.
-* This ensures the lookup is not null, undefined, empty object, or empty string.
-* If this test fails, given fallbackValue is returned.
-*
-* @example
-*  // to validate myObject.foo.bar, and get "helloworld" back as default if it is empty:
-*  validateSingleValue("helloworld", myObject, "foo", "bar")
-*
-* @param fallbackValue         what to return if empty
-* @param objectToBeValidated   object to do lookup in
-* @param args                  indices used for lookup in object
-* @returns {*}                 the looked-up value from objectToBeValidated if it exists, fallbackValue if not.
-*/
+ * uses {@link objectHasOwnValueCheckAll} to lookup given args in given objectToBeValidated.
+ * This ensures the lookup is not null, undefined, empty object, or empty string.
+ * If this test fails, given fallbackValue is returned.
+ *
+ * @example
+ *  // to validate myObject.foo.bar, and get "helloworld" back as default if it is empty:
+ *  validateSingleValue("helloworld", myObject, "foo", "bar")
+ *
+ * @param fallbackValue         what to return if empty
+ * @param objectToBeValidated   object to do lookup in
+ * @param args                  indices used for lookup in object
+ * @returns {*}                 objectToBeValidated if validation succeeded, fallbackValue if not.
+ */
 export function validateSingleValue(fallbackValue, objectToBeValidated, ...args) {
     if (!objectHasOwnValueCheckAll(objectToBeValidated, ...args)) {
         return fallbackValue;
@@ -125,18 +125,34 @@ export function validateSingleValue(fallbackValue, objectToBeValidated, ...args)
 }
 
 /**
-* Utilityfunction to simplify validation! uses {@link validateSingleValue} for validation, and throws an
-* Error with provided message if it fails.
-*
-* @param errorMessage          the message to use in new Error(errorMessage)
-* @param objectToBeValidated   the object to validate args in
-* @param args                  args for lookup. see {@link validateSingleValue}
-* @returns {*}                 the looked-up value from objectToBeValidated if it exists
-*/
-export function validateSingleValueOrThrowError(errorMessage, objectToBeValidated, ...args) {
+ * Utilityfunction to simplify validation! uses {@link validateSingleValue} for validation, and executes
+ * given callback (and returns returnvalue from it) if validation fails.
+ *
+ * @param callback              Function to be executed if validation fails
+ * @param objectToBeValidated   The object to do validation-lookup in
+ * @param args                  indices used for lookup in objectToBeValidated
+ * @returns {*}                 objectToBeValidated if validation succeeded, returnvalue from callback if not.
+ */
+export function validateSingleValueOrCallback(callback, objectToBeValidated, ...args) {
     const validatedValue = validateSingleValue(null, objectToBeValidated, ...args);
     if (validatedValue == null) {
-        throw new Error(errorMessage);
+        console.log("validatedValue is null.. running callback!");
+        return callback();
     }
+    console.log("validating value successful, returning:");
+    console.log(validatedValue);
     return validatedValue;
+}
+
+/**
+ * Utilityfunction to simplify validation! uses {@link validateSingleValueOrCallback} for validation, and passes
+ * a callback that simply thrown an Error if validation fails.
+ *
+ * @param errorMessage          the message to use in new Error(errorMessage)
+ * @param objectToBeValidated   the object to validate args in
+ * @param args                  args for lookup. see {@link validateSingleValue}
+ * @returns {*}                 the looked-up value from objectToBeValidated if it exists
+ */
+export function validateSingleValueOrThrowError(errorMessage, objectToBeValidated, ...args) {
+    return validateSingleValueOrCallback(()=>{throw new Error(errorMessage);}, objectToBeValidated, ...args);
 }
