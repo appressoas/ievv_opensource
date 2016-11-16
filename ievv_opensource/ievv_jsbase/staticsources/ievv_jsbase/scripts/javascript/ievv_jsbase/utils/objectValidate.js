@@ -112,7 +112,7 @@ export function objectHasOwnValue(givenObject, ...args) {
  * @param fallbackValue         what to return if empty
  * @param objectToBeValidated   object to do lookup in
  * @param args                  indices used for lookup in object
- * @returns {*}                 objectToBeValidated if validation succeeded, fallbackValue if not.
+ * @returns {*}                 lookup in objectToBeValidated if validation succeeded, fallbackValue if not.
  */
 export function validateSingleValue(fallbackValue, objectToBeValidated, ...args) {
     if (!objectHasOwnValueCheckAll(objectToBeValidated, ...args)) {
@@ -131,7 +131,7 @@ export function validateSingleValue(fallbackValue, objectToBeValidated, ...args)
  * @param callback              Function to be executed if validation fails
  * @param objectToBeValidated   The object to do validation-lookup in
  * @param args                  indices used for lookup in objectToBeValidated
- * @returns {*}                 objectToBeValidated if validation succeeded, returnvalue from callback if not.
+ * @returns {*}                 lookup in objectToBeValidated if validation succeeded, returnvalue from callback if not.
  */
 export function validateSingleValueOrCallback(callback, objectToBeValidated, ...args) {
     const validatedValue = validateSingleValue(null, objectToBeValidated, ...args);
