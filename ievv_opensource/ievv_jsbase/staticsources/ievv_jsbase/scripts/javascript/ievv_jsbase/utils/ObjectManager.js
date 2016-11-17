@@ -165,7 +165,7 @@ export default class ObjectManager {
 
     static _recursiveMerge(mergedValues, overrides) {
     for (let key in overrides) {
-        if ((key in mergedValues) && overrides[key].constructor == Object) {
+        if ((key in mergedValues) && overrides[key] != null && overrides[key].constructor == Object) {
           mergedValues[key] = this._recursiveMerge(mergedValues[key], overrides[key]);
         } else {
           mergedValues[key] = overrides[key];
@@ -189,7 +189,7 @@ export default class ObjectManager {
    *                                will be created to merge both given objects into.
    * @returns {*}                   The result from deep-merging
    */
-  static merge(givenObject, overrides, overrideValuesInGiven) {
+  static _merge(givenObject, overrides, overrideValuesInGiven) {
     if (overrideValuesInGiven) {
       return this._recursiveMerge(givenObject, overrides);
     }
@@ -197,5 +197,93 @@ export default class ObjectManager {
     let mergedValues = {};
     mergedValues = this._recursiveMerge(mergedValues, givenObject);
     return this._recursiveMerge(mergedValues, overrides);
+  }
+
+    /**
+     * Merges all values from overrideObject into originalObject.
+     * This happens in place (as objects are passed-by-reference), so originalObject is modified.
+     *
+     * This is a deep-merge (unlike Object.assign).
+     *
+     * @example <caption>Simple example</caption>
+     * let originalObject = {
+     *      foo: "bar",
+     *      person: {
+     *          name: "Sandy claws",
+     *          age: 42
+     *      }
+     * }
+     *
+     * let overrideObject = {
+     *      foo: "baz",
+     *      person: {
+     *          age: 23,
+     *          phone: 12345678
+     *      }
+     *  }
+     *
+     *  ObjectManager.mergeInPlace(originalObject, overrideObject);
+     *
+     *  // originalObject will now be:
+     *  originalObject == {
+     *      foo: "baz",
+     *      person: {
+     *          age: 23,
+     *          phone: 12345678,
+     *          name: "Sandy claws"
+     *      }
+     *  }
+     *
+     * @param originalObject    the object to modify
+     * @param overrideObject    the object to copy values from
+     */
+  static mergeInPlace(originalObject, overrideObject) {
+      this._merge(originalObject, overrideObject, true);
+  }
+
+    /**
+     * Merges all values from originalObject and overrideObject into a new object that is returned.
+     *
+     * This is a deep-merge (unlike Object.assign).
+     *
+     * First, all values from originalObject are merged into a new object.
+     * Then all values from overrideObject are merged into the same object, overriding any corresponding keys from
+     * originalObject.
+     *
+     * @example <caption>Simple example</caption>
+     * let originalObject = {
+     *      foo: "bar",
+     *      person: {
+     *          name: "Sandy claws",
+     *          age: 42
+     *      }
+     * }
+     *
+     * let overrideObject = {
+     *      foo: "baz",
+     *      person: {
+     *          age: 23,
+     *          phone: 12345678
+     *      }
+     *  }
+     *
+     *  let mergedObject = ObjectManager.mergeAndCopy(originalObject, overrideObject);
+     *
+     *  // mergedObject will now be:
+     *  mergedObject == {
+     *      foo: "baz",
+     *      person: {
+     *          age: 23,
+     *          phone: 12345678,
+     *          name: "Sandy claws"
+     *      }
+     *  }
+     *
+     * @param originalObject    initial values for new object
+     * @param overrideObject    object to override values from original object with
+     * @returns {{}}            new object containing values from originalObject overridden by overrideObject (see example)
+     */
+  static mergeAndClone(originalObject, overrideObject) {
+      return this._merge(originalObject, overrideObject, false);
   }
 }
