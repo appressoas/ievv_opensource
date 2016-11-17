@@ -77,15 +77,20 @@ describe('HttpDjangoJsonRequest', () => {
         });
     });
 
-    it('Sets Content-Type header', () => {
+    it('Sets Content-Type and Accept headers', () => {
         const httprequest = new HttpDjangoJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
         return httprequest.post('test').then(function(response) {
+            expect(httprequest.request.headers.length).toBe(3);
             expect(httprequest.request.headers[0].header).toBe(
-                'Content-Type');
+                'Accept');
             expect(httprequest.request.headers[0].value).toBe(
+                'application/json');
+            expect(httprequest.request.headers[1].header).toBe(
+                'Content-Type');
+            expect(httprequest.request.headers[1].value).toBe(
                 'application/json; charset=UTF-8');
         });
     });
@@ -96,7 +101,7 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.get('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(1);
+            expect(httprequest.request.headers.length).toBe(2);
         });
     });
 
@@ -106,7 +111,7 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.head('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(1);
+            expect(httprequest.request.headers.length).toBe(2);
         });
     });
 
@@ -116,10 +121,10 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.post('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(2);
-            expect(httprequest.request.headers[1].header).toBe(
+            expect(httprequest.request.headers.length).toBe(3);
+            expect(httprequest.request.headers[2].header).toBe(
                 'X-CSRFToken');
-            expect(httprequest.request.headers[1].value).toBe(
+            expect(httprequest.request.headers[2].value).toBe(
                 'testtoken');
         });
     });
@@ -130,10 +135,10 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.put('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(2);
-            expect(httprequest.request.headers[1].header).toBe(
+            expect(httprequest.request.headers.length).toBe(3);
+            expect(httprequest.request.headers[2].header).toBe(
                 'X-CSRFToken');
-            expect(httprequest.request.headers[1].value).toBe(
+            expect(httprequest.request.headers[2].value).toBe(
                 'testtoken');
         });
     });
@@ -144,10 +149,10 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.patch('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(2);
-            expect(httprequest.request.headers[1].header).toBe(
+            expect(httprequest.request.headers.length).toBe(3);
+            expect(httprequest.request.headers[2].header).toBe(
                 'X-CSRFToken');
-            expect(httprequest.request.headers[1].value).toBe(
+            expect(httprequest.request.headers[2].value).toBe(
                 'testtoken');
         });
     });
@@ -158,9 +163,10 @@ describe('HttpDjangoJsonRequest', () => {
             status: 200
         });
         return httprequest.httpdelete('test').then(function(response) {
-            expect(httprequest.request.headers[1].header).toBe(
+            expect(httprequest.request.headers.length).toBe(3);
+            expect(httprequest.request.headers[2].header).toBe(
                 'X-CSRFToken');
-            expect(httprequest.request.headers[1].value).toBe(
+            expect(httprequest.request.headers[2].value).toBe(
                 'testtoken');
         });
     });

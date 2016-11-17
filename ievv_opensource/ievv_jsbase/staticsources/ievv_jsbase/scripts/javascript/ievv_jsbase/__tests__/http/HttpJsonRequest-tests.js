@@ -63,16 +63,20 @@ describe('HttpJsonRequest', () => {
         });
     });
 
-    it('Sets content-type', () => {
+    it('Sets content-type and Accept headers', () => {
         const httprequest = new HttpJsonRequest('http://example.com/');
         httprequest.request = new XMLHttpRequestMock('onload', {
             status: 200
         });
         return httprequest.post('test').then(function(response) {
-            expect(httprequest.request.headers.length).toBe(1);
+            expect(httprequest.request.headers.length).toBe(2);
             expect(httprequest.request.headers[0].header).toBe(
-                'Content-Type');
+                'Accept');
             expect(httprequest.request.headers[0].value).toBe(
+                'application/json');
+            expect(httprequest.request.headers[1].header).toBe(
+                'Content-Type');
+            expect(httprequest.request.headers[1].value).toBe(
                 'application/json; charset=UTF-8');
         });
     });
