@@ -161,7 +161,7 @@ export default class WidgetRegistrySingleton {
     }
 
     _getAllWidgetElementsWithinElement(element) {
-        return element.querySelectorAll(`[${this._widgetAttribute}]`);
+        return Array.from(element.querySelectorAll(`[${this._widgetAttribute}]`));
     }
 
     /**
@@ -235,7 +235,7 @@ export default class WidgetRegistrySingleton {
     }
 
     _getAllInstanciatedWidgetElementsWithinElement(element) {
-        return element.querySelectorAll(`[${this._widgetInstanceIdAttribute}]`);
+        return Array.from(element.querySelectorAll(`[${this._widgetInstanceIdAttribute}]`));
     }
 
     /**

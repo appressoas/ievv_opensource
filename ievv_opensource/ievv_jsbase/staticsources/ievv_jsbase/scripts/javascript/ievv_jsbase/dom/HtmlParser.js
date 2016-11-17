@@ -79,6 +79,6 @@ export default class HtmlParser {
      * @returns {NodeList}
      */
     querySelectorAll(query) {
-        return this._tempDocumentBody.querySelectorAll(query);
+        return Array.from(this._tempDocumentBody.querySelectorAll(query));
     }
 }
