@@ -1,4 +1,5 @@
 import "babel-polyfill";
+import "./polyfill/all";
 import SignalHandlerSingleton from "./SignalHandlerSingleton";
 import WidgetRegistrySingleton from "./widget/WidgetRegistrySingleton";
 import LoggerSingleton from "./log/LoggerSingleton";
