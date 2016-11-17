@@ -163,6 +163,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             "title": self.title or self.app.appname,
             "source": self.app.make_source_relative_path("scripts", "javascript"),
             "destination": self.app.make_source_relative_path("built_docs"),
+            "includes": ["\\.(js|es6|jsx)$"],
             "excludes": [
                 "__tests__.+$",
                 "__mocks__.+$"
