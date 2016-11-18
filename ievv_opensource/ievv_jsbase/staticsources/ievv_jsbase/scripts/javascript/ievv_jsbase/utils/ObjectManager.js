@@ -141,11 +141,8 @@ export default class ObjectManager {
     static validateOrCallback(callback, objectToBeValidated, ...args) {
         const validatedValue = this.validateOrFallback(null, objectToBeValidated, ...args);
         if (validatedValue == null) {
-            console.log("validatedValue is null.. running callback!");
             return callback();
         }
-        console.log("validating value successful, returning:");
-        console.log(validatedValue);
         return validatedValue;
     }
     
