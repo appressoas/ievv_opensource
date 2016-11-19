@@ -10,6 +10,20 @@ describe('PostCleanContentEditableHtml', () => {
             '<p>Some text</p>');
     });
 
+    it('custom wrapper tag', () => {
+        const wrapper = new PostCleanContentEditableHtml(
+            'Some text', 'li');
+        expect(wrapper.toString()).toEqual(
+            '<li>Some text</li>');
+    });
+
+    it('custom wrapper tag with attributes', () => {
+        const wrapper = new PostCleanContentEditableHtml(
+            'Some text', 'li', {'class': 'large'});
+        expect(wrapper.toString()).toEqual(
+            '<li class="large">Some text</li>');
+    });
+
     it('wraps text in root in block element complex', () => {
         const wrapper = new PostCleanContentEditableHtml(
             'Some text<p>In block text</p>More text');

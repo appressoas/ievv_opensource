@@ -5,7 +5,9 @@ import CleanHtml from "./CleanHtml";
 
 
 export class PostCleanContentEditableHtml {
-    constructor(html) {
+    constructor(html, wrapperTagName='p', wrapperTagAttributes={}) {
+        this._wrapperTagName = wrapperTagName;
+        this._wrapperTagAttributes = wrapperTagAttributes;
         this._currentBlockElementLevel = 0;
         this._currentInlineElementLevel = 0;
         this._resultHtml = '';
@@ -33,12 +35,12 @@ export class PostCleanContentEditableHtml {
     }
 
     startWrapping() {
-        this._resultHtml += makeHtmlStartTag('p');
+        this._resultHtml += makeHtmlStartTag(this._wrapperTagName, this._wrapperTagAttributes);
         this._isWrapping = true;
     }
 
     endWrapping() {
-        this._resultHtml += makeHtmlEndTag('p');
+        this._resultHtml += makeHtmlEndTag(this._wrapperTagName);
         this._isWrapping = false;
     }
 
@@ -111,7 +113,15 @@ export class PostCleanContentEditableHtml {
  * contenteditable editors.
  */
 export default class CleanContentEditableHtml extends CleanHtml {
+    setInlineWithoutParentWrapperTag(tagName, tagAttributes={}) {
+        this._inlineWithoutParentWrapperTagName = tagName;
+        this._inlineWithoutParentWrapperTagAttributes = tagAttributes;
+    }
+
     postClean(html) {
-        return new PostCleanContentEditableHtml(html).toString();
+        return new PostCleanContentEditableHtml(
+            html,
+            this._inlineWithoutParentWrapperTagName,
+            this._inlineWithoutParentWrapperTagAttributes).toString();
     }
 }
