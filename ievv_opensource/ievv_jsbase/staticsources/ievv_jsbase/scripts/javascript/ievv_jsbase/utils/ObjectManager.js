@@ -283,4 +283,8 @@ export default class ObjectManager {
   static mergeAndClone(originalObject, overrideObject) {
       return this._merge(originalObject, overrideObject, false);
   }
+
+  static clone(object) {
+      return this.mergeAndClone({}, object);
+  }
 }
