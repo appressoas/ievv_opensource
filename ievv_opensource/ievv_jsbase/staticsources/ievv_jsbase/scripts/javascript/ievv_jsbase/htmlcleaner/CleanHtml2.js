@@ -1,8 +1,186 @@
 import htmlparser from "htmlparser2";
-import {makeHtmlStartTag, makeHtmlEndTag} from "./utils";
-import {isInlineTag} from "./utils";
+import {makeHtmlStartTag, makeHtmlEndTag, isInlineTag} from "./utils";
 import CleanHtml from "./CleanHtml";
-import ObjectManager from "../utils/ObjectManager";
+import TypeConvert from "../utils/TypeConvert";
+
+
+export class CleanerNode {
+    constructor(options, parentNode, tagName, attributes={}) {
+        this._inlineWrapperNode = null;
+        this.options = options;
+        this.parentNode = parentNode;
+        this.originalTagName = tagName;
+        this.originalAttributes = attributes;
+        this.tagName = this.cleanTagName();
+        this.attributes = this.cleanAttributes();
+        this.children = [];
+    }
+
+    getClosestParentWithTagName(tagName) {
+        if(this.parentNode == null || this.parentNode.tagName == null) {
+            return null;
+        }
+        if(this.parentNode.tagName == tagName) {
+            return this.parentNode;
+        } else {
+            return this.parentNode.getClosestParentWithTagName(tagName);
+        }
+    }
+
+    transformTagName() {
+        if(this.originalTagName != null && this.options.transformTagsMap.has(this.originalTagName)) {
+            return this.options.transformTagsMap.get(this.originalTagName);
+        }
+        return this.originalTagName;
+    }
+
+    cleanTagName() {
+        const tagName = this.transformTagName();
+        if(tagName != null && this.options.allowedTagsSet.has(tagName)) {
+            return tagName;
+        }
+        return null;
+    }
+
+    cleanAttributes() {
+        const cleanedAttributes = {};
+        for(let attributeName of Object.keys(this.originalAttributes)) {
+            if(this.options.isAllowedAttributeForTagName(this.tagName, attributeName)) {
+                cleanedAttributes[attributeName] = this.originalAttributes[attributeName];
+            }
+        }
+        return cleanedAttributes;
+    }
+
+    shouldWrapStandaloneInlineTags() {
+        return this.parentNode == null && this.options.wrapStandaloneInlineTagName != null;
+    }
+
+    getStandaloneInlineTagWrapper() {
+        if(this._inlineWrapperNode == null) {
+            const node = this.makeChildNode(
+                this.options.wrapStandaloneInlineTagName,
+                this.options.wrapStandaloneInlineTagAttributes);
+            this._inlineWrapperNode = node;
+            this.children.push(node);
+        }
+        return this._inlineWrapperNode;
+    }
+
+    stopWrappingStandaloneInlineTags() {
+        this._inlineWrapperNode = null;
+    }
+
+    addText(text) {
+        if(this.shouldWrapStandaloneInlineTags()) {
+            this.getStandaloneInlineTagWrapper().addText(text);
+        } else {
+            this.children.push(text);
+        }
+    }
+
+    makeChildNode(tagName, attributes) {
+        const cleanerNodeClass = this.options.getCleanerNodeClassForTagName(tagName);
+        return new cleanerNodeClass(
+            this.options, this,
+            tagName, attributes);
+    }
+
+    isInlineTag() {
+        return isInlineTag(this.tagName);
+    }
+
+    addChildNode(node) {
+        if(this.shouldWrapStandaloneInlineTags() && node.isInlineTag()) {
+            this.getStandaloneInlineTagWrapper().addChildNode(node);
+        } else {
+            this.stopWrappingStandaloneInlineTags();
+            this.children.push(node);
+        }
+    }
+
+    addChildNodeFromTag(tagName, attributes) {
+        const node = this.makeChildNode(tagName, attributes);
+        this.addChildNode(node);
+        return node;
+    }
+
+    shouldRenderTag() {
+        if(this.tagName == null) {
+            return false;
+        }
+        const closestParentNodeWithSameTag = this.getClosestParentWithTagName(this.tagName);
+        if(closestParentNodeWithSameTag == null) {
+            return true;
+        }
+        return this.options.allowNestedWithinSameTagSet.has(this.tagName);
+    }
+
+    makeStartTag() {
+        if(this.shouldRenderTag()) {
+            return makeHtmlStartTag(this.tagName, this.attributes);
+        }
+        return '';
+    }
+
+    makeEndTag() {
+        if(this.shouldRenderTag()) {
+            return makeHtmlEndTag(this.tagName);
+        }
+        return '';
+    }
+
+    childrenToHtml() {
+        let html = '';
+        for(let child of this.children) {
+            if(typeof child == 'string') {
+                html += child;
+            } else {
+                html += child.toHtml();
+            }
+        }
+        return html;
+    }
+
+    toHtml() {
+        return `${this.makeStartTag()}${this.childrenToHtml()}${this.makeEndTag(this.tagName)}`;
+    }
+
+    toString() {
+        return this.toHtml();
+    }
+}
+
+
+// Should be the default for nodes that can not contain
+// text as a direct child, such as UL, OL, TABLE, ...
+// and all the self-closing tags.
+export class NoTextCleanerNode extends CleanerNode {
+    addText(text) {}
+}
+
+
+export class FlatListCleanerNode extends NoTextCleanerNode {
+    shouldRenderTag() {
+        if(this.tagName == null) {
+            return false;
+        }
+        const closestUlParentNode = this.getClosestParentWithTagName(this.tagName);
+        return closestUlParentNode == null;
+
+    }
+
+    addChildNode(node) {
+        const closestUlParentNode = this.getClosestParentWithTagName(this.tagName);
+        if(closestUlParentNode == null) {
+            super.addChildNode(node);
+        } else {
+            closestUlParentNode.addChildNode(node);
+        }
+    }
+}
+
+
 
 
 /*
@@ -25,11 +203,6 @@ Handle &nbsp; (should be removed)
 export class CleanHtmlParser {
     constructor(html, options) {
         this.options = options;
-        this._currentBlockElementLevel = 0;
-        this._currentInlineElementLevel = 0;
-        this._isWrappingStandaloneInline = false;
-        this._resultHtml = '';
-        this._path = [];
         this._parse(html);
         if(this._isWrappingStandaloneInline) {
             this.endWrappingStandaloneInline();
@@ -37,144 +210,138 @@ export class CleanHtmlParser {
     }
 
     _parse(html) {
+        this._rootNode = new this.options.rootCleanerNodeClass(
+            this.options,
+            null,  // parentNode
+            this.options.rootCleanerNodeTagName,
+            this.options.rootCleanerNodeAttributes);
+        this._currentNode = this._rootNode;
         const parser = new htmlparser.Parser({
             onopentag: (...args) => {
-                this._onOpenTag(...args);
+                this.onOpenTag(...args);
             },
             ontext: (...args) => {
-                this._onText(...args);
+                this.onText(...args);
             },
             onclosetag: (...args) => {
-                this._onCloseTag(...args);
+                this.onCloseTag(...args);
             }
         }, {decodeEntities: true});
         parser.write(html);
         parser.end();
     }
 
-    isAllowedTag(tagName) {
-        const isAllowedTagName = this.options.allowedTags.indexOf(tagName) != -1;
-        if(!isAllowedTagName) {
-            return false;
+    onOpenTag(tagName, attributes) {
+        const node = this._currentNode.addChildNodeFromTag(tagName, attributes);
+        // console.log(`${tagName}: ${node.toString()}`);
+        this._currentNode = node;
+    }
+
+    onText(text) {
+        this._currentNode.addText(text);
+    }
+
+    onCloseTag(tagName) {
+        this._currentNode = this._currentNode.parentNode;
+    }
+
+    get rootNode() {
+        return this._rootNode;
+    }
+}
+
+
+
+class CleanHtmlOptions {
+    constructor() {
+        this._allowedTagsSet = new Set();
+        this._allowedAttributesMap = new Map();
+        this._allowNestedWithinSameTagSet = new Set();
+        this._transformTagsMap = new Map();
+        this.defaultCleanerNodeClass = CleanerNode;
+        this.rootCleanerNodeClass = CleanerNode;
+        this.rootCleanerNodeTagName = null;
+        this.rootCleanerNodeAttributes = {};
+        this._tagNameToCleanerNodeClassMap = new Map();
+        this.wrapStandaloneInlineTagName = null;
+        this.wrapStandaloneInlineTagAttributes = {};
+
+    }
+
+    get allowedTagsSet() {
+        return this._allowedTagsSet;
+    }
+
+    set allowedTagsSet(allowedTagsSet) {
+        this._allowedTagsSet = TypeConvert.toSet(allowedTagsSet);
+    }
+
+
+    get allowedAttributesMap() {
+        return this._allowedAttributesMap;
+    }
+
+    set allowedAttributesMap(allowedAttributesMap) {
+        this._allowedAttributesMap = TypeConvert.toMapOfSets(allowedAttributesMap);
+    }
+
+    isAllowedAttributeForTagName(tagName, attributeName) {
+        if(this._allowedAttributesMap.has(tagName)) {
+            return this._allowedAttributesMap.get(tagName).has(attributeName);
         }
-        const tagWithSameNameIndex = this._path.indexOf(tagName);
-        const hasParentWithSameTagName = tagWithSameNameIndex != -1
-            && tagWithSameNameIndex != (this._path.length - 1);
-        if(hasParentWithSameTagName) {
-            return this.options.allowSelfNested.indexOf(tagName) != -1;
-        }
-        return true;
+        return false;
     }
 
-    startWrappingStandaloneInline() {
-        this._resultHtml += makeHtmlStartTag(
-            this.options.wrapStandaloneInlineTags.tagName,
-            this.options.wrapStandaloneInlineTags.tagAttributes);
-        this._isWrappingStandaloneInline = true;
+
+    set transformTagsMap(transformTagsMap) {
+        this._transformTagsMap = TypeConvert.toMap(transformTagsMap);
     }
 
-    endWrappingStandaloneInline() {
-        this._resultHtml += makeHtmlEndTag(this.options.wrapStandaloneInlineTags.tagName);
-        this._isWrappingStandaloneInline = false;
+    get transformTagsMap() {
+        return this._transformTagsMap;
     }
 
-    _shouldWrap() {
-        return this.options.wrapStandaloneInlineTags
-            && this._currentBlockElementLevel == 0
-            && !this._isWrappingStandaloneInline;
+
+    get allowNestedWithinSameTagSet() {
+        return this._allowNestedWithinSameTagSet;
     }
 
-    _onOpenInlineTag(tagName, attributes) {
-        if(this._shouldWrap()) {
-            this.startWrappingStandaloneInline();
-        }
-        this._currentInlineElementLevel ++;
-        this._resultHtml += makeHtmlStartTag(tagName, attributes);
+    set allowNestedWithinSameTagSet(allowNestedWithinSameTagSet) {
+        this._allowNestedWithinSameTagSet = TypeConvert.toSet(allowNestedWithinSameTagSet);
     }
 
-    _isAllowedAttributeForTagName(tagName, attributeName) {
-        const allowedAttributesForTagName = this.options.allowedAttributes[tagName];
-        if(typeof allowedAttributesForTagName == 'undefined') {
-            return false;
-        }
-        return allowedAttributesForTagName.indexOf(attributeName) != -1;
+
+    set tagNameToCleanerNodeClassMap(tagNameToCleanerNodeClassMap) {
+        this._tagNameToCleanerNodeClassMap = TypeConvert.toMap(tagNameToCleanerNodeClassMap);
     }
 
-    _cleanAttributes(tagName, attributes) {
-        const cleanedAttributes = {};
-        for(let attributeName of Object.keys(attributes)) {
-            if(this._isAllowedAttributeForTagName(tagName, attributeName)) {
-                cleanedAttributes[attributeName] = attributes[attributeName];
-            }
-        }
-        return cleanedAttributes;
+    get tagNameToCleanerNodeClassMap() {
+        return this._tagNameToCleanerNodeClassMap;
     }
 
-    _onOpenBlockTag(tagName, attributes) {
-        if(this._currentInlineElementLevel == 0) {
-            if(this._currentBlockElementLevel == 0 && this._isWrappingStandaloneInline) {
-                this.endWrappingStandaloneInline();
-            }
-            this._currentBlockElementLevel++;
-            this._resultHtml += makeHtmlStartTag(tagName, attributes);
-        }
-    }
-
-    _transformTagName(tagName) {
-        const newTagName = this.options.transformTags[tagName];
-        if(typeof newTagName == 'undefined') {
-            return tagName;
-        }
-        return newTagName;
-    }
-
-    _onOpenTag(tagName, attributes) {
-        tagName = this._transformTagName(tagName);
-        this._path.push(tagName);
-        if(this.isAllowedTag(tagName)) {
-            let cleanedAttributes = this._cleanAttributes(tagName, attributes);
-            if(isInlineTag(tagName)) {
-                this._onOpenInlineTag(tagName, cleanedAttributes);
-            } else {
-                this._onOpenBlockTag(tagName, cleanedAttributes);
-            }
-        }
-    }
-
-    _onText(text) {
-        if(this._shouldWrap()) {
-            this.startWrappingStandaloneInline();
-        }
-        this._resultHtml += text;
-    }
-
-    _onCloseInlineTag(tagName) {
-        this._currentInlineElementLevel --;
-        this._resultHtml += makeHtmlEndTag(tagName);
-    }
-
-    _onCloseBlockTag(tagName) {
-        if(this._currentInlineElementLevel == 0) {
-            this._currentBlockElementLevel --;
-            this._resultHtml += makeHtmlEndTag(tagName);
+    getCleanerNodeClassForTagName(tagName) {
+        if(this._tagNameToCleanerNodeClassMap.has(tagName)) {
+            return this._tagNameToCleanerNodeClassMap.get(tagName);
+        } else {
+            return this.defaultCleanerNodeClass;
         }
     }
 
-    _onCloseTag(tagName) {
-        tagName = this._transformTagName(tagName);
-        if(this.isAllowedTag(tagName)) {
-            if (isInlineTag(tagName)) {
-                this._onCloseInlineTag(tagName);
-            } else {
-                this._onCloseBlockTag(tagName);
-            }
-        }
-        this._path.pop();
+    setCleanerNodeClassForTagName(tagName, cleanerNodeClass) {
+        this._tagNameToCleanerNodeClassMap.set(tagName, cleanerNodeClass);
     }
 
-    toString() {
-        return this._resultHtml;
-    }
+    // updateFromObject(optionsObject) {
+    //     if(typeof optionsObject.allowedTagsSet != 'undefined') {
+    //         this.allowedTagsSet = optionsObject.allowedTagsSet;
+    //     }
+    //     if(typeof optionsObject.allowedAttributesMap != 'undefined') {
+    //         this.allowedAttributesMap = optionsObject.allowedAttributesMap;
+    //     }
+    //     if(typeof optionsObject.transformTagsMap != 'undefined') {
+    //         this.transformTagsMap = optionsObject.transformTagsMap;
+    //     }
+    // }
 }
 
 
@@ -184,26 +351,11 @@ export class CleanHtmlParser {
  * contenteditable editors.
  */
 export default class CleanHtml2 {
-    constructor(options={}) {
-        this.options = ObjectManager.mergeAndClone(this.getDefaultOptions(), options);
+    constructor() {
+        this.options = new CleanHtmlOptions();
     }
 
-    getDefaultOptions() {
-        return {
-            allowedTags: ['h2', 'h3', 'p', 'strong', 'em', 'a'],
-            allowSelfNested: [],
-            flattenNestedLists: false,
-            wrapStandaloneInlineTags: {
-                tagName: 'p'
-            },
-            allowedAttributes: {
-                a: ['href']
-            },
-            transformTags: {}
-        }
-    }
-
-        /**
+    /**
      * Called at the beginning of {@link CleanHtml#clean}
      * before performing the default cleaning.
      *
@@ -235,7 +387,7 @@ export default class CleanHtml2 {
     }
 
     _clean(html) {
-        return new CleanHtmlParser(html, this.options).toString();
+        return new CleanHtmlParser(html, this.options).rootNode.toHtml();
     }
 
     /**
