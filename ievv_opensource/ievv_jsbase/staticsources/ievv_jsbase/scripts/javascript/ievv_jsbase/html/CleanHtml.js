@@ -166,15 +166,14 @@ export class FlatListCleanerNode extends NoTextCleanerNode {
         }
         const closestUlParentNode = this.getClosestParentWithTagName(this.tagName);
         return closestUlParentNode == null;
-
     }
 
     addChildNode(node) {
-        const closestUlParentNode = this.getClosestParentWithTagName(this.tagName);
-        if(closestUlParentNode == null) {
+        const closestListParentNode = this.getClosestParentWithTagName(this.tagName);
+        if(closestListParentNode == null) {
             super.addChildNode(node);
         } else {
-            closestUlParentNode.addChildNode(node);
+            closestListParentNode.addChildNode(node);
         }
     }
 }
