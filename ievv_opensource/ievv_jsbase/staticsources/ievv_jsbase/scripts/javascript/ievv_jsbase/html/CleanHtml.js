@@ -1,6 +1,5 @@
 import htmlparser from "htmlparser2";
 import {makeHtmlStartTag, makeHtmlEndTag, isInlineTag} from "./utils";
-import CleanHtml from "./CleanHtml";
 import TypeConvert from "../utils/TypeConvert";
 
 
@@ -350,7 +349,7 @@ class CleanHtmlOptions {
  * suitable for cleaning input typed and pasted into
  * contenteditable editors.
  */
-export default class CleanHtml2 {
+export default class CleanHtml {
     constructor() {
         this.options = new CleanHtmlOptions();
     }

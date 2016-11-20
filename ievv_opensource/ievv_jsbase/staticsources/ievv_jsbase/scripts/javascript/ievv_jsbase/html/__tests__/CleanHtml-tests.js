@@ -1,25 +1,25 @@
-import CleanHtml2 from "../CleanHtml2";
-import {FlatListCleanerNode} from "../CleanHtml2";
-import {MergeIntoParentCleanerNode} from "../CleanHtml2";
+import CleanHtml from "../CleanHtml";
+import {FlatListCleanerNode} from "../CleanHtml";
+import {MergeIntoParentCleanerNode} from "../CleanHtml";
 
 
-describe('CleanHtml2', () => {
+describe('CleanHtml', () => {
     it('sanity', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p'];
         expect(htmlCleaner.clean('<p>Test</p>')).toEqual(
             '<p>Test</p>');
     });
 
     it('only allowed tags sanity', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = [];
         expect(htmlCleaner.clean('<p class="test">Test</p>')).toEqual(
             'Test');
     });
 
     it('only allowed tags', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['em', 'strong'];
         expect(htmlCleaner.clean(
             '<p class="test"><em>Test1</em> Test 2 <i>Test 3</i> <strong>Test 4</strong></p>'))
@@ -27,7 +27,7 @@ describe('CleanHtml2', () => {
     });
 
     it('allowedAttributesMap sanity', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p'];
         htmlCleaner.options.allowedAttributesMap = {
             'p': ['class']
@@ -37,7 +37,7 @@ describe('CleanHtml2', () => {
     });
 
     it('allowedAttributesMap only applies to specified tags', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p', 'em'];
         htmlCleaner.options.allowedAttributesMap = {
             'p': ['class']
@@ -47,7 +47,7 @@ describe('CleanHtml2', () => {
     });
 
     it('wrapStandaloneInline text', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p'];
         htmlCleaner.options.wrapStandaloneInlineTagName = 'p';
         expect(htmlCleaner.clean('Test')).toEqual(
@@ -55,7 +55,7 @@ describe('CleanHtml2', () => {
     });
 
     it('wrapStandaloneInline tag', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p', 'em'];
         htmlCleaner.options.wrapStandaloneInlineTagName = 'p';
         expect(htmlCleaner.clean('<em>Test</em>')).toEqual(
@@ -63,7 +63,7 @@ describe('CleanHtml2', () => {
     });
 
     it('wraps inline other tags than p works', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['li', 'em'];
         htmlCleaner.options.wrapStandaloneInlineTagName = 'li';
         expect(htmlCleaner.clean('<em>Test</em>')).toEqual(
@@ -71,7 +71,7 @@ describe('CleanHtml2', () => {
     });
 
     it('wraps inline custom attributes', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p'];
         htmlCleaner.options.allowedAttributesMap = {
             p: ['class']
@@ -85,7 +85,7 @@ describe('CleanHtml2', () => {
     });
 
     it('transforms tags simple', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p'];
         htmlCleaner.options.transformTagsMap = {
             'div': 'p'
@@ -95,7 +95,7 @@ describe('CleanHtml2', () => {
     });
 
     it('transforms tags deep', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['p', 'em'];
         htmlCleaner.options.transformTagsMap = {
             'div': 'p',
@@ -106,14 +106,14 @@ describe('CleanHtml2', () => {
     });
 
     it('prevent nested simple', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['div'];
         expect(htmlCleaner.clean('<div><div>Test</div></div>')).toEqual(
             '<div>Test</div>');
     });
 
     it('prevent nested very recursive', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['div'];
         expect(htmlCleaner.clean(
             '<div>Pre <div><div>Test</div></div> Post</div>')).toEqual(
@@ -121,7 +121,7 @@ describe('CleanHtml2', () => {
     });
 
     it('FlatListCleanerNode', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['ul', 'li'];
         htmlCleaner.options.allowNestedWithinSameTagSet = ['ul', 'li'];
         htmlCleaner.options.setCleanerNodeClassForTagName('ul', FlatListCleanerNode);
@@ -159,7 +159,7 @@ describe('CleanHtml2', () => {
     });
 
     it('Force common parent is possible', () => {
-        const htmlCleaner = new CleanHtml2();
+        const htmlCleaner = new CleanHtml();
         htmlCleaner.options.allowedTagsSet = ['ul', 'li'];
         htmlCleaner.options.allowNestedWithinSameTagSet = ['ul', 'li'];
         htmlCleaner.options.allowedAttributesMap = {
@@ -198,4 +198,10 @@ describe('CleanHtml2', () => {
             '</ul>';
         expect(htmlCleaner.clean(original)).toEqual(expected);
     });
+
+    // it('mergeMode', () => {
+    //     const htmlCleaner = new CleanHtml();
+    //     htmlCleaner.options.allowedTagsSet = ['ul', 'li'];
+        // expect(htmlCleaner.clean('<p>This is</p>')).toEqual(expected);
+    // });
 });
