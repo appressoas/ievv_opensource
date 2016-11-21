@@ -8,7 +8,7 @@ class IevvJsBaseCoreComponent(javascriptregistry.component.AbstractJsComponent):
         return 'ievv_jsbase_core'
 
     def _get_version(self):
-        return '1.0.0'
+        return ievv_jsbase.__version__
 
     def _versioned_static_urls(self, path_patterns):
         return [
@@ -17,8 +17,6 @@ class IevvJsBaseCoreComponent(javascriptregistry.component.AbstractJsComponent):
         ]
 
     def get_sourceurls(self):
-        return [
-            self.get_static_url('ievv_jsbase/{version}/scripts/ievv_jsbase_core.js'.format(
-                version=ievv_jsbase.__version__)),
-
-        ]
+        return self._versioned_static_urls([
+            'ievv_jsbase/{version}/scripts/ievv_jsbase_core.js'
+        ])
