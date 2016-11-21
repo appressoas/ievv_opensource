@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "demoapp2",
+  "version": "0.0.1",
+  "dependencies": {
+    "autoprefixer": "^6.5.1",
+    "cssnano": "^3.7.7",
+    "postcss-cli": "^2.6.0",
+    "postcss-scss": "^0.3.1",
+    "stylelint": "^7.4.2"
+  }
+}

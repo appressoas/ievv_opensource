@@ -290,6 +290,9 @@ class Apps(LogMixin):
     """
     Basically a list around :class:`.App` objects.
     """
+    MODE_DEVELOP = 'develop'
+    MODE_PRODUCTION = 'production'
+
     def __init__(self, *apps, help_header=None):
         """
         Parameters:
@@ -299,6 +302,7 @@ class Apps(LogMixin):
         self.loglevel = Logger.DEBUG
         self.command_error_message = None
         self.help_header = help_header
+        self.mode = self.MODE_DEVELOP
         for app in apps:
             self.add_app(app)
 
@@ -397,3 +401,12 @@ class Apps(LogMixin):
                                   handler=handler)
         self.loglevel = loglevel
         self.command_error_message = command_error_message
+
+    def set_development_mode(self):
+        self.mode = self.MODE_DEVELOP
+
+    def set_production_mode(self):
+        self.mode = self.MODE_PRODUCTION
+
+    def is_in_production_mode(self):
+        return self.mode == self.MODE_PRODUCTION

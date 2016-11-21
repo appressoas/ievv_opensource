@@ -106,7 +106,10 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         :class:`ievv_opensource.utils.ievvbuildstatic.npminstall.Plugin` plugin.
         """
         self.app.get_installer('npm').queue_install(
-            'browserify')
+            'browserify', installtype='dev')
+        if self.app.apps.is_in_production_mode():
+            self.app.get_installer('npm').queue_install(
+                'uglifyify', installtype='dev')
 
     def get_browserify_executable(self):
         return self.app.get_installer('npm').find_executable('browserify')
@@ -118,6 +121,9 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         Override this in subclasses to add transforms and such.
         """
         return []
+
+    def get_browserify_production_args(self):
+        return ['-t', '[', 'uglifyify', ']']
 
     def make_browserify_args(self):
         """
@@ -141,6 +147,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
            '-o', self.get_destinationfile_path(),
         ])
         args.extend(self.get_browserify_extra_args())
+        if self.app.apps.is_in_production_mode():
+            args.extend(self.get_browserify_production_args())
         return args
 
     def make_browserify_executable_environment(self):
