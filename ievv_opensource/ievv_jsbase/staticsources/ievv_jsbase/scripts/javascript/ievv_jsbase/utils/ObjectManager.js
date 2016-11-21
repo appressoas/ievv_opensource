@@ -283,4 +283,16 @@ export default class ObjectManager {
   static mergeAndClone(originalObject, overrideObject) {
       return this._merge(originalObject, overrideObject, false);
   }
+
+  /**
+   * Copies all values from given originalObject into a new object, which is returned to caller.
+   *
+   * uses {@link ObjectManager#mergeAndClone}, but passes an empty object as one of the two it desires for merging..
+   *
+   * @param originalObject
+   * @returns {{}}
+   */
+  static clone(originalObject) {
+    return this.mergeAndClone({}, originalObject);
+  }
 }
