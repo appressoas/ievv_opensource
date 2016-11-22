@@ -7,11 +7,13 @@
   },
   "devDependencies": {
     "babel-jest": "^16.0.0",
+    "babel-loader": "^6.2.8",
     "babel-polyfill": "^6.16.0",
     "esdoc": "^0.4.8",
     "esdoc-importpath-plugin": "^0.0.1",
     "htmlparser2": "^3.9.2",
-    "jest": "^16.0.2"
+    "jest": "^16.0.2",
+    "webpack": "^1.13.3"
   },
   "license": "BSD-3-Clause",
   "main": "scripts/javascript/ievv_jsbase/ievv_jsbase.js",
