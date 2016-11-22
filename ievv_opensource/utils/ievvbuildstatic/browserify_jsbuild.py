@@ -123,7 +123,10 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         return []
 
     def get_browserify_production_args(self):
-        return ['-t', '[', 'uglifyify', ']']
+        return [
+            '-t', '[', 'uglifyify', ']',
+            '-g', 'uglifyify',
+        ]
 
     def make_browserify_args(self):
         """
