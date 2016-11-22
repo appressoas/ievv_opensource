@@ -1,5 +1,6 @@
+import typeDetect from "./typeDetect";
 /**
- * Utility-class with several static functions to simplify validation, merging and other standard operations on 
+ * Utility-class with several static functions to simplify validation, merging and other standard operations on
  * javascript-Objects.
  */
 export default class ObjectManager {
@@ -44,7 +45,7 @@ export default class ObjectManager {
 
         return true;
     }
-    
+
     /**
      * Validate that an object and nested keys are not null, undefined or empty string "".
      *
@@ -59,7 +60,7 @@ export default class ObjectManager {
     static validateAllowEmptyObject(givenObject, ...args) {
         return this._hasOwnValue(givenObject, false, true, ...args);
     }
-    
+
     /**
      * Validate that an object and nested keys are not null, undefined or empty object {}.
      *
@@ -74,7 +75,7 @@ export default class ObjectManager {
     static validateAllowEmptyString(givenObject, ...args) {
         return this._hasOwnValue(givenObject, true, false, ...args);
     }
-    
+
     /**
      * Validate that an object and nested keys are not null, undefined or empty string "" or empty object {}.
      *
@@ -89,7 +90,7 @@ export default class ObjectManager {
     static validate(givenObject, ...args) {
         return this._hasOwnValue(givenObject, true, true, ...args);
     }
-    
+
     /**
      * Validate that an object and nested keys are not null or undefined.
      *
@@ -104,7 +105,7 @@ export default class ObjectManager {
     static validateAllowEmptyStringAndEmptyObject(givenObject, ...args) {
         return this._hasOwnValue(givenObject, false, false, ...args);
     }
-    
+
     /**
      * uses {@link validate} to lookup given args in given objectToBeValidated.
      * This ensures the lookup is not null, undefined, empty object, or empty string.
@@ -128,7 +129,7 @@ export default class ObjectManager {
         }
         return objectToBeValidated;
     }
-    
+
     /**
      * Utilityfunction to simplify validation! uses {@link validateOrFallback} for validation, and executes
      * given callback (and returns returnvalue from it) if validation fails.
@@ -145,7 +146,7 @@ export default class ObjectManager {
         }
         return validatedValue;
     }
-    
+
     /**
      * Utilityfunction to simplify validation! uses {@link validateOrCallback} for validation, and passes
      * a callback that simply thrown an Error if validation fails.
@@ -161,40 +162,49 @@ export default class ObjectManager {
 
 
     static _recursiveMerge(mergedValues, overrides) {
-    for (let key in overrides) {
-        if ((key in mergedValues) && overrides[key] != null && overrides[key].constructor == Object) {
-          mergedValues[key] = this._recursiveMerge(mergedValues[key], overrides[key]);
-        } else {
-          mergedValues[key] = overrides[key];
+        for (let key in overrides) {
+            let detectedType = typeDetect(overrides[key]);
+            if (detectedType == 'object') {
+                if(mergedValues[key] == undefined) {
+                    mergedValues[key] = {};
+                }
+                mergedValues[key] = this._recursiveMerge(mergedValues[key], overrides[key]);
+            } else if(detectedType == 'array') {
+                mergedValues[key] = Array.from(overrides[key]);
+            } else if(detectedType == 'null' || detectedType == 'number'
+                || detectedType == 'boolean' || detectedType == 'string') {
+                mergedValues[key] = overrides[key];
+            } else {
+                throw new Error(`Unsupported type: ${detectedType}.`);
+            }
         }
-      }
-      return mergedValues;
-  }
-
-  /**
-   * Deep copy all values from overrides to givenObject.
-   *
-   * All keys in passed overrides-object will be cloned to passed givenObject. This happens deeply, so all
-   * nested objects will also be iterated (NOTE: lists are not iterated, only objects).
-   *
-   * Note that objects are passed by-reference, so if you do not want givenObject to be modified directly make sure
-   * you pass false as third param
-   *
-   * @param givenObject             The object to override values in
-   * @param overrides               The object to copy all values from
-   * @param overrideValuesInGiven   if true givenObjects will be overwritten directly, if false a new object
-   *                                will be created to merge both given objects into.
-   * @returns {*}                   The result from deep-merging
-   */
-  static _merge(givenObject, overrides, overrideValuesInGiven) {
-    if (overrideValuesInGiven) {
-      return this._recursiveMerge(givenObject, overrides);
+        return mergedValues;
     }
 
-    let mergedValues = {};
-    mergedValues = this._recursiveMerge(mergedValues, givenObject);
-    return this._recursiveMerge(mergedValues, overrides);
-  }
+    /**
+     * Deep copy all values from overrides to givenObject.
+     *
+     * All keys in passed overrides-object will be cloned to passed givenObject. This happens deeply, so all
+     * nested objects will also be iterated (NOTE: lists are not iterated, only objects).
+     *
+     * Note that objects are passed by-reference, so if you do not want givenObject to be modified directly make sure
+     * you pass false as third param
+     *
+     * @param givenObject             The object to override values in
+     * @param overrides               The object to copy all values from
+     * @param overrideValuesInGiven   if true givenObjects will be overwritten directly, if false a new object
+     *                                will be created to merge both given objects into.
+     * @returns {*}                   The result from deep-merging
+     */
+    static _merge(givenObject, overrides, overrideValuesInGiven) {
+        if (overrideValuesInGiven) {
+            return this._recursiveMerge(givenObject, overrides);
+        }
+
+        let mergedValues = {};
+        mergedValues = this._recursiveMerge(mergedValues, givenObject);
+        return this._recursiveMerge(mergedValues, overrides);
+    }
 
     /**
      * Merges all values from overrideObject into originalObject.
@@ -234,9 +244,9 @@ export default class ObjectManager {
      * @param originalObject    the object to modify
      * @param overrideObject    the object to copy values from
      */
-  static mergeInPlace(originalObject, overrideObject) {
-      this._merge(originalObject, overrideObject, true);
-  }
+    static mergeInPlace(originalObject, overrideObject) {
+        this._merge(originalObject, overrideObject, true);
+    }
 
     /**
      * Merges all values from originalObject and overrideObject into a new object that is returned.
@@ -280,11 +290,19 @@ export default class ObjectManager {
      * @param overrideObject    object to override values from original object with
      * @returns {{}}            new object containing values from originalObject overridden by overrideObject (see example)
      */
-  static mergeAndClone(originalObject, overrideObject) {
-      return this._merge(originalObject, overrideObject, false);
-  }
+    static mergeAndClone(originalObject, overrideObject) {
+        return this._merge(originalObject, overrideObject, false);
+    }
 
-  static clone(object) {
-      return this.mergeAndClone({}, object);
-  }
+    /**
+     * Copies all values from given originalObject into a new object, which is returned to caller.
+     *
+     * uses {@link ObjectManager#mergeAndClone}, but passes an empty object as one of the two it desires for merging..
+     *
+     * @param originalObject
+     * @returns {{}}
+     */
+    static clone(originalObject) {
+        return this.mergeAndClone({}, originalObject);
+    }
 }
