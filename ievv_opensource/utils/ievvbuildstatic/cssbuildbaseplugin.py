@@ -18,7 +18,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
     """
     default_group = 'css'
 
-    def __init__(self, lint=True, lintrules=None, lintrules_overrides=None, autoprefix=True, minify=True,
+    def __init__(self, lint=True, lintrules=None, lintrules_overrides=None, autoprefix=True,
                  browserslist='> 5%', **kwargs):
         """
 
@@ -42,16 +42,14 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                 if you just want to add new rules or override some of the existing rules.
             autoprefix (bool): Run https://github.com/postcss/autoprefixer on the css?
                 Defaults to ``True``.
-            minify (bool): Minify the css? Defaults to ``True``.
             browserslist (str): A string with defining supported browsers
                 for https://github.com/ai/browserslist. Used by the autoprefix
-                and cssnano (used when minify=True) commands.
+                and cssnano commands.
             **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
         super(AbstractPlugin, self).__init__(**kwargs)
         self.lint = lint
         self.autoprefix = autoprefix
-        self.minify = minify
         self.browserslist = browserslist
         self.lintrules = lintrules or {
             "block-no-empty": None,
@@ -78,8 +76,11 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
     def get_stylelint_version(self):
         return None
 
+    def should_minify(self):
+        return self.app.apps.is_in_production_mode()
+
     def requires_postcss(self):
-        return self.autoprefix or self.minify
+        return self.autoprefix or self.should_minify()
 
     def install(self):
         if self.requires_postcss():
@@ -88,7 +89,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             if self.autoprefix:
                 self.app.get_installer('npm').queue_install(
                     'autoprefixer', version=self.get_autoprefixer_version())
-            if self.minify:
+            if self.should_minify():
                 self.app.get_installer('npm').queue_install(
                     'cssnano', version=self.get_cssnano_version())
         if self.lint:
@@ -115,7 +116,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                 '--use', 'autoprefixer',
                 '--autoprefixer.browsers', self.browserslist,
             ])
-        if self.minify:
+        if self.should_minify():
             args.extend([
                 '--use', 'cssnano',
                 '--cssnano.browsers', self.browserslist,

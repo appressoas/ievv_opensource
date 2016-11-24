@@ -121,6 +121,17 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
     def get_sassc_executable(self):
         return os.environ.get('IEVVTASKS_BUILDSTATIC_SASSC_EXECUTABLE', 'sassc')
 
+    def get_sass_kwargs(self):
+        kwargs = {}
+        sass_include_paths = self.format_sass_include_paths()
+        if sass_include_paths:
+            kwargs['load_path'] = sass_include_paths
+        # style = 'nested'
+        # if self.app.apps.is_in_production_mode():
+        #     style = 'compressed'
+        # kwargs['style'] = style
+        return kwargs
+
     def build_css(self):
         self.get_logger().command_start('Building {source} into {destination}.'.format(
             source=self.get_sourcefile_path(),
@@ -131,18 +142,13 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
             os.makedirs(destinationdirectory)
 
         executable = self.get_sassc_executable()
-        kwargs = {}
-        sass_include_paths = self.format_sass_include_paths()
-        if sass_include_paths:
-            kwargs['load_path'] = sass_include_paths
-            self.get_logger().info('Using --load-path={}'.format(sass_include_paths))
         try:
             self.run_shell_command(executable,
                                    args=[
                                        self.get_sourcefile_path(),
                                        self.get_destinationfile_path()
                                    ],
-                                   kwargs=kwargs)
+                                   kwargs=self.get_sass_kwargs())
         except ShellCommandError:
             self.get_logger().command_error('SASS build FAILED!')
             raise cssbuildbaseplugin.CssBuildException()
