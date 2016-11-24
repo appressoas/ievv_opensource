@@ -5,12 +5,12 @@ import shutil
 import time
 from collections import OrderedDict
 
-import sys
 from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin, Logger
+
 from . import docbuilders
 
 
@@ -114,6 +114,9 @@ class App(LogMixin):
         for all plugins within the app.
         """
         self._save_json_appconfig(appconfig_dict=self._make_json_appconfig_dict())
+        for alias in self.installers_config.keys():
+            installer = self.get_installer(alias=alias)
+            installer.initialize()
         for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.install()
         for installer in self.installers.values():

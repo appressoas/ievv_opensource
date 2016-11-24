@@ -231,3 +231,7 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
         self.run_shell_command('npm',
                                args=['run', script] + args,
                                _cwd=self.app.get_source_path())
+
+    def initialize(self):
+        if os.path.exists(self.get_packagejson_path()):
+            self.install()
