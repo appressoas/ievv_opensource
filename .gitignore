@@ -39,6 +39,7 @@ bower_components/
 /.tox/
 /dist/
 
+ievv_buildstatic.appconfig.json
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_build_directory
 
