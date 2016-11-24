@@ -1,7 +1,6 @@
 let path = require('path');
 
 const appconfig = require("./ievv_buildstatic.appconfig.json");
-console.log(appconfig);
 
 let webpackConfig = {
     entry: path.resolve(__dirname, 'scripts/javascript/ievv_jsbase/ievv_jsbase_core.js'),
@@ -14,10 +13,19 @@ let webpackConfig = {
             {
                 test: /.jsx?$/,
                 loader: 'babel-loader',
-                // exclude: /node_modules/
+                exclude: /node_modules/,
                 include: [
                     path.resolve(__dirname, "scripts/javascript/ievv_jsbase"),
-                ]
+                ],
+                query: {
+                    presets: [
+                        'babel-preset-es2015'
+                    ].map(require.resolve),
+                }
+            },
+            {
+                test: /.json$/,
+                loader: 'json-loader'
             }
         ]
     }
@@ -29,6 +37,5 @@ if(appconfig.is_in_production_mode) {
     webpackConfig.devtool = 'cheap-module-eval-source-map';
     webpackConfig.output.pathinfo = true;
 }
-
 
 module.exports = webpackConfig;
