@@ -13,7 +13,7 @@ class Logger(object):
     Logger class used by :class:`.LogMixin`.
     """
     loggers = {}
-    messagelock = threading.Lock()
+    # messagelock = threading.Lock()
     DEBUG = 5
     STDOUT = 4
     INFO = 3
@@ -51,17 +51,19 @@ class Logger(object):
         self.command_error_message = command_error_message
 
     def _acquire_messagelock(self):
-        if not self._has_messagelock:
-            self.__class__.messagelock.acquire()
-            self._has_messagelock = True
+        # if not self._has_messagelock:
+        #     self.__class__.messagelock.acquire()
+        #     self._has_messagelock = True
+        pass
 
     def _release_messagelock(self):
-        self._messagelocktimer = None
-        try:
-            self.__class__.messagelock.release()
-        except RuntimeError:
-            pass
-        self._has_messagelock = False
+        # self._messagelocktimer = None
+        # try:
+        #     self.__class__.messagelock.release()
+        # except RuntimeError:
+        #     pass
+        # self._has_messagelock = False
+        pass
 
     def _slowrelease_messagelock(self):
         if not self._messagelocktimer:

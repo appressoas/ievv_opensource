@@ -1,7 +1,6 @@
-import os
-
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
 from ievv_opensource.utils.ievvbuildstatic.filepath import AbstractDjangoAppPath
+from ievv_opensource.utils.ievvbuildstatic.watcher import ProcessWatchConfig
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
@@ -123,20 +122,45 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         else:
             return 'jsbuild'
 
+    def get_npm_watch_script(self):
+        return 'jsbuild-watch'
+
     def run(self):
         npm_script = self.get_npm_script()
-        self.get_logger().command_start('Running "npm run {npm_script}" for {appname!r}'.format(
+        about = '"npm run {npm_script}" for {appname!r}'.format(
             npm_script=npm_script,
             appname=self.app.appname
-        ))
+        )
+        self.get_logger().command_start('Running {about}'.format(
+            about=about))
         try:
             self.run_shell_command('npm',
                                    args=['run', npm_script],
                                    _cwd=self.app.get_source_path())
         except ShellCommandError:
-            self.get_logger().command_error('browserify build FAILED!')
+            self.get_logger().command_error('{} FAILED!'.format(about))
         else:
-            self.get_logger().command_success('browserify build succeeded :)')
+            self.get_logger().command_success('{} succeeded :)'.format(about))
 
     def __str__(self):
         return '{}({})'.format(super(Plugin, self).__str__(), self.sourcefolder)
+
+    def run_watcher_process(self):
+        about = '"npm run {scriptname}" for {appname!r}'.format(
+            scriptname=self.get_npm_watch_script(),
+            appname=self.app.appname)
+        self.get_logger().info(
+            'Starting watcher process: {about}.'.format(about=about))
+        try:
+            self.app.get_installer('npm').run_npm_script(script=self.get_npm_watch_script())
+        except ShellCommandError:
+            self.get_logger().command_error('{} FAILED!'.format(about))
+        except KeyboardInterrupt:
+            pass
+
+    def watch(self):
+        if self.app.get_installer('npm').has_npm_script(self.get_npm_watch_script()):
+            return ProcessWatchConfig(
+                plugin=self)
+        else:
+            return None

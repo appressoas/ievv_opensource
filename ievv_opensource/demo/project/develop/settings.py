@@ -42,14 +42,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefile='browserify_reactjsbuild_demo.js',
                 destinationfile='browserify_reactjsbuild_demo.js',
             ),
-            ievvbuildstatic.browserify_babelbuild.Plugin(
-                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_babelbuild_import_path_demo'),
-                sourcefile='browserify_babelbuild_import_path_demo.js',
-                destinationfile='browserify_babelbuild_import_path_demo.js',
-                extra_import_paths=[
-                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
-                ]
-            ),
         ]
     ),
     ievvbuildstatic.config.App(
@@ -82,14 +74,9 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         appname='ievv_jsbase',
         version=ievv_jsbase.__version__,
         plugins=[
-            # ievvbuildstatic.autosetup_esdoc.Plugin(),
-            # ievvbuildstatic.browserify_babelbuild.Plugin(
-            #     sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsbase'),
-            #     sourcefile='ievv_jsbase_core.js',
-            #     destinationfile='ievv_jsbase_core.js',
-            # ),
-            # ievvbuildstatic.run_jstests.Plugin(),
-            ievvbuildstatic.npmrun_jsbuild.Plugin()
+            ievvbuildstatic.autosetup_esdoc.Plugin(),
+            ievvbuildstatic.npmrun_jsbuild.Plugin(),
+            ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '

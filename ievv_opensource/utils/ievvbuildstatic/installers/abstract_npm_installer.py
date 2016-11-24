@@ -147,6 +147,9 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
         package_json_dict['scripts'] = scripts
         self.save_packagejson_dict()
 
+    def has_npm_script(self, scriptname):
+        return scriptname in self.get_packagejson_dict().get('scripts', {})
+
     def get_packagejson_key_from_installtype(self, installtype):
         if installtype is None:
             return 'dependencies'

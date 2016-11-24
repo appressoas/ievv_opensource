@@ -3,7 +3,7 @@ import shutil
 
 from future.utils import python_2_unicode_compatible
 
-from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfig
+from ievv_opensource.utils.ievvbuildstatic.watcher import WatchdogWatchConfig
 from ievv_opensource.utils.logmixin import LogMixin
 
 
@@ -107,17 +107,17 @@ class Plugin(LogMixin):
         :meth:`.get_watch_folders` and :meth:`.get_watch_regexes`.
 
         Returns:
-            WatchConfig: A :class:`ievv_opensource.utils.ievvbuildstatic.watcher.WatchConfig`
+            WatchdogWatchConfig: A :class:`ievv_opensource.utils.ievvbuildstatic.watcher.WatchConfig`
                 object if you want to watch for changes in this plugin, or ``None`` if you do not
                 want to watch for changes.
         """
         watchfolders = self.get_watch_folders()
         if watchfolders:
             watchregexes = self.get_watch_regexes()
-            return WatchConfig(
+            return WatchdogWatchConfig(
                 watchfolders=watchfolders,
                 watchregexes=watchregexes,
-                runnable=self)
+                plugin=self)
         else:
             return None
 

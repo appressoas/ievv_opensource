@@ -5,6 +5,7 @@ import shutil
 import time
 from collections import OrderedDict
 
+import sys
 from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
