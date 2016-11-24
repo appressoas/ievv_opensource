@@ -22,7 +22,9 @@
     "build-docs": "esdoc -c esdoc.json",
     "test": "jest",
     "test-debug": "jest --debug",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "jsbuild": "webpack --config webpack.config.js",
+    "jsbuild-production": "webpack --config webpack.config.js -p"
   },
   "version": "1.0.0"
 }
