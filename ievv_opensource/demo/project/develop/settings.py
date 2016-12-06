@@ -1,4 +1,5 @@
 from ievv_opensource import ievv_jsbase
+from ievv_opensource import ievv_jsui
 from ievv_opensource.demo.project.default.settings import *  # noqa
 from ievv_opensource.utils import ievvbuildstatic
 from ievv_opensource.utils import ievvdevrun
@@ -91,6 +92,44 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
             ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
+    ievvbuildstatic.config.App(
+        appname='ievv_jsui_demoapp',
+        version=ievv_jsui.__version__,
+        plugins=[
+            ievvbuildstatic.autosetup_esdoc.Plugin(),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui_demoapp'),
+                sourcefile='JsUiDemo.js',
+                destinationfile='ievv_jsui_demo.js',
+                extra_import_paths=[
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+                ],
+                extra_watchfolders=[
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+                ]
+            ),
+            ievvbuildstatic.nodemodulescopy.Plugin(
+                sourcefiles=[
+                    # 'medium-editor/dist/js/medium-editor.js'
+                ]
+            )
+        ]
+    ),
+    ievvbuildstatic.config.App(
+        appname='ievv_jsui',
+        version=ievv_jsui.__version__,
+        plugins=[
+            ievvbuildstatic.autosetup_esdoc.Plugin(),
+            ievvbuildstatic.browserify_babelbuild.Plugin(
+                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui'),
+                sourcefile='ievv_jsui_core.js',
+                destinationfile='ievv_jsui_core.js',
+            ),
+            ievvbuildstatic.run_jstests.Plugin(),
+        ]
+    ),
     help_header='You can configure the settings for ievv buildstatic in '
                 'the IEVVTASKS_BUILDSTATIC_APPS setting in: '
                 '{configfile}'.format(configfile=__file__),
@@ -100,11 +139,11 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
 IEVVTASKS_DEVRUN_RUNNABLES = {
     'default': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
-        ievvdevrun.runnables.django_runserver.RunnableThread(port=9001),
+        ievvdevrun.runnables.django_runserver.RunnableThread(port=9005),
         ievvdevrun.runnables.redis_server.RunnableThread(port='6381'),
         ievvdevrun.runnables.celery_worker.RunnableThread(app='ievv_opensource.demo'),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
-        ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
+        # ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
+        # ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.develop/'),
     ),
     'design': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),

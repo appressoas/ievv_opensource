@@ -1,0 +1,30 @@
+{
+  "destination": "built_docs",
+  "excludes": [
+    "__tests__.+$",
+    "__mocks__.+$"
+  ],
+  "includes": [
+    "\\.(js|es6|jsx)$"
+  ],
+  "index": "esdoc/index.md",
+  "plugins": [
+    {
+      "name": "esdoc-importpath-plugin",
+      "option": {
+        "replaces": [
+          {
+            "from": "^javascript/",
+            "to": ""
+          },
+          {
+            "from": "^ievv_jsui_demoapp/",
+            "to": ""
+          }
+        ]
+      }
+    }
+  ],
+  "source": "scripts/javascript",
+  "title": "ievv_jsui_demoapp"
+}

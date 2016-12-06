@@ -1,0 +1,24 @@
+{% extends "django_cradmin/standalone-base.django.html" %}
+{% load static %}
+
+{% block title %}
+    Select a demo
+{% endblock title %}
+
+{% block page-cover-title %}
+    Select a demo
+{% endblock page-cover-title %}
+
+
+{% block content %}
+    <div class="adminui-page-section">
+        <div class="container container--tight">
+            <nav class="blocklist  blocklist--tight">
+                <a class="blocklist__item blocklist__item--link"
+                        href="{% url 'ievv_jsbase_datetimepicker_demo' %}">
+                    Date/time-picker demo
+                </a>
+            </nav>
+        </div>
+    </div>
+{% endblock content %}

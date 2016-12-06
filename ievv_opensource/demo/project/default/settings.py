@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_elasticsearch',
     'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
     'ievv_opensource.ievv_jsbase',
+    'ievv_opensource.ievv_jsui',
+    'ievv_opensource.ievv_jsui.ievv_jsui_demoapp'
 ]
 
 MIDDLEWARE_CLASSES = (

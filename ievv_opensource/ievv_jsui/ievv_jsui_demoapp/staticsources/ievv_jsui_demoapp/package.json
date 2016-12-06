@@ -1,0 +1,9 @@
+{
+  "ievv_buildstatic": {},
+  "name": "ievv_jsui_demoapp",
+  "private": true,
+  "scripts": {
+    "build-docs": "esdoc -c esdoc.json"
+  },
+  "version": "0.0.1"
+}
