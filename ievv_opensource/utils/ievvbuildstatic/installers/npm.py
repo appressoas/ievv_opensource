@@ -55,3 +55,9 @@ class NpmInstaller(AbstractNpmInstaller):
                 'npm install {package} (properties: {properties!r}) FAILED!'.format(
                     package=package, properties=properties))
             raise SystemExit()
+
+    def run_packagejson_script(self, script, args=None):
+        args = args or []
+        self.run_shell_command('npm',
+                               args=['run', script] + args,
+                               _cwd=self.app.get_source_path())

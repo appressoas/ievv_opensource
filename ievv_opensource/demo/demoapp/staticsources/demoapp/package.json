@@ -15,5 +15,10 @@
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "uniq": "^1.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "uglify": "^0.1.5",
+    "uglifyify": "^3.0.4"
   }
 }

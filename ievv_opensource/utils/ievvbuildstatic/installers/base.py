@@ -37,3 +37,6 @@ class AbstractInstaller(LogMixin, ShellCommandMixin):
 
     def get_command_error_message(self):
         return self.app.apps.command_error_message
+
+    def initialize(self):
+        raise NotImplementedError()

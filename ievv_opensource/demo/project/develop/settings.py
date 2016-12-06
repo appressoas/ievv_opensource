@@ -43,24 +43,16 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 sourcefile='browserify_reactjsbuild_demo.js',
                 destinationfile='browserify_reactjsbuild_demo.js',
             ),
-            ievvbuildstatic.browserify_babelbuild.Plugin(
-                sourcefolder=os.path.join('scripts', 'javascript', 'browserify_babelbuild_import_path_demo'),
-                sourcefile='browserify_babelbuild_import_path_demo.js',
-                destinationfile='browserify_babelbuild_import_path_demo.js',
-                extra_import_paths=[
-                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
-                ]
-            ),
         ]
     ),
     ievvbuildstatic.config.App(
         appname='demoapp2',
         version='2.0.1',
-        installers_config={
-            'npm': {
-                'installer_class': ievvbuildstatic.installers.npm.NpmInstaller
-            }
-        },
+        # installers_config={
+        #     'npm': {
+        #         'installer_class': ievvbuildstatic.installers.npm.NpmInstaller
+        #     }
+        # },
         plugins=[
             ievvbuildstatic.sassbuild.Plugin(
                 sourcefolder='styles/theme',
@@ -84,11 +76,7 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         version=ievv_jsbase.__version__,
         plugins=[
             ievvbuildstatic.autosetup_esdoc.Plugin(),
-            ievvbuildstatic.browserify_babelbuild.Plugin(
-                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsbase'),
-                sourcefile='ievv_jsbase_core.js',
-                destinationfile='ievv_jsbase_core.js',
-            ),
+            ievvbuildstatic.npmrun_jsbuild.Plugin(),
             ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),

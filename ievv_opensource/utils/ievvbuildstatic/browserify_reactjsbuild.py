@@ -1,4 +1,3 @@
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from . import browserify_babelbuild
 
 

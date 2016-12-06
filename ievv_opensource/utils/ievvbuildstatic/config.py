@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import shutil
@@ -9,6 +10,7 @@ from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import LogMixin, Logger
+
 from . import docbuilders
 
 
@@ -81,11 +83,40 @@ class App(LogMixin):
         for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.runwrapper()
 
+    def _make_json_appconfig_dict(self):
+        return {
+            'appname': self.appname,
+            'version': self.version,
+            'sourcefolder': self.get_source_path(),
+            'destinationfolder': self.get_destination_path(),
+            'keep_temporary_files': self.keep_temporary_files,
+            'is_in_production_mode': self.apps.is_in_production_mode()
+        }
+
+    def _get_json_appconfig_path(self):
+        return self.get_source_path('ievv_buildstatic.appconfig.json')
+
+    def _save_json_appconfig(self, appconfig_dict):
+        config_path = self._get_json_appconfig_path()
+        self.get_logger().debug('Creating {config_path}'.format(config_path=config_path))
+        open(config_path, 'w').write(
+            json.dumps(appconfig_dict, indent=2, sort_keys=True)
+        )
+
+    def add_pluginconfig_to_json_config(self, plugin_name, config_dict):
+        appconfig_dict = json.loads(open(self._get_json_appconfig_path(), 'r').read())
+        appconfig_dict[plugin_name] = config_dict
+        self._save_json_appconfig(appconfig_dict=appconfig_dict)
+
     def install(self, skipgroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within the app.
         """
+        self._save_json_appconfig(appconfig_dict=self._make_json_appconfig_dict())
+        for alias in self.installers_config.keys():
+            installer = self.get_installer(alias=alias)
+            installer.initialize()
         for plugin in self.iterplugins(skipgroups=skipgroups):
             plugin.install()
         for installer in self.installers.values():
@@ -290,6 +321,9 @@ class Apps(LogMixin):
     """
     Basically a list around :class:`.App` objects.
     """
+    MODE_DEVELOP = 'develop'
+    MODE_PRODUCTION = 'production'
+
     def __init__(self, *apps, help_header=None):
         """
         Parameters:
@@ -299,6 +333,7 @@ class Apps(LogMixin):
         self.loglevel = Logger.DEBUG
         self.command_error_message = None
         self.help_header = help_header
+        self.mode = self.MODE_DEVELOP
         for app in apps:
             self.add_app(app)
 
@@ -397,3 +432,12 @@ class Apps(LogMixin):
                                   handler=handler)
         self.loglevel = loglevel
         self.command_error_message = command_error_message
+
+    def set_development_mode(self):
+        self.mode = self.MODE_DEVELOP
+
+    def set_production_mode(self):
+        self.mode = self.MODE_PRODUCTION
+
+    def is_in_production_mode(self):
+        return self.mode == self.MODE_PRODUCTION

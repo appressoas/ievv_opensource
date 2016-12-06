@@ -1,31 +1,74 @@
+import multiprocessing
 import threading
 from collections import OrderedDict
 
+import psutil
 from watchdog.events import RegexMatchingEventHandler
 from watchdog.observers import Observer
 
 from ievv_opensource.utils.logmixin import LogMixin
 
 
-class WatchConfig(object):
+class WatchdogWatchConfig(object):
     """
     Used by plugins to configure watching.
 
     See :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.watch`.
     """
-    def __init__(self, watchfolders, watchregexes, runnable):
+    def run(self):
+        self.plugin.run()
+
+    def __init__(self, watchfolders, watchregexes, plugin):
         """
         Args:
             watchfolders: List of folders to watch.
             watchregexes: List of regexes to watch.
-            runnable: A runnable (an object with a run()-method), such as a plugin.
+            plugin: A :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin` object.
         """
         self.folders = watchfolders
         self.regexes = watchregexes
-        self.runnable = runnable
+        self.plugin = plugin
 
-    def run(self):
-        self.runnable.run()
+
+class ProcessWrapper(object):
+    def __init__(self, process):
+        self.process = process
+        self.process.daemon = True
+
+    def start(self):
+        self.process.start()
+
+    def stop(self):
+        try:
+            process = psutil.Process(self.process.pid)
+        except psutil.NoSuchProcess:
+            pass
+        else:
+            for childprocess in process.children():
+                childprocess.terminate()
+            try:
+                process.terminate()
+            except psutil.NoSuchProcess:
+                pass
+
+    def join(self):
+        self.process.join()
+
+
+class ProcessWatchConfig(object):
+    """
+
+    """
+    def __init__(self, plugin):
+        """
+        Args:
+            plugin: A :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin` object.
+        """
+        self.plugin = plugin
+
+    def create_process(self):
+        process = multiprocessing.Process(target=self.plugin.run_watcher_process)
+        return ProcessWrapper(process=process)
 
 
 class WatchConfigPool(LogMixin):
@@ -38,9 +81,9 @@ class WatchConfigPool(LogMixin):
     def get_logger_name(self):
         return 'watcherpool'
 
-    def __watch_folder(self, folderpath, runnables, regexes):
+    def __watch_folder(self, folderpath, plugins, regexes):
         event_handler = EventHandler(
-            runnables=runnables,
+            plugins=plugins,
             regexes=regexes
         )
         observer = Observer()
@@ -48,34 +91,44 @@ class WatchConfigPool(LogMixin):
         self.get_logger().info(
             'Starting watcher for folder {!r} with regexes {!r}. '
             'Runnables notified of changes: {}.'.format(
-                folderpath, regexes, ', '.join(str(runnable) for runnable in runnables)))
+                folderpath, regexes, ', '.join(str(plugin) for plugin in plugins)))
         observer.start()
         return observer
 
     def __build_foldermap(self):
         # Note: We use OrderedDict here, and a list (instead of set) for
-        #       runnables below to maintain the order of apps when building.
+        #       plugins below to maintain the order of apps when building.
         #       This should not matter, but it is nice to have the apps
         #       build in the same order as they are listed in settings.
-        foldermap = OrderedDict()
+        watchdog_foldermap = OrderedDict()
+        process_runnables = []
         for watchconfig in self._watchconfigs:
-            for folderpath in watchconfig.folders:
-                if folderpath not in foldermap:
-                    foldermap[folderpath] = {
-                        'regexes': set(),
-                        'runnables': []
-                    }
-                foldermap[folderpath]['regexes'].update(watchconfig.regexes)
-                if watchconfig.runnable not in foldermap[folderpath]['runnables']:
-                    foldermap[folderpath]['runnables'].append(watchconfig.runnable)
-        return foldermap
+            if isinstance(watchconfig, WatchdogWatchConfig):
+                for folderpath in watchconfig.folders:
+                    if folderpath not in watchdog_foldermap:
+                        watchdog_foldermap[folderpath] = {
+                            'regexes': set(),
+                            'plugins': []
+                        }
+                    watchdog_foldermap[folderpath]['regexes'].update(watchconfig.regexes)
+                    if watchconfig.plugin not in watchdog_foldermap[folderpath]['plugins']:
+                        watchdog_foldermap[folderpath]['plugins'].append(watchconfig.plugin)
+            elif isinstance(watchconfig, ProcessWatchConfig):
+                process_runnables.append(watchconfig)
+            else:
+                raise ValueError('Unknown watch config type: {}'.format(type(watchconfig)))
+        return watchdog_foldermap, process_runnables
 
     def watch(self):
-        foldermap = self.__build_foldermap()
+        watchdog_foldermap, process_runnables = self.__build_foldermap()
         observers = []
-        for folderpath, folderkwargs in foldermap.items():
+        for folderpath, folderkwargs in watchdog_foldermap.items():
             observer = self.__watch_folder(folderpath=folderpath, **folderkwargs)
             observers.append(observer)
+        for process_runnable in process_runnables:
+            process = process_runnable.create_process()
+            process.start()
+            observers.append(process)
         return observers
 
 
@@ -91,7 +144,7 @@ class EventHandler(RegexMatchingEventHandler):
     :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.get_watch_folders`.
     """
     def __init__(self, *args, **kwargs):
-        self.runnables = kwargs.pop('runnables')
+        self.plugins = kwargs.pop('plugins')
         self.runtimer = None
         self.is_running = False
         super(EventHandler, self).__init__(*args, **kwargs)
@@ -100,8 +153,8 @@ class EventHandler(RegexMatchingEventHandler):
         if self.is_running:
             return
         self.is_running = True
-        for runnable in self.runnables:
-            runnable.runwrapper()
+        for plugin in self.plugins:
+            plugin.runwrapper()
 
         self.is_running = False
 
