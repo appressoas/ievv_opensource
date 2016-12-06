@@ -8,11 +8,6 @@
     "\\.(js|es6|jsx)$"
   ],
   "index": "esdoc/index.md",
-  "manual": {
-    "tutorial": [
-      "esdoc/manual/tutorial.md"
-    ]
-  },
   "plugins": [
     {
       "name": "esdoc-importpath-plugin",

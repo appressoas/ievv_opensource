@@ -85,24 +85,31 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         version=ievv_jsui.__version__,
         plugins=[
             ievvbuildstatic.autosetup_esdoc.Plugin(),
-            ievvbuildstatic.browserify_babelbuild.Plugin(
-                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui_demoapp'),
-                sourcefile='JsUiDemo.js',
-                destinationfile='ievv_jsui_demo.js',
+            ievvbuildstatic.npmrun_jsbuild.Plugin(
                 extra_import_paths=[
-                    ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
-                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
-                ],
-                extra_watchfolders=[
                     ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
                     ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
                 ]
             ),
-            ievvbuildstatic.nodemodulescopy.Plugin(
-                sourcefiles=[
-                    # 'medium-editor/dist/js/medium-editor.js'
-                ]
-            )
+
+            # ievvbuildstatic.browserify_babelbuild.Plugin(
+            #     sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui_demoapp'),
+            #     sourcefile='JsUiDemo.js',
+            #     destinationfile='ievv_jsui_demo.js',
+            #     extra_import_paths=[
+            #         ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
+            #         ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+            #     ],
+            #     extra_watchfolders=[
+            #         ievvbuildstatic.filepath.SourcePath('ievv_jsui', 'scripts', 'javascript'),
+            #         ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+            #     ]
+            # ),
+            # ievvbuildstatic.nodemodulescopy.Plugin(
+            #     sourcefiles=[
+            #         # 'medium-editor/dist/js/medium-editor.js'
+            #     ]
+            # )
         ]
     ),
     ievvbuildstatic.config.App(
@@ -110,12 +117,17 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
         version=ievv_jsui.__version__,
         plugins=[
             ievvbuildstatic.autosetup_esdoc.Plugin(),
-            ievvbuildstatic.browserify_babelbuild.Plugin(
-                sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui'),
-                sourcefile='ievv_jsui_core.js',
-                destinationfile='ievv_jsui_core.js',
+            ievvbuildstatic.npmrun_jsbuild.Plugin(
+                extra_import_paths=[
+                    ievvbuildstatic.filepath.SourcePath('ievv_jsbase', 'scripts', 'javascript'),
+                ]
             ),
-            ievvbuildstatic.run_jstests.Plugin(),
+            # ievvbuildstatic.browserify_babelbuild.Plugin(
+            #     sourcefolder=os.path.join('scripts', 'javascript', 'ievv_jsui'),
+            #     sourcefile='ievv_jsui_core.js',
+            #     destinationfile='ievv_jsui_core.js',
+            # ),
+            # ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '
