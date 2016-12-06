@@ -8,7 +8,7 @@ class IevvJsUiDemoComponent(javascriptregistry.component.AbstractJsComponent):
 
     def get_dependencies(self):
         return [
-            'ievv_jsui_core',
+            # 'ievv_jsui_core',
             'ievv_jsbase_core'
         ]
 
@@ -23,5 +23,5 @@ class IevvJsUiDemoComponent(javascriptregistry.component.AbstractJsComponent):
 
     def get_sourceurls(self):
         return self._versioned_static_urls([
-            'ievv_jsui_demoapp/{version}/scripts/ievv_jsui_demo.js'
+            'ievv_jsui_demoapp/{version}/scripts/ievv_jsui_demoapp.js'
         ])

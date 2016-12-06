@@ -1,4 +1,5 @@
 import DateTimePicker from "ievv_jsui/DateTimePicker";
+import SelectModalWidget from "ievv_jsui/select/SelectModalWidget.jsx";
 
 export default class JsUiDemo {
   constructor() {
@@ -8,6 +9,7 @@ export default class JsUiDemo {
 
     const widgetRegistry = new window.ievv_jsbase_core.WidgetRegistrySingleton();
     widgetRegistry.registerWidgetClass('jsui-datetime-picker', DateTimePicker);
+    widgetRegistry.registerWidgetClass('jsui-select-modal', SelectModalWidget);
     widgetRegistry.initializeAllWidgetsWithinElement(document.body);
   }
 }

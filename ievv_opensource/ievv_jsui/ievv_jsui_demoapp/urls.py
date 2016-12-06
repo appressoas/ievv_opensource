@@ -5,7 +5,10 @@ urlpatterns = [
     url(r'^$',
         views.Overview.as_view(),
         name="ievv_jsui_demo_overview"),
-    url(r'^jsui-date-time-picker-demo$',
-        views.IevvJsUiDateTimePickerDemo.as_view(),
-        name="ievv_jsbase_datetimepicker_demo")
+    url(r'^date-time-picker-demo$',
+        views.DateTimePickerDemo.as_view(),
+        name="ievv_jsbase_datetimepicker_demo"),
+    url(r'^select-demo$',
+        views.SelectDemo.as_view(),
+        name="ievv_jsbase_select_demo")
 ]

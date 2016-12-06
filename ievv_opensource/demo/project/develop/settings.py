@@ -1,3 +1,5 @@
+import django_cradmin
+
 from ievv_opensource import ievv_jsbase
 from ievv_opensource import ievv_jsui
 from ievv_opensource.demo.project.default.settings import *  # noqa
@@ -143,3 +145,7 @@ IEVV_ELASTICSEARCH2_CONNECTION_ALIASES = {
 
 # IEVV_ELASTICSEARCH2_DEBUGTRANSPORT_PRETTYPRINT_ALL_REQUESTS = True
 IEVV_BATCHFRAMEWORK_ALWAYS_SYNCRONOUS = False
+
+DJANGO_CRADMIN_THEME_PATH = 'django_cradmin/{version}/styles/basetheme/main.css'.format(
+    version=django_cradmin.__version__
+)

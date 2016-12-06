@@ -42,7 +42,7 @@
  *          }
  *     }
  *
- *     _onClick = (e) => {
+ *     _onClick(e) {
  *          e.preventDefault();
  *          console.log(`I should have opened the menu with id="${this.config.menuId}" here`);
  *     }

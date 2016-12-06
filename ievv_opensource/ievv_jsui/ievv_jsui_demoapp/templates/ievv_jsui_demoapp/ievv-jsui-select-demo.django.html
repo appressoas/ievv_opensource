@@ -1,0 +1,44 @@
+{% extends "django_cradmin/standalone-base.django.html" %}
+{% load static %}
+
+{% block title %}
+    IEVV JsUi Select demo
+{% endblock title %}
+
+{% block page-cover-title %}
+    IEVV JsUi Select demo
+{% endblock page-cover-title %}
+
+{% block page-cover-content %}
+    {{ block.super }}
+{% endblock page-cover-content %}
+
+
+{% block content %}
+    <div class="adminui-page-section">
+        <div class="container">
+            <button type="button" class="button"
+                    data-ievv-jsbase-widget="jsui-select-modal" data-ievv-jsbase-widget-config='{
+                        "clientsideData": [
+                            {
+                                "title": "John",
+                                "meta": "Age: 23, lives in London",
+                                "description": "The John",
+                                "imageSrc": null
+                            },
+                            {
+                                "title": "Peter",
+                                "description": "Peter is coool"
+                            },
+                            {
+                                "title": "Jane",
+                                "description": "Jane is awesome, but she no longer likes Tarzan"
+                            }
+                        ],
+                        "clientsideSearchAttributes": ["title", "description"]
+                    }'>
+                Open select dialog
+            </button>
+        </div>
+    </div>
+{% endblock content %}

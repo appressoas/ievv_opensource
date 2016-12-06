@@ -1,5 +1,5 @@
 const path = require('path');
-
+const webpack = require('webpack');
 const appconfig = require("./ievv_buildstatic.appconfig.json");
 
 const import_paths = [path.resolve(__dirname, 'node_modules')];
@@ -9,47 +9,57 @@ const include = appconfig.npmrun_jsbuild.import_paths.slice();
 include.push(path.resolve(__dirname, "scripts/javascript/ievv_jsui_demoapp"));
 
 const webpackConfig = {
-    entry: path.resolve(__dirname, 'scripts/javascript/ievv_jsui_demoapp/ievv_jsui_demoapp.js'),
-    output: {
-        filename: 'ievv_jsui_demoapp.js',
-        path: path.resolve(appconfig.destinationfolder, 'scripts')
-    },
-    resolve: {
-        root: import_paths,
-        extensions: [".js", ""],
-    },
-    resolveLoader: {
-        // We only want loaders to be resolved from node_modules
-        // in this directory (not in any of the other packages, and
-        // not from other directories).
-        root: path.resolve(__dirname, 'node_modules')
-    },
-    module: {
-        loaders: [
-            {
-                test: /.jsx?$/,
-                loader: 'babel-loader',
-                exclude: /node_modules/,
-                include: include,
-                query: {
-                    presets: [
-                        'babel-preset-es2015'
-                    ].map(require.resolve),
-                }
-            },
-            {
-                test: /.json$/,
-                loader: 'json-loader'
-            }
-        ]
-    }
+  entry: path.resolve(__dirname, 'scripts/javascript/ievv_jsui_demoapp/ievv_jsui_demoapp.js'),
+  output: {
+    filename: 'ievv_jsui_demoapp.js',
+    path: path.resolve(appconfig.destinationfolder, 'scripts'),
+    target: 'web'
+  },
+  resolve: {
+    root: import_paths,
+    extensions: [".js", ".jsx", ""],
+  },
+  resolveLoader: {
+    // We only want loaders to be resolved from node_modules
+    // in this directory (not in any of the other packages, and
+    // not from other directories).
+    root: path.resolve(__dirname, 'node_modules')
+  },
+  module: {
+    loaders: [
+      {
+        test: /.jsx?$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        include: include,
+        query: {
+          presets: [
+            'babel-preset-es2015',
+            'babel-preset-react'
+          ].map(require.resolve),
+        }
+      },
+      {
+        test: /.json$/,
+        loader: 'json-loader'
+      }
+    ]
+  },
+  plugins: []
 };
 
 if(appconfig.is_in_production_mode) {
-    webpackConfig.devtool = 'source-map';
+  webpackConfig.devtool = 'source-map';
+  webpackConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
+    })
+  );
 } else {
-    webpackConfig.devtool = 'cheap-module-eval-source-map';
-    webpackConfig.output.pathinfo = true;
+  // webpackConfig.devtool = 'cheap-module-eval-source-map';
+  webpackConfig.output.pathinfo = true;
 }
 
 

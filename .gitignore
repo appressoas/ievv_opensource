@@ -57,3 +57,9 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 /ievv_opensource/demo/demoapp/static/
 /ievv_opensource/demo/demoapp2/static/
 /ievv_opensource/ievv_jsbase/staticsources/ievv_jsbase/built_docs/
+
+.idea/sqldialects.xml
+ievv_opensource/ievv_jsui/ievv_jsui_demoapp/static/
+ievv_opensource/ievv_jsui/ievv_jsui_demoapp/staticsources/ievv_jsui_demoapp/esdoc/
+ievv_opensource/ievv_jsui/staticsources/ievv_jsui/esdoc/
+npm-debug.log

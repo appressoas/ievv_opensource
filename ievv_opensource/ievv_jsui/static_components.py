@@ -5,7 +5,7 @@ from ievv_opensource import ievv_jsui
 class IevvJsUiCoreComponent(javascriptregistry.component.AbstractJsComponent):
     @classmethod
     def get_component_id(cls):
-        return 'ievv_jsui_core'
+        return 'ievv_jsui'
 
     def get_dependencies(self):
         return [
@@ -23,5 +23,5 @@ class IevvJsUiCoreComponent(javascriptregistry.component.AbstractJsComponent):
 
     def get_sourceurls(self):
         return self._versioned_static_urls([
-            'ievv_jsui/{version}/scripts/ievv_jsui_core.js'
+            'ievv_jsui/{version}/scripts/ievv_jsui.js'
         ])
