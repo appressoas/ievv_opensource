@@ -83,7 +83,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             self.get_logger().command_start('Running tests for {appname}'.format(
                 appname=self.app.appname))
             try:
-                self.app.get_installer('npm').run_npm_script(
+                self.app.get_installer('npm').run_packagejson_script(
                     script=self.get_test_script_key(),
                     args=['--silent'])
             except ShellCommandError:

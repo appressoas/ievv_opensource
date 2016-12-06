@@ -152,7 +152,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         self.get_logger().info(
             'Starting watcher process: {about}.'.format(about=about))
         try:
-            self.app.get_installer('npm').run_npm_script(script=self.get_npm_watch_script())
+            self.app.get_installer('npm').run_packagejson_script(script=self.get_npm_watch_script())
         except ShellCommandError:
             self.get_logger().command_error('{} FAILED!'.format(about))
         except KeyboardInterrupt:

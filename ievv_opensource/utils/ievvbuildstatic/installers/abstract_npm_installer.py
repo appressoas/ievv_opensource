@@ -216,21 +216,15 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
     def install_npm_package(self, package, properties):
         raise NotImplementedError()
 
-    def run_npm_script(self, script, args=None):
+    def run_packagejson_script(self, script, args=None):
         """
-        Exectute ``npm run <script> [args]``.
+        Run a script in the scripts section of the package.json.
 
         Args:
             script: The npm script to run.
             args (list): List of arguments.
-
-        Returns:
-
         """
-        args = args or []
-        self.run_shell_command('npm',
-                               args=['run', script] + args,
-                               _cwd=self.app.get_source_path())
+        raise NotImplementedError()
 
     def initialize(self):
         if os.path.exists(self.get_packagejson_path()):

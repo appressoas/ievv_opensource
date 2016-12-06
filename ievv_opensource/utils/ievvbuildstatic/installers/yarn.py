@@ -53,6 +53,11 @@ class YarnInstaller(AbstractNpmInstaller):
         else:
             self.yarn_json_output_handler(outputdict=outputdict)
 
+    def _run_yarn(self, args):
+        self.run_shell_command('yarn',
+                               args=args,
+                               _cwd=self.app.get_source_path())
+
     def log_shell_command_stderr(self, line):
         try:
             outputdict = json.loads(line)
@@ -63,9 +68,7 @@ class YarnInstaller(AbstractNpmInstaller):
 
     def install_packages_from_packagejson(self):
         try:
-            self.run_shell_command('yarn',
-                                   args=['--json'],
-                                   _cwd=self.app.get_source_path())
+            self._run_yarn(args=['--json'])
         except ShellCommandError:
             self.get_logger().command_error('yarn FAILED!')
             raise SystemExit()
@@ -79,11 +82,14 @@ class YarnInstaller(AbstractNpmInstaller):
         if properties['installtype'] is not None:
             args.append('--{}'.format(properties['installtype']))
         try:
-            self.run_shell_command('yarn',
-                                   args=args,
-                                   _cwd=self.app.get_source_path())
+            self._run_yarn(args=args)
         except ShellCommandError:
             self.get_logger().command_error(
                 'yarn add {package} (properties: {properties!r}) FAILED!'.format(
                     package=package, properties=properties))
             raise SystemExit()
+
+    def run_packagejson_script(self, script, args=None):
+        args = args or []
+        args = ['run', script] + args
+        self._run_yarn(args=args)

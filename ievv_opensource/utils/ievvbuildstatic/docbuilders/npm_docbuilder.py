@@ -28,7 +28,7 @@ class NpmDocBuilder(base.AbstractDocBuilder):
 
     def __run_build_docs_npm_script(self):
         try:
-            self.app.get_installer('npm').run_npm_script(
+            self.app.get_installer('npm').run_packagejson_script(
                 script='build-docs',
                 args=['--silent'])
         except ShellCommandError:
