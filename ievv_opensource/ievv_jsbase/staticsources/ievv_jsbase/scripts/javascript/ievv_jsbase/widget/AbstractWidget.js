@@ -131,4 +131,8 @@ export default class AbstractWidget {
     destroy() {
         
     }
+
+    get widgetInstanceId() {
+      return this.element.getAttribute('data-ievv-jsbase-widget-instanceid');
+    }
 }
