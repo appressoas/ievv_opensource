@@ -22,6 +22,20 @@ class MockWidgetWithDefaultConfig extends MockWidget {
     }
 }
 
+class MockWidgetWithDefaultDeepConfig extends MockWidget {
+    getDefaultConfig() {
+        return {
+            "about": {
+                "name": "Jack",
+                "age": 29
+            },
+            "general": {
+                "size": 2
+            }
+        };
+    }
+}
+
 
 describe('AbstractWidget', () => {
     it('AbstractWidget constructor', () => {
@@ -66,6 +80,22 @@ describe('AbstractWidget', () => {
         expect(widget.config).toEqual({
             "name": "John",
             "age": 29
+        });
+    });
+
+    it('AbstractWidget defaultConfig and input config deep merge', () => {
+        const element = new HtmlParser(`
+            <div data-ievv-jsbase-widget-config='{"about": {"name": "John"}, "general": {"size": 10}}'></div>
+        `).firstRootElement;
+        const widget = new MockWidgetWithDefaultDeepConfig(element);
+        expect(widget.config).toEqual({
+            "about": {
+                "name": "John",
+                "age": 29
+            },
+            "general": {
+                "size": 10
+            }
         });
     });
 

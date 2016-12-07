@@ -1,3 +1,4 @@
+import ObjectManager from "../utils/ObjectManager";
 /**
  * Base class for widgets for {@link WidgetRegistrySingleton}.
  *
@@ -115,7 +116,7 @@ export default class AbstractWidget {
     get config() {
         if(typeof this._config === 'undefined') {
             const parsedConfig = this._parseConfig();
-            this._config = Object.assign({}, this.getDefaultConfig(), parsedConfig);
+            this._config = ObjectManager.mergeAndClone(this.getDefaultConfig(), parsedConfig);
         }
         return this._config;
     }
