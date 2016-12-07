@@ -1,8 +1,22 @@
 import React from "react";
-import IevvSearch from "../IevvSearch";
 
 
-export default class SelectModal extends React.Component {
+export default class IevvModal extends React.Component {
+  static get defaultProps() {
+    return {
+      modalCssClass: "modal",
+      backdropCssClass: "modal__backdrop",
+      contentCssClass: "modal__content",
+      closeWrapperCssClass: "modal__close",
+      closeIconCssClass: "icon-close",
+      closeButtonAriaLabel: "Close"
+    }
+  }
+
+  renderModalContent() {
+    return <em>You should override renderModalContent() to put content here!</em>
+  }
+
   render() {
     return <div className={this.props.modalCssClass}>
       <div className={this.props.backdropCssClass}></div>
@@ -15,7 +29,7 @@ export default class SelectModal extends React.Component {
           </button>
         </div>
 
-        <IevvSearch/>
+        {this.renderModalContent()}
       </div>
     </div>;
   }

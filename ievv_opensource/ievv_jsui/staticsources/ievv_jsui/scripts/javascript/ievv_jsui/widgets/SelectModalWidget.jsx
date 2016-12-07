@@ -1,8 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import AbstractWidget from "ievv_jsbase/widget/AbstractWidget";
-import SelectModal from "./SelectModal";
-
+import IevvSearchModal from "../components/IevvSearchModal";
 
 export default class SelectModalWidget extends AbstractWidget {
   constructor(element) {
@@ -47,7 +46,8 @@ export default class SelectModalWidget extends AbstractWidget {
     document.body.appendChild(this._modalElement);
     const props = Object.assign({}, this.config);
     props.closeCallback = () => {this.close()};
-    const reactElement = <SelectModal {...props} />;
+    props.signalNamePrefix = `ievv_jsui.Select.${this.widgetInstanceId}`;
+    const reactElement = <IevvSearchModal {...props} />;
     ReactDOM.render(
       reactElement,
       this._modalElement

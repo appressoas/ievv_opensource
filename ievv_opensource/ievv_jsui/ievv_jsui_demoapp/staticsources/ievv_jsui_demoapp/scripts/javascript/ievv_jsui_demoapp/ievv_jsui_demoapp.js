@@ -1,5 +1,5 @@
 import DateTimePicker from "ievv_jsui/DateTimePicker";
-import SelectModalWidget from "ievv_jsui/select/SelectModalWidget.jsx";
+import SelectModalWidget from "ievv_jsui/widgets/SelectModalWidget.jsx";
 
 export default class JsUiDemo {
   constructor() {
