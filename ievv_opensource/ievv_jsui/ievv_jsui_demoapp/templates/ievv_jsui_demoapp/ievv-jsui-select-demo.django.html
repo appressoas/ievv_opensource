@@ -17,25 +17,48 @@
 {% block content %}
     <div class="adminui-page-section">
         <div class="container">
+            <div id="id_no_result_wrapper">
+                Please select a value
+            </div>
+            <div id="id_result_wrapper">
+                <h3 id="id_title"></h3>
+                <p id="id_description"></p>
+            </div>
+            <input type="text" id="id_value_target" class="input" />
+
             <button type="button" class="button"
                     data-ievv-jsbase-widget="jsui-select-modal" data-ievv-jsbase-widget-config='{
-                        "clientsideData": [
-                            {
-                                "title": "John",
-                                "meta": "Age: 23, lives in London",
-                                "description": "The John",
-                                "imageSrc": null
-                            },
-                            {
-                                "title": "Peter",
-                                "description": "Peter is coool"
-                            },
-                            {
-                                "title": "Jane",
-                                "description": "Jane is awesome, but she no longer likes Tarzan"
-                            }
-                        ],
-                        "clientsideSearchAttributes": ["title", "description"]
+                        "valueTargetInputId": "id_value_target",
+                        "titlePreviewId": "id_title",
+                        "descriptionPreviewId": "id_description",
+                        "noValueWrapperId": "id_result_wrapper",
+                        "hasValueWrapperId": "id_no_result_wrapper",
+                        "result": {
+                            "clientsideData": [
+                                {
+                                    "value": 1,
+                                    "title": "John",
+                                    "description": "The John",
+                                    "imageSrc": null
+                                },
+                                {
+                                    "value": 2,
+                                    "title": "Peter",
+                                    "description": "Peter is coool"
+                                },
+                                {
+                                    "value": 3,
+                                    "title": "Jane",
+                                    "description": "Jane is awesome, but she no longer likes Tarzan"
+                                }
+                            ],
+                            "clientsideSearchAttributes": ["title", "description"]
+                        },
+                        "search": {
+                            "placeholder": "Søk...",
+                            "changeDelay": 200
+                        },
+                        "modalCssClass": "modal modal--wide"
                     }'>
                 Open select dialog
             </button>

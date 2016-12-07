@@ -2,19 +2,21 @@ import React from "react";
 
 
 export default class IevvSearch extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.state = {value: ''};
-    console.log(this.props);
-  }
 
   static get defaultProps() {
     return {
       'changeDelay': 200,
       'placeholder': 'Search ...',
-      'className': 'input input--outlined'
+      'inputClassName': 'input input--outlined',
+      'labelClassName': 'label',
+      'autofocus': false
     }
+  }
+
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.state = {value: ''};
   }
 
   handleChange(event) {
@@ -33,14 +35,19 @@ export default class IevvSearch extends React.Component {
 
   _onChangeDelayed() {
     new window.ievv_jsbase_core.SignalHandlerSingleton().send(
-      this.props.changeSignalName,
+      this.props.searchSignalName,
       this.state.value
     );
   }
 
   render() {
-    return <input type="search" placeholder={this.props.placeholder} className={this.props.className}
+    return <label className={this.props.labelClassName}>
+      <input type="search"
+                  placeholder={this.props.placeholder}
+                  className={this.props.inputClassName}
                   value={this.state.value}
-                  onChange={this.handleChange} />;
+                  autoFocus={this.props.autofocus}
+                  onChange={this.handleChange} />
+    </label>;
   }
 }
