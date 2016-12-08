@@ -64,6 +64,7 @@
  * </button>
  */
 export default class AbstractWidget {
+
     /**
      * @param {Element} element The element to load the widget in.
      */
@@ -130,5 +131,35 @@ export default class AbstractWidget {
      */
     destroy() {
         
+    }
+
+    /**
+     * If you override {@link AbstractWidget#afterInitializeAllWidgets},
+     * you must override this to return ``true``.
+     *
+     * @returns {boolean} Should return ``true`` if you want the widget registry
+     *   to call {@link AbstractWidget#afterInitializeAllWidgets}.
+     */
+    useAfterInitializeAllWidgets() {
+        return false;
+    }
+
+    /**
+     * Called after all the widgets within the element that
+     * {@link WidgetRegistrySingleton#initializeAllWidgetsWithinElement}
+     * was called with is initialized.
+     *
+     * For performance reasons, this is only called if
+     * {@link AbstractWidget#useAfterInitializeAllWidgets} returns
+     * ``true``, so you must also override that method if you override
+     * this method.
+     *
+     * This is useful if you need to do something after other
+     * widgets have finished initializing, which may be the case
+     * for loosely coupled widgets.
+     *
+     * Does nothing by default.
+     */
+    afterInitializeAllWidgets() {
     }
 }

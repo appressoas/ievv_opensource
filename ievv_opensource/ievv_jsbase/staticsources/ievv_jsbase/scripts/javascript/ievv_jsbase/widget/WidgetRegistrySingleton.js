@@ -170,8 +170,15 @@ export default class WidgetRegistrySingleton {
      * @param {Element} element A DOM element.
      */
     initializeAllWidgetsWithinElement(element) {
+        const afterInitializeAllWidgets = [];
         for(let widgetElement of this._getAllWidgetElementsWithinElement(element)) {
-            this.initializeWidget(widgetElement);
+            let widget = this.initializeWidget(widgetElement);
+            if(widget.useAfterInitializeAllWidgets()) {
+                afterInitializeAllWidgets.push(widget);
+            }
+        }
+        for(let widget of afterInitializeAllWidgets) {
+            widget.afterInitializeAllWidgets();
         }
     }
 
@@ -194,6 +201,25 @@ export default class WidgetRegistrySingleton {
      */
     getWidgetInstanceByInstanceId(widgetInstanceId) {
         return this._widgetInstanceMap.get(widgetInstanceId);
+    }
+
+    getWidgetInstanceFromElement(element) {
+        let widgetInstanceId = this.getWidgetInstanceIdFromElement(element);
+        if(widgetInstanceId) {
+            let widgetInstance = this.getWidgetInstanceByInstanceId(widgetInstanceId);
+            if(widgetInstance) {
+                return widgetInstance;
+            } else {
+                throw new ElementIsNotInitializedAsWidget(
+                    `Element\n\n${element.outerHTML}\n\nhas the ` +
+                    `${this._widgetInstanceIdAttribute} attribute, but the id is ` +
+                    `not in the widget registry.`);
+            }
+        } else {
+            throw new ElementHasNoWidgetInstanceIdError(
+                `Element\n\n${element.outerHTML}\n\nhas no or empty ` +
+                `${this._widgetInstanceIdAttribute} attribute.`);
+        }
     }
 
     /**
