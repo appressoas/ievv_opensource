@@ -1,11 +1,10 @@
 import HttpResponse from "./HttpResponse";
-import QueryString from "./QueryString";
 import {UrlParser} from "./UrlParser";
 
 
 /**
  * API for performing HTTP requests.
-
+ *
  * @example <caption>Make a POST request</caption>
  * const request = new HttpRequest('http://example.com/api/users/');
  * request.post('Hello world')
@@ -19,7 +18,7 @@ import {UrlParser} from "./UrlParser";
  *         }
  *     })
  *     .catch((error) => {
- *         // Error - response is an HttpError object.
+ *         // Error - response is an HttpResponse object.
  *         console.error(error.toString());
  *         if(error.response.isRedirect()) {
  *             // Yes - redirect is treated as an error by default.
@@ -33,6 +32,7 @@ import {UrlParser} from "./UrlParser";
  *         } else if (error.response.isConnectionRefused()) {
  *             console.log('Connection refused.');
  *         }
+ *         throw error.toError();  // You can throw the error response as an exception
  *     });
  *
  * @example <caption>Make a GET request with a querystring</caption>
