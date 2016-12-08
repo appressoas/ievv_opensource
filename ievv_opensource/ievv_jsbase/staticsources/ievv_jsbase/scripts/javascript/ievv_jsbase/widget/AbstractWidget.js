@@ -3,8 +3,8 @@
  *
  * @example <caption>Create a very simple widget</caption>
  * export default class OpenMenuWidget extends AbstractWidget {
- *     constructor(element) {
- *          super(element);
+ *     constructor(element, widgetInstanceId) {
+ *          super(element, widgetInstanceId);
  *          this._onClickBound = (...args) => {
  *              this._onClick(...args);
  *          };
@@ -67,9 +67,12 @@ export default class AbstractWidget {
 
     /**
      * @param {Element} element The element to load the widget in.
+     * @param {string} widgetInstanceId The unique ID of this widget instance
+     *  in the widget registry.
      */
-    constructor(element) {
+    constructor(element, widgetInstanceId) {
         this.element = element;
+        this.widgetInstanceId = widgetInstanceId;
     }
 
     /**

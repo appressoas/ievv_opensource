@@ -152,9 +152,9 @@ export default class WidgetRegistrySingleton {
             throw new InvalidWidgetAliasError(`No WidgetClass registered with the "${alias}" alias.`);
         }
         let WidgetClass = this._widgetClassMap.get(alias);
-        let widget = new WidgetClass(element);
         this._widgetInstanceCounter ++;
         let widgetInstanceId = this._widgetInstanceCounter.toString();
+        let widget = new WidgetClass(element, widgetInstanceId);
         this._widgetInstanceMap.set(widgetInstanceId, widget);
         element.setAttribute(this._widgetInstanceIdAttribute, widgetInstanceId);
         return widget;
