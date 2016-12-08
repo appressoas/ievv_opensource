@@ -32,7 +32,7 @@ import {UrlParser} from "./UrlParser";
  *         } else if (error.response.isConnectionRefused()) {
  *             console.log('Connection refused.');
  *         }
- *         throw error.toError();  // You can throw the error response as an exception
+ *         // throw error;  // You can throw the error as an exception
  *     });
  *
  * @example <caption>Make a GET request with a querystring</caption>
