@@ -56,7 +56,7 @@ export class ReceivedSignalInfo {
    * @returns {string}
    */
   getPrettyFormattedData() {
-      return new PrettyFormat(this.data).toString(2);
+    return new PrettyFormat(this.data).toString(2);
   }
 
   /**
@@ -279,6 +279,7 @@ export default class SignalHandlerSingleton {
     if(!_instance) {
       _instance = this;
       this._signalMap = new Map();
+      this._receiverMap = new Map();
     }
     return _instance;
   }
@@ -322,6 +323,11 @@ export default class SignalHandlerSingleton {
     }
     if(!this._signalMap.has(signalName)) {
       this._signalMap.set(signalName, new _SignalReceivers(signalName));
+      if(this._receiverMap.has(receiverName)) {
+        this._receiverMap.get(receiverName).add(signalName);
+      } else {
+        this._receiverMap.set(receiverName, new Set([signalName]));
+      }
     }
     let signal = this._signalMap.get(signalName);
     signal.addReceiver(receiverName, callback)
@@ -337,8 +343,28 @@ export default class SignalHandlerSingleton {
     if(this._signalMap.has(signalName)) {
       let signal = this._signalMap.get(signalName);
       signal.removeReceiver(receiverName);
-      if(signal.receiverCount() === 0) {
+      if(signal.receiverCount() == 0) {
         this._signalMap.delete(signalName);
+      }
+      let receiverSignalSet = this._receiverMap.get(receiverName);
+      if(receiverSignalSet.has(signalName)) {
+        receiverSignalSet.delete(signalName);
+      }
+      if(receiverSignalSet.size == 0) {
+        this._receiverMap.delete(receiverName);
+      }
+    }
+  }
+
+  /**
+   * Remove all signals registered for a receiver.
+   *
+   * @param {string} receiverName The name of the receiver.
+   */
+  removeAllSignalsFromReceiver(receiverName) {
+    if(this._receiverMap.has(receiverName)) {
+      for(let signalName of this._receiverMap.get(receiverName)) {
+        this.removeReceiver(signalName, receiverName);
       }
     }
   }
