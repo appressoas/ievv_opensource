@@ -8,6 +8,38 @@ export default class AbstractLogger {
     throw new Error('Must be overridden in subclasses.');
   }
 
+  /**
+   * Returns ``true`` if loglevel is higher
+   * than or equal to {@link LogLevels#DEBUG}.
+   */
+  get isDebug() {
+    return this.getLogLevel() >= LOGLEVEL.DEBUG;
+  }
+
+  /**
+   * Returns ``true`` if loglevel is higher
+   * than or equal to {@link LogLevels#INFO}.
+   */
+  get isInfo() {
+    return this.getLogLevel() >= LOGLEVEL.INFO;
+  }
+
+  /**
+   * Returns ``true`` if loglevel is higher
+   * than or equal to {@link LogLevels#WARNING}.
+   */
+  get isWarning() {
+    return this.getLogLevel() >= LOGLEVEL.WARNING;
+  }
+
+  /**
+   * Returns ``true`` if loglevel is higher
+   * than or equal to {@link LogLevels#ERROR}.
+   */
+  get isError() {
+    return this.getLogLevel() >= LOGLEVEL.ERROR;
+  }
+
   _noOutput() {
 
   }
@@ -58,54 +90,6 @@ export default class AbstractLogger {
       return console.error.bind(console);
     }
     return this._noOutput;
-  }
-
-  /**
-   * Calls the provided function if loglevel is higher
-   * than or equal to {@link LogLevels#DEBUG}.
-   *
-   * @param {function} callable
-   */
-  ifDebug(callable) {
-    if (this.getLogLevel() >= LOGLEVEL.DEBUG) {
-        callable();
-    }
-  }
-
-  /**
-   * Calls the provided function if loglevel is higher
-   * than or equal to {@link LogLevels#INFO}.
-   *
-   * @param {function} callable
-   */
-  ifInfo(callable) {
-    if (this.getLogLevel() >= LOGLEVEL.INFO) {
-        callable();
-    }
-  }
-
-  /**
-   * Calls the provided function if loglevel is higher
-   * than or equal to {@link LogLevels#WARNING}.
-   *
-   * @param {function} callable
-   */
-  ifWarning(callable) {
-    if (this.getLogLevel() >= LOGLEVEL.WARNING) {
-        callable();
-    }
-  }
-
-  /**
-   * Calls the provided function if loglevel is higher
-   * than or equal to {@link LogLevels#ERROR}.
-   *
-   * @param {function} callable
-   */
-  ifError(callable) {
-    if (this.getLogLevel() >= LOGLEVEL.ERROR) {
-        callable();
-    }
   }
 
 }
