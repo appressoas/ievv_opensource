@@ -323,11 +323,11 @@ export default class SignalHandlerSingleton {
     }
     if(!this._signalMap.has(signalName)) {
       this._signalMap.set(signalName, new _SignalReceivers(signalName));
-      if(this._receiverMap.has(receiverName)) {
-        this._receiverMap.get(receiverName).add(signalName);
-      } else {
-        this._receiverMap.set(receiverName, new Set([signalName]));
-      }
+    }
+    if(this._receiverMap.has(receiverName)) {
+      this._receiverMap.get(receiverName).add(signalName);
+    } else {
+      this._receiverMap.set(receiverName, new Set([signalName]));
     }
     let signal = this._signalMap.get(signalName);
     signal.addReceiver(receiverName, callback)
@@ -347,11 +347,13 @@ export default class SignalHandlerSingleton {
         this._signalMap.delete(signalName);
       }
       let receiverSignalSet = this._receiverMap.get(receiverName);
-      if(receiverSignalSet.has(signalName)) {
-        receiverSignalSet.delete(signalName);
-      }
-      if(receiverSignalSet.size == 0) {
-        this._receiverMap.delete(receiverName);
+      if(receiverSignalSet != undefined) {
+        if(receiverSignalSet.has(signalName)) {
+          receiverSignalSet.delete(signalName);
+        }
+        if(receiverSignalSet.size == 0) {
+          this._receiverMap.delete(receiverName);
+        }
       }
     }
   }
