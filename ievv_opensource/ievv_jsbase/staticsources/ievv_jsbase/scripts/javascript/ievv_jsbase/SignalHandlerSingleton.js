@@ -47,7 +47,7 @@ export class ReceivedSignalInfo {
    * @returns {string}
    */
   toString() {
-    return `ReceivedSignalInfo: signalName="${this.signalName}" receiverName="${this.receiverName}`;
+    return `ReceivedSignalInfo: signalName="${this.signalName}" receiverName="${this.receiverName}"`;
   }
 
   /**
