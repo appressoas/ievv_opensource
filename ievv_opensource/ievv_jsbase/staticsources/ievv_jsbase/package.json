@@ -3,6 +3,7 @@
     "htmlparser2": "^3.9.2"
   },
   "devDependencies": {
+    "babel-core": "^6.20.0",
     "babel-jest": "^17.0.2",
     "babel-loader": "^6.2.8",
     "babel-polyfill": "^6.16.0",
@@ -21,9 +22,14 @@
     "jsbuild": "webpack --config webpack.config.js",
     "jsbuild-production": "webpack --config webpack.config.js -p",
     "jsbuild-watch": "webpack --config webpack.config.js --watch",
-    "test": "jest",
+    "test": "jest --no-cache",
     "test-debug": "jest --debug",
     "test-watch": "jest --watch"
+  },
+  "jest": {
+    "transform": {
+      ".*": "./config/jest/transform.js"
+    }
   },
   "version": "1.0.0"
 }
