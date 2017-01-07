@@ -324,7 +324,7 @@ class Apps(LogMixin):
     MODE_DEVELOP = 'develop'
     MODE_PRODUCTION = 'production'
 
-    def __init__(self, *apps, help_header=None):
+    def __init__(self, *apps, **kwargs):
         """
         Parameters:
             apps: :class:`.App` objects to add initially. Uses :meth:`.add_app` to add the apps.
@@ -332,7 +332,7 @@ class Apps(LogMixin):
         self.apps = OrderedDict()
         self.loglevel = Logger.DEBUG
         self.command_error_message = None
-        self.help_header = help_header
+        self.help_header = kwargs.pop('help_header', None)
         self.mode = self.MODE_DEVELOP
         for app in apps:
             self.add_app(app)
