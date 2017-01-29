@@ -35,7 +35,7 @@ export class UrlParser {
     let split = domainAndPath.split('/');
     let domain = split.shift();
     let path = '';
-    if(split.length > 1) {
+    if(split.length > 0) {
       path = `/${split.join('/')}`;
     }
     return {

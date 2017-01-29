@@ -38,7 +38,12 @@ describe('UrlParser', () => {
     expect(urlparser.domain).toBe('example.com');
   });
 
-  it('with scheme - get path', () => {
+  it('with scheme - get path short', () => {
+    const urlparser = new UrlParser('http://example.com/a');
+    expect(urlparser.path).toBe('/a');
+  });
+
+  it('with scheme - get path long', () => {
     const urlparser = new UrlParser('http://example.com/api/people');
     expect(urlparser.path).toBe('/api/people');
   });
@@ -53,7 +58,12 @@ describe('UrlParser', () => {
     expect(urlparser.domain).toBe('example.com');
   });
 
-  it('no scheme, with domain - get path', () => {
+  it('no scheme, with domain - get path short', () => {
+    const urlparser = new UrlParser('example.com/a');
+    expect(urlparser.path).toBe('/a');
+  });
+
+  it('no scheme, with domain - get path long', () => {
     const urlparser = new UrlParser('example.com/api/people');
     expect(urlparser.path).toBe('/api/people');
   });
@@ -63,7 +73,12 @@ describe('UrlParser', () => {
     expect(urlparser.path).toBe('');
   });
 
-  it('no scheme, no domain - get path', () => {
+  it('no scheme, no domain - get path short', () => {
+    const urlparser = new UrlParser('/a');
+    expect(urlparser.path).toBe('/a');
+  });
+
+  it('no scheme, no domain - get path long', () => {
     const urlparser = new UrlParser('/api/people');
     expect(urlparser.path).toBe('/api/people');
   });
