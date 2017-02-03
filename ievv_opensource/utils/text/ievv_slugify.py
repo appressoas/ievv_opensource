@@ -16,7 +16,7 @@ def ievv_slugify(value):
 
     """
     character_replace_map = {
-        'æ': 'e',
+        'æ': 'a',
         'ø': 'o',
         'å': 'a'
     }
