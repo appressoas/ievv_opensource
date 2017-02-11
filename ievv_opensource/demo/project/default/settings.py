@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_elasticsearch',
     'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
-    'ievv_opensource.ievv_jsbase',
 ]
 
 MIDDLEWARE = [

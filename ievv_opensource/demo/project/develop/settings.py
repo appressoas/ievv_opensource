@@ -1,4 +1,3 @@
-from ievv_opensource import ievv_jsbase
 from ievv_opensource.demo.project.default.settings import *  # noqa
 from ievv_opensource.utils import ievvbuildstatic
 from ievv_opensource.utils import ievvdevrun
@@ -68,15 +67,6 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
                 ]
             ),
             ievvbuildstatic.mediacopy.Plugin(),
-        ]
-    ),
-    ievvbuildstatic.config.App(
-        appname='ievv_jsbase',
-        version=ievv_jsbase.__version__,
-        plugins=[
-            ievvbuildstatic.autosetup_esdoc.Plugin(),
-            ievvbuildstatic.npmrun_jsbuild.Plugin(),
-            ievvbuildstatic.run_jstests.Plugin(),
         ]
     ),
     help_header='You can configure the settings for ievv buildstatic in '
