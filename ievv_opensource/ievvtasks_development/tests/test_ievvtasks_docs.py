@@ -1,5 +1,6 @@
 import os
 import shutil
+import unittest
 
 from django.core import management
 from django.core.management import CommandError
@@ -9,6 +10,7 @@ from ievv_opensource.utils import virtualenvutils
 from ievv_opensource.python2_compatibility import mock
 
 
+@unittest.skip('This is both slow and hard to ensure works in different environments')
 class TestDocs(TestCase):
     def __remove_documentation_build_directory(self):
         if os.path.exists(self.documentation_build_directory):

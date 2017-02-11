@@ -7,7 +7,7 @@ from ievv_opensource.utils.text.ievv_slugify import ievv_slugify
 
 class TestIevvSlugify(TestCase):
     def test_ievv_slugify_e(self):
-        self.assertEqual('e', ievv_slugify("æ"))
+        self.assertEqual('a', ievv_slugify("æ"))
 
     def test_ievv_slugify_o(self):
         self.assertEqual('o', ievv_slugify("ø"))
@@ -16,7 +16,7 @@ class TestIevvSlugify(TestCase):
         self.assertEqual('a', ievv_slugify("å"))
 
     def test_ievv_slugify_word(self):
-        self.assertEqual('helle-assen-gare-e-do', ievv_slugify('Hællæ Åssen gåre æ dø!'))
+        self.assertEqual('halla-assen-gare-a-do', ievv_slugify('Hællæ Åssen gåre æ dø!'))
 
     def test_ievv_slugify_word_with_settings_map(self):
         character_replace_map = {
