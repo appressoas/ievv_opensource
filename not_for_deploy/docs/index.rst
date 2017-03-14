@@ -72,6 +72,7 @@ Utilities
    utils.text
    utils.ievv_colorize
    utils.choices_with_meta
+   utils.validate_redirect_url
 
 
 ************

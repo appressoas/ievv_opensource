@@ -435,3 +435,15 @@ IEVV_COLORIZE_USE_COLORS
 ========================
 Colorize output from :func:`ievv_opensource.utils.ievv_colorize.colorize`? Defaults
 to ``True``.
+
+
+.. setting:: IEVV_VALID_REDIRECT_URL_REGEX
+
+IEVV_VALID_REDIRECT_URL_REGEX
+=============================
+Valid redirect URLs for :doc:`utils.validate_redirect_url`. Defaults to ``^.*$``.
+
+Example for only allowing redirect urls that does not contain a domain, or
+redirect urls within the example.com domain::
+
+    IEVV_VALID_REDIRECT_URL_REGEX = r'^(https?://example\.com.*|/.*)$'
