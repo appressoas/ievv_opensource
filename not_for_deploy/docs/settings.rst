@@ -447,3 +447,8 @@ Example for only allowing redirect urls that does not contain a domain, or
 redirect urls within the example.com domain::
 
     IEVV_VALID_REDIRECT_URL_REGEX = r'^(https?://example\.com/|/).*$'
+
+.. warning:: Do not use ``^https://example\.com.*$`` (no / after the domain). This
+    can potentially lead to attacks using subdomains. ``^https://example\.com.*$`` would
+    allow ``example.com.spamdomain.io/something``, but ``^https://example\.com/.*$`` would
+    not allow this.
