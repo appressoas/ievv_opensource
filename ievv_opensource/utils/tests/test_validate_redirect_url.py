@@ -9,15 +9,15 @@ class TestIsValidUrl(test.TestCase):
     def test_anything_is_valid_by_default(self):
         self.assertTrue(validate_redirect_url.is_valid_url('http://example.com/test/ing'))
 
-    @override_settings(IEVV_VALID_REDIRECT_URL_REGEX=r'^(https://example\.com.*|/.*)$')
+    @override_settings(IEVV_VALID_REDIRECT_URL_REGEX='^(https://example\.com/|/).*')
     def test_custom_regex(self):
         self.assertTrue(validate_redirect_url.is_valid_url('https://example.com/test/ing'))
-        self.assertTrue(validate_redirect_url.is_valid_url('https://example.com'))
+        self.assertTrue(validate_redirect_url.is_valid_url('https://example.com/'))
         self.assertTrue(validate_redirect_url.is_valid_url('/test/path'))
         self.assertTrue(validate_redirect_url.is_valid_url('/'))
         self.assertFalse(validate_redirect_url.is_valid_url('http://example.com/test/ing'))
-        self.assertFalse(validate_redirect_url.is_valid_url('http://example.com'))
-        self.assertFalse(validate_redirect_url.is_valid_url('https://example2.com'))
+        self.assertFalse(validate_redirect_url.is_valid_url('http://example.com/'))
+        self.assertFalse(validate_redirect_url.is_valid_url('https://example2.com/'))
         self.assertFalse(validate_redirect_url.is_valid_url('https://example2.com/test/ing'))
 
 

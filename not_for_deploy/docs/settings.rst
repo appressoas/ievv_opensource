@@ -446,4 +446,4 @@ Valid redirect URLs for :doc:`utils.validate_redirect_url`. Defaults to ``^.*$``
 Example for only allowing redirect urls that does not contain a domain, or
 redirect urls within the example.com domain::
 
-    IEVV_VALID_REDIRECT_URL_REGEX = r'^(https?://example\.com.*|/.*)$'
+    IEVV_VALID_REDIRECT_URL_REGEX = r'^(https?://example\.com/|/).*$'
