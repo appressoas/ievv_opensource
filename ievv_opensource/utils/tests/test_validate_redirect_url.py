@@ -6,8 +6,11 @@ from ievv_opensource.utils import validate_redirect_url
 
 
 class TestIsValidUrl(test.TestCase):
-    def test_anything_is_valid_by_default(self):
-        self.assertTrue(validate_redirect_url.is_valid_url('http://example.com/test/ing'))
+    def test_path_is_valid_by_default(self):
+        self.assertTrue(validate_redirect_url.is_valid_url('/test/ing'))
+
+    def test_domain_is_not_valid_by_default(self):
+        self.assertFalse(validate_redirect_url.is_valid_url('http://example.com/test/ing'))
 
     @override_settings(IEVV_VALID_REDIRECT_URL_REGEX='^(https://example\.com/|/).*$')
     def test_custom_regex(self):
@@ -22,9 +25,13 @@ class TestIsValidUrl(test.TestCase):
 
 
 class TestValidateUrl(test.TestCase):
-    def test_anything_is_valid_by_default(self):
+    def test_path_is_valid_by_default(self):
         # No ValidationError
-        validate_redirect_url.validate_url('http://example.com/test/ing')
+        validate_redirect_url.validate_url('/test/ing')
+
+    def test_domain_is_not_valid_by_default(self):
+        with self.assertRaises(ValidationError):
+            validate_redirect_url.validate_url('http://example.com/test/ing')
 
     @override_settings(IEVV_VALID_REDIRECT_URL_REGEX=r'^/test$')
     def test_invalid_url(self):

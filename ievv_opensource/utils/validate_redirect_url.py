@@ -14,7 +14,7 @@ def is_valid_url(url):
             ``http://example.com``, ``/test``, ``http://example.com/test``.
 
     """
-    allowed_redirect_url_regex = getattr(settings, 'IEVV_VALID_REDIRECT_URL_REGEX', r'^.*$')
+    allowed_redirect_url_regex = getattr(settings, 'IEVV_VALID_REDIRECT_URL_REGEX', r'^/.*$')
     return bool(re.match(allowed_redirect_url_regex, url))
 
 
