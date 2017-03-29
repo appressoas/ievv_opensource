@@ -22,7 +22,8 @@ class Choice(object):
 
         A user-friendly longer description of the choice.
     """
-    def __init__(self, value, label=None, description=''):
+    def __init__(self, value, label=None, description='',
+                 attributename=None):
         """
         Args:
             value: The value for the choice.
@@ -38,6 +39,17 @@ class Choice(object):
         self.value = value
         self.label = label or value
         self.description = description
+        if attributename is None:
+            self.attributename = self._value_to_attributename(value)
+        else:
+            self.attributename = attributename
+
+    def _value_to_attributename(self, value):
+        valuestring = str(value)
+        attributename = valuestring.upper().replace('-', '_').replace(' ', '_')
+        if len(attributename) > 0 and attributename[0].isdigit():
+            attributename = '_{}'.format(attributename)
+        return attributename
 
     def get_short_label(self):
         """
@@ -153,7 +165,6 @@ class ChoicesWithMeta(object):
     """
     def __init__(self, *choices):
         self.choices = OrderedDict()
-        self.choices_attributes = {}
         for choice in self.get_default_choices():
             self.add(choice)
         for choice in choices:
@@ -198,20 +209,6 @@ class ChoicesWithMeta(object):
         """
         return len(self.choices)
 
-    def __getattr__(self, value):
-        """
-
-        Args:
-            value:
-
-        Returns:
-
-        """
-        if value in self.choices_attributes:
-            return self.choices_attributes[value]
-        else:
-            raise AttributeError()
-
     def get_default_choices(self):
         """
         Lets say you have a field where a set of default choices
@@ -255,10 +252,6 @@ class ChoicesWithMeta(object):
         except IndexError:
             return None
 
-    def _value_to_attributename(self, value):
-        attributename = value.upper().replace('-', '_').replace(' ', '_')
-        return attributename
-
     def add(self, choice):
         """
         Add a :class:`.Choice`.
@@ -269,7 +262,7 @@ class ChoicesWithMeta(object):
         if choice.value in self.choices:
             raise KeyError('A choice with value "{}" alredy exists.'.format(choice.value))
         self.choices[choice.value] = choice
-        self.choices_attributes[self._value_to_attributename(value=choice.value)] = choice
+        setattr(self, choice.attributename, choice)
 
     def remove(self, value):
         """
@@ -279,8 +272,9 @@ class ChoicesWithMeta(object):
             value: The value to remove from the ChoicesWithMeta.
         """
         if value in self.choices:
+            attributename = self.choices[value].attributename
+            delattr(self, attributename)
             del self.choices[value]
-            del self.choices_attributes[self._value_to_attributename(value=value)]
         else:
             raise KeyError('{value} is not a valid choice value.'.format(value=value))
 

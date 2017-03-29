@@ -20,25 +20,33 @@ class TestChoice(test.TestCase):
         choice = choices_with_meta.Choice(value='test', label='Test', description='A description')
         self.assertEqual('Test - A description', choice.get_long_label())
 
+    def test_value_to_attributename(self):
+        self.assertEqual('TEST',
+                         choices_with_meta.Choice(value='test').attributename)
+        self.assertEqual('MULTI_WORD',
+                         choices_with_meta.Choice(value='multi word').attributename)
+        self.assertEqual('LINE_SEPARATED_WORDS',
+                         choices_with_meta.Choice(value='line-separated-words').attributename)
+        self.assertEqual('_0',
+                         choices_with_meta.Choice(value=0).attributename)
+
+    def test_custom_attributename(self):
+        self.assertEqual('first',
+                         choices_with_meta.Choice(value=0, attributename='first').attributename)
+
 
 class TestChoicesWithMeta(test.TestCase):
-    def test_value_to_attributename(self):
-        choices = choices_with_meta.ChoicesWithMeta()
-        self.assertEqual('TEST', choices._value_to_attributename('test'))
-        self.assertEqual('MULTI_WORD', choices._value_to_attributename('multi word'))
-        self.assertEqual('LINE_SEPARATED_WORDS', choices._value_to_attributename('line-separated-words'))
-
     def test_add_adds_to_choices(self):
         choices = choices_with_meta.ChoicesWithMeta()
         choice = choices_with_meta.Choice(value='test1')
         choices.add(choice)
         self.assertEqual(choice, choices.choices['test1'])
 
-    def test_add_adds_to_choices_attributes(self):
+    def test_add_adds_to_attributes(self):
         choices = choices_with_meta.ChoicesWithMeta()
         choice = choices_with_meta.Choice(value='test1')
         choices.add(choice)
-        self.assertEqual(choice, choices.choices_attributes['TEST1'])
+        self.assertEqual(choice, choices.TEST1)
 
     def test_getitem_value_exists(self):
         choices = choices_with_meta.ChoicesWithMeta()
