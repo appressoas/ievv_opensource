@@ -11,7 +11,7 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
         You can just add it to your Django development settings with::
 
-            IEVVTASKS_DEVELOPRUN_THREADLIST = {
+            IEVVTASKS_DEVRUN_RUNNABLES = {
                 'default': ievvdevrun.config.RunnableThreadList(
                     ievvdevrun.runnables.redis_server.RunnableThread()
                 )
@@ -19,7 +19,7 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
         And you can make it not restart on crash with::
 
-            IEVVTASKS_DEVELOPRUN_THREADLIST = {
+            IEVVTASKS_DEVRUN_RUNNABLES = {
                 'default': ievvdevrun.config.RunnableThreadList(
                     ievvdevrun.runnables.redis_server.RunnableThread(
                         autorestart_on_crash=False)

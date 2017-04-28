@@ -14,7 +14,7 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
         You can just add it to your Django development settings with::
 
-            IEVVTASKS_DEVELOPRUN_THREADLIST = {
+            IEVVTASKS_DEVRUN_RUNNABLES = {
                 'default': ievvdevrun.config.RunnableThreadList(
                     ievvdevrun.runnables.dbdev_runserver.RunnableThread()
                 )
