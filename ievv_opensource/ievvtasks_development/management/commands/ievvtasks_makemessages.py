@@ -2,10 +2,11 @@ import os
 
 from django.conf import settings
 from django.core import management
-from django.core.management.base import BaseCommand
+
+from ievv_opensource.ievvtasks_common.base_command import BaseIevvTasksCommand
 
 
-class Command(BaseCommand):
+class Command(BaseIevvTasksCommand):
     help = 'Run makemessages for the languages specified in the ' \
            'IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES setting.'
 
@@ -39,7 +40,13 @@ class Command(BaseCommand):
                             extensions=extensions,
                             domain='djangojs')
 
+    def __run_pre_management_commands(self):
+        management_commands = getattr(
+            settings, 'IEVVTASKS_MAKEMESSAGES_PRE_MANAGEMENT_COMMANDS', [])
+        self.run_management_commands(management_commands)
+
     def handle(self, *args, **options):
+        self.__run_pre_management_commands()
         current_directory = os.getcwd()
         for directory in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
             directory = os.path.abspath(directory)
