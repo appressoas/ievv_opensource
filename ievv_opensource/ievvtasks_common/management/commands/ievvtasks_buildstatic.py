@@ -30,6 +30,12 @@ class Command(BaseCommand):
                             required=False, action='append_const', const='slow-jstest',
                             help='Skip running slow javascript tests. The same as "--skip slow-jstest". '
                                  'Slow javascript tests are also skipped if you use "--skip-jstests".')
+        parser.add_argument('-i', '--include', dest='includegroups',
+                            required=False, action='append',
+                            help='Include plugin groups. If this is provided, only plugin '
+                                 'belonging to the provided groups are executed. '
+                                 'Overrides any groups provided using "--skip" (I.E.: included '
+                                 'groups are included no matter what other options are provided).')
         parser.add_argument('--loglevel', dest='loglevel',
                             required=False, default='stdout',
                             choices=['debug', 'stdout', 'info', 'warning', 'error'],
@@ -45,17 +51,32 @@ class Command(BaseCommand):
                             required=False, action='store_const', const='debug',
                             help='Verbose output. Same as "--loglevel debug".')
 
-    def handle(self, *args, **options):
-        loglevel = getattr(Logger, options['loglevel'].upper())
-        appnames = options['appnames']
+    def __get_skipgroups(self, options):
         skipgroups = options['skipgroups']
-        production_mode = options['production_mode']
         skipgroups = set(skipgroups or [])
         if 'skip-jstests' in skipgroups:
             skipgroups.add('skip-slow-jstests')
         if 'skip-js' in skipgroups:
             skipgroups.add('skip-slow-jstests')
             skipgroups.add('skip-jstests')
+        return skipgroups
+
+    def __get_includegroups(self, options):
+        includegroups = options['includegroups']
+        includegroups = set(includegroups or [])
+        if 'skip-jstests' in includegroups:
+            includegroups.add('skip-slow-jstests')
+        if 'skip-js' in includegroups:
+            includegroups.add('skip-slow-jstests')
+            includegroups.add('skip-jstests')
+        return includegroups
+
+    def handle(self, *args, **options):
+        loglevel = getattr(Logger, options['loglevel'].upper())
+        appnames = options['appnames']
+        production_mode = options['production_mode']
+        skipgroups = self.__get_skipgroups(options=options)
+        includegroups = self.__get_includegroups(options=options)
         if appnames:
             try:
                 settings.IEVVTASKS_BUILDSTATIC_APPS.validate_appnames(appnames=appnames)
@@ -70,7 +91,13 @@ class Command(BaseCommand):
         else:
             settings.IEVVTASKS_BUILDSTATIC_APPS.set_development_mode()
         settings.IEVVTASKS_BUILDSTATIC_APPS.log_help_header()
-        settings.IEVVTASKS_BUILDSTATIC_APPS.install(appnames=appnames, skipgroups=skipgroups)
-        settings.IEVVTASKS_BUILDSTATIC_APPS.run(appnames=appnames, skipgroups=skipgroups)
+        settings.IEVVTASKS_BUILDSTATIC_APPS.install(appnames=appnames,
+                                                    skipgroups=skipgroups,
+                                                    includegroups=includegroups)
+        settings.IEVVTASKS_BUILDSTATIC_APPS.run(appnames=appnames,
+                                                skipgroups=skipgroups,
+                                                includegroups=includegroups)
         if options['watch']:
-            settings.IEVVTASKS_BUILDSTATIC_APPS.watch(appnames=appnames, skipgroups=skipgroups)
+            settings.IEVVTASKS_BUILDSTATIC_APPS.watch(appnames=appnames,
+                                                      skipgroups=skipgroups,
+                                                      includegroups=includegroups)

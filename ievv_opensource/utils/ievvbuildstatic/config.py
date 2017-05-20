@@ -23,7 +23,9 @@ class App(LogMixin):
                  destinationfolder='static',
                  keep_temporary_files=False,
                  installers_config=None,
-                 docbuilder_classes=None):
+                 docbuilder_classes=None,
+                 default_skipgroups=None,
+                 default_includegroups=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -42,6 +44,8 @@ class App(LogMixin):
         self.plugins = []
         self.docbuilder_classes = docbuilder_classes or self.get_default_docbuilder_classes()
         self.keep_temporary_files = keep_temporary_files
+        self.default_skipgroups = default_skipgroups or []
+        self.default_includegroups = default_includegroups or []
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
         for plugin in plugins:
@@ -68,19 +72,23 @@ class App(LogMixin):
         plugin.app = self
         self.plugins.append(plugin)
 
-    def iterplugins(self, skipgroups=None):
-        skipgroups = skipgroups or []
+    def iterplugins(self, skipgroups=None, includegroups=None):
+        skipgroups = skipgroups or self.default_skipgroups
+        includegroups = includegroups or self.default_includegroups
+        skipgroups = {group for group in skipgroups if group not in includegroups}
         for plugin in self.plugins:
+            if includegroups and plugin.group not in includegroups:
+                continue
             if plugin.group and plugin.group in skipgroups:
                 continue
             yield plugin
 
-    def run(self, skipgroups=None):
+    def run(self, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within the app.
         """
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.runwrapper()
 
     def _make_json_appconfig_dict(self):
@@ -108,7 +116,7 @@ class App(LogMixin):
         appconfig_dict[plugin_name] = config_dict
         self._save_json_appconfig(appconfig_dict=appconfig_dict)
 
-    def install(self, skipgroups=None):
+    def install(self, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within the app.
@@ -117,11 +125,11 @@ class App(LogMixin):
         for alias in self.installers_config.keys():
             installer = self.get_installer(alias=alias)
             installer.initialize()
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.install()
         for installer in self.installers.values():
             installer.install()
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.post_install()
 
     def get_app_config(self):
@@ -228,12 +236,12 @@ class App(LogMixin):
             absolute_path = '{}{}'.format(path, new_extension)
         return absolute_path
 
-    def watch(self, skipgroups=None):
+    def watch(self, skipgroups=None, includegroups=None):
         """
         Start a watcher thread for each plugin.
         """
         watchconfigs = []
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             watchconfig = plugin.watch()
             if watchconfig:
                 watchconfigs.append(watchconfig)
@@ -356,13 +364,13 @@ class Apps(LogMixin):
         """
         return self.apps[appname]
 
-    def install(self, appnames=None, skipgroups=None):
+    def install(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.install(skipgroups=skipgroups)
+            app.install(skipgroups=skipgroups, includegroups=includegroups)
 
     def log_help_header(self):
         if self.help_header:
@@ -382,15 +390,15 @@ class Apps(LogMixin):
             if include:
                 yield app
 
-    def run(self, appnames=None, skipgroups=None):
+    def run(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.run(skipgroups=skipgroups)
+            app.run(skipgroups=skipgroups, includegroups=includegroups)
 
-    def watch(self, appnames=None, skipgroups=None):
+    def watch(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Start watcher threads for all folders that at least one
         :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
@@ -400,7 +408,7 @@ class Apps(LogMixin):
         """
         watchconfigpool = WatchConfigPool()
         for app in self.iterapps(appnames=appnames):
-            watchconfigpool.extend(app.watch(skipgroups=skipgroups))
+            watchconfigpool.extend(app.watch(skipgroups=skipgroups, includegroups=includegroups))
         all_observers = watchconfigpool.watch()
         try:
             while True:
