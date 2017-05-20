@@ -9,13 +9,23 @@ class Command(BaseCommand):
     help = 'Run makemessages for the languages specified in the ' \
            'IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES setting.'
 
+    def __makemessages(self, ignore, extensions, domain):
+        management.call_command(
+            'makemessages',
+            locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
+            ignore=ignore,
+            extensions=extensions,
+            domain=domain)
+
     def __build_python_translations(self):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_IGNORE', [
             'static/*'
         ])
-        management.call_command('makemessages',
-                                locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
-                                ignore=ignore)
+        extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_EXTENSIONS', [
+            'py', 'html', 'txt'])
+        self.__makemessages(ignore=ignore,
+                            extensions=extensions,
+                            domain='django')
 
     def __build_javascript_translations(self):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
@@ -23,10 +33,11 @@ class Command(BaseCommand):
             'bower_components/*',
             'not_for_deploy/*',
         ])
-        management.call_command('makemessages',
-                                domain='djangojs',
-                                locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
-                                ignore=ignore)
+        extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS', [
+            'js'])
+        self.__makemessages(ignore=ignore,
+                            extensions=extensions,
+                            domain='djangojs')
 
     def handle(self, *args, **options):
         current_directory = os.getcwd()
