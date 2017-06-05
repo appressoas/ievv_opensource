@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 import inspect
 import os
+import re
 from collections import OrderedDict
 
+import htmls
 from django import template
 from django.db import connection
 from ievv_opensource.utils.singleton import Singleton
@@ -36,6 +38,17 @@ class AbstractCustomSql(object):
         cursor = connection.cursor()
         cursor.execute(sql)
 
+    def execute_sql_multiple(self, sql_iterable):
+        for sql in sql_iterable:
+            self.execute_sql(sql)
+
+    def make_sql_file_path(self, path):
+        this_file_path = inspect.getfile(self.__class__)
+        sqldirectory = os.path.join(
+            os.path.dirname(inspect.getfile(self.__class__)),
+            '{}_sqlcode'.format(os.path.splitext(this_file_path)[0]))
+        return os.path.join(sqldirectory, path)
+
     def get_sql_from_file(self, path):
         """
         Get SQL from a file as a string.
@@ -46,14 +59,9 @@ class AbstractCustomSql(object):
                 with ``_sqlcode``.
 
                 So if the file with this class is in ``path/to/customsql.py``,
-                path will be relative to ``path/to/customsql_sqlcode/``.
+                path will be relative to ``path/to/customsqlcode/``.
         """
-        this_file_path = inspect.getfile(self.__class__)
-        sqldirectory = os.path.join(
-            os.path.dirname(inspect.getfile(self.__class__)),
-            '{}_sqlcode'.format(os.path.splitext(this_file_path)[0]))
-        full_path = os.path.join(sqldirectory, path)
-        return open(full_path, 'rb').read().decode('utf-8')
+        return open(self.make_sql_file_path(path), 'rb').read().decode('utf-8')
 
     def execute_sql_from_file(self, path):
         """
@@ -79,6 +87,12 @@ class AbstractCustomSql(object):
         for path in paths:
             self.execute_sql_from_file(path=path)
 
+    def render_sql_from_template(self, path, context_data):
+        template_sql = self.get_sql_from_file(path)
+        context_data = context_data or {}
+        djangotemplate = template.Template(template_sql)
+        return djangotemplate.render(template.Context(context_data))
+
     def execute_sql_from_template_file(self, path, context_data=None):
         """
         Execute SQL from the provided Django template file.
@@ -91,11 +105,7 @@ class AbstractCustomSql(object):
             path: See :meth:`.get_sql_from_file`.
             context_data (dict): Template context data. Can be ``None``.
         """
-        template_sql = self.get_sql_from_file(path)
-        context_data = context_data or {}
-        djangotemplate = template.Template(template_sql)
-        sql = djangotemplate.render(template.Context(context_data))
-        self.execute_sql(sql)
+        self.execute_sql(self.render_sql_from_template(path=path, context_data=context_data))
 
     def execute_sql_from_template_files(self, paths, context_data=None):
         """
@@ -125,6 +135,106 @@ class AbstractCustomSql(object):
         for the first initialization, and to update code after updates/changes.
 
         Must be overridden in subclasses.
+        """
+        raise NotImplementedError()
+
+    def _normalize_whitespace(self, sql):
+        return re.sub(r'\s+', ' ', sql).strip()
+
+    CREATE_TRIGGER_PATTERN = re.compile(r'^\s*CREATE\s+TRIGGER\s+'
+                                        r'(?P<trigger_name>[a-zA-Z0-9_]+)\s+'
+                                        r'(?:BEFORE|AFTER|INSTEAD\s+OF)\s+'
+                                        r'(?:[^\s]+\s+OR\s+)*(?:[^\s]+)\s+'
+                                        r'ON\s+(?P<table_name>[a-zA-Z0-9_]+)',
+                                        re.IGNORECASE | re.MULTILINE)
+
+    def make_drop_trigger_statements_from_sql_code(self, sql):
+        matches = self.CREATE_TRIGGER_PATTERN.finditer(sql)
+        drop_statements = []
+        for match in matches:
+            drop_statement = 'DROP TRIGGER IF EXISTS {trigger_name} ON {table_name}'.format(
+                **match.groupdict())
+            drop_statements.append(drop_statement)
+        return drop_statements
+
+    CREATE_FUNCTION_PATTERN = re.compile(r'^\s*CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+'
+                                         r'(?P<function_name>[a-zA-Z0-9_]+)\s*'
+                                         r'\((?P<arguments>[^)]*)\)',
+                                         re.IGNORECASE | re.MULTILINE)
+
+    def make_drop_function_statements_from_sql_code(self, sql):
+        matches = self.CREATE_FUNCTION_PATTERN.finditer(sql)
+        drop_statements = []
+        for match in matches:
+            function_name = match.groupdict()['function_name']
+            arguments = self._normalize_whitespace(match.groupdict()['arguments'])
+            drop_statement = 'DROP FUNCTION IF EXISTS {function_name} ({arguments}) RESTRICT'.format(
+                function_name=function_name,
+                arguments=arguments)
+            drop_statements.append(drop_statement)
+        return drop_statements
+
+    CREATE_INDEX_PATTERN = re.compile(r'^\s*CREATE\s+(?:UNIQUE\s+)?INDEX\s+'
+                                      r'(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?'
+                                      r'(?P<index_name>[a-zA-Z0-9_]+)\s*ON',
+                                      re.IGNORECASE | re.MULTILINE)
+
+    def make_drop_index_statements_from_sql_code(self, sql):
+        matches = self.CREATE_INDEX_PATTERN.finditer(sql)
+        drop_statements = []
+        for match in matches:
+            drop_statement = 'DROP INDEX IF EXISTS {index_name} RESTRICT'.format(
+                **match.groupdict())
+            drop_statements.append(drop_statement)
+        return drop_statements
+
+    CREATE_TYPE_PATTERN = re.compile(r'^\s*CREATE\s+TYPE\s+'
+                                     r'(?P<type_name>[a-zA-Z0-9_]+)',
+                                     re.IGNORECASE | re.MULTILINE)
+
+    def make_drop_type_statements_from_sql_code(self, sql):
+        matches = self.CREATE_TYPE_PATTERN.finditer(sql)
+        drop_statements = []
+        for match in matches:
+            drop_statement = 'DROP TYPE IF EXISTS {type_name} RESTRICT'.format(
+                **match.groupdict())
+            drop_statements.append(drop_statement)
+        return drop_statements
+
+    def make_drop_statements_from_sql_code(
+            self, sql, sql_types=('index', 'type', 'function', 'trigger')):
+        output_sql = []
+        for sql_type in sql_types:
+            methodname = 'make_drop_{}_statements_from_sql_code'.format(sql_type)
+            output_sql.extend(getattr(self, methodname)(sql))
+        return output_sql
+
+    def make_drop_statements_from_sql_file(self, path):
+        return self.make_drop_statements_from_sql_code(self.get_sql_from_file(path))
+
+    def make_drop_statements_from_sql_files(self, paths):
+        sql_statements = []
+        for path in paths:
+            sql_statements.extend(self.make_drop_statements_from_sql_file(path))
+        return sql_statements
+
+    def make_drop_statements_from_sql_template_file(self, path, context_data):
+        sql = self.render_sql_from_template(path=path, context_data=context_data)
+        return self.make_drop_statements_from_sql_code(sql)
+
+    def make_drop_statements_from_sql_template_files(self, paths, context_data):
+        sql_statements = []
+        for path in paths:
+            sql = self.render_sql_from_template(path=path, context_data=context_data)
+            sql_statements.extend(self.make_drop_statements_from_sql_code(sql))
+        return sql_statements
+
+    def clear(self):
+        """
+        Revert :meth:`.initialize` and remove any data created by the triggers.
+
+        Drop/delete triggers, functions, columns, indexes, etc. created
+        in :meth:`.initialize`.
         """
         raise NotImplementedError()
 
