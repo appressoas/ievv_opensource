@@ -11,9 +11,17 @@ class Command(BaseCommand):
                             required=False, action='store_true',
                             default=False,
                             help='Do not include SECRET_KEY= in output.')
+        parser.add_argument('--heroku', dest='heroku',
+                            required=False, action='store_true',
+                            default=False,
+                            help='Output with heroku config:set ...')
 
     def handle(self, *args, **options):
         key = secret_key.generate_django_secret_key()
-        if not options['plain']:
+        if options['plain']:
+            pass
+        elif options['heroku']:
+            key = 'heroku config:set DJANGO_SECRET_KEY="{}" --app myapp'.format(key)
+        else:
             key = 'SECRET_KEY="{}"'.format(key)
         self.stdout.write(key)
