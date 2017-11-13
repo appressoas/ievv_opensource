@@ -62,13 +62,3 @@ class NpmInstaller(AbstractNpmInstaller):
         self.run_shell_command('npm',
                                args=['run', script] + args,
                                _cwd=self.app.get_source_path())
-
-    def link_package(self, packagename):
-        self.run_shell_command('npm',
-                               args=['npm', 'link', packagename],
-                               _cwd=self.app.get_source_path())
-
-    def unlink_package(self, packagename):
-        self.run_shell_command('npm',
-                               args=['npm', 'unlink', packagename],
-                               _cwd=self.app.get_source_path())

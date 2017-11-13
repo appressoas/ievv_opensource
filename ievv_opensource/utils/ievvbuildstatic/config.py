@@ -477,11 +477,11 @@ class Apps(LogMixin):
     def log_deferred_messages(self):
         if self._successes:
             self.get_logger().success('Success messages:')
-            for message in self._successes:
+            for message in set(self._successes):
                 self.get_logger().success('- {}'.format(message))
         if self._warnings:
             self.get_logger().warning('Warnings:')
-            for message in self._warnings:
+            for message in set(self._warnings):
                 self.get_logger().warning('- {}'.format(message))
         self._successes = []
         self._warnings = []
