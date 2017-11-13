@@ -50,6 +50,7 @@ class Command(BaseCommand):
         parser.add_argument('--debug', dest='loglevel',
                             required=False, action='store_const', const='debug',
                             help='Verbose output. Same as "--loglevel debug".')
+        settings.IEVVTASKS_BUILDSTATIC_APPS.add_cli_arguments(parser=parser)
 
     def __get_skipgroups(self, options):
         skipgroups = options['skipgroups']
@@ -90,6 +91,7 @@ class Command(BaseCommand):
             settings.IEVVTASKS_BUILDSTATIC_APPS.set_production_mode()
         else:
             settings.IEVVTASKS_BUILDSTATIC_APPS.set_development_mode()
+        settings.IEVVTASKS_BUILDSTATIC_APPS.set_options(options=options)
         settings.IEVVTASKS_BUILDSTATIC_APPS.log_help_header()
         settings.IEVVTASKS_BUILDSTATIC_APPS.install(appnames=appnames,
                                                     skipgroups=skipgroups,

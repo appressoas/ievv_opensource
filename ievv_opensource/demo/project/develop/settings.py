@@ -46,11 +46,11 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
     ievvbuildstatic.config.App(
         appname='demoapp2',
         version='2.0.1',
-        # installers_config={
-        #     'npm': {
-        #         'installer_class': ievvbuildstatic.installers.npm.NpmInstaller
-        #     }
-        # },
+        installers_config={
+            'npm': {
+                'installer_class': ievvbuildstatic.installers.npm.NpmInstaller
+            }
+        },
         plugins=[
             ievvbuildstatic.sassbuild.Plugin(
                 sourcefolder='styles/theme',

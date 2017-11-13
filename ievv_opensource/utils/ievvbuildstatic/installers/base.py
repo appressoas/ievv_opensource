@@ -1,8 +1,9 @@
+from ievv_opensource.utils.ievvbuildstatic.options_mixin import OptionsMixin
 from ievv_opensource.utils.logmixin import LogMixin
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
 
-class AbstractInstaller(LogMixin, ShellCommandMixin):
+class AbstractInstaller(LogMixin, ShellCommandMixin, OptionsMixin):
     """
     Base class for installers.
 
@@ -40,3 +41,9 @@ class AbstractInstaller(LogMixin, ShellCommandMixin):
 
     def initialize(self):
         raise NotImplementedError()
+
+    def add_deferred_success(self, message):
+        self.app.add_deferred_success('[{}] {}'.format(self.name, message))
+
+    def add_deferred_warning(self, message):
+        self.app.add_deferred_warning('[{}] {}'.format(self.name, message))

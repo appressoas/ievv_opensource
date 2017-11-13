@@ -17,6 +17,7 @@ class NpmInstaller(AbstractNpmInstaller):
     NPM installer.
     """
     name = 'npminstall'
+    optionprefix = 'npm'
 
     def __init__(self, *args, **kwargs):
         super(NpmInstaller, self).__init__(*args, **kwargs)
@@ -60,4 +61,14 @@ class NpmInstaller(AbstractNpmInstaller):
         args = args or []
         self.run_shell_command('npm',
                                args=['run', script] + args,
+                               _cwd=self.app.get_source_path())
+
+    def link_package(self, packagename):
+        self.run_shell_command('npm',
+                               args=['npm', 'link', packagename],
+                               _cwd=self.app.get_source_path())
+
+    def unlink_package(self, packagename):
+        self.run_shell_command('npm',
+                               args=['npm', 'unlink', packagename],
                                _cwd=self.app.get_source_path())

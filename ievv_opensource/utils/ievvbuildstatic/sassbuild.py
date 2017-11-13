@@ -151,9 +151,11 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
                                    kwargs=self.get_sass_kwargs())
         except ShellCommandError:
             self.get_logger().command_error('SASS build FAILED!')
+            self.add_deferred_warning('SASS build FAILED!')
             raise cssbuildbaseplugin.CssBuildException()
         else:
             self.get_logger().command_success('SASS build successful :)')
+            self.add_deferred_success('SASS build successful :)')
 
     def get_watch_folders(self):
         """

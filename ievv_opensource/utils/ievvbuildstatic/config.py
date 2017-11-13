@@ -65,6 +65,14 @@ class App(LogMixin):
             installers_config[alias].update(overrides)
         return installers_config
 
+    def get_options_classes(self):
+        options_classes = []
+        for installer_config in self.installers_config.values():
+            options_classes.append(installer_config['installer_class'])
+        for plugin in self.plugins:
+            options_classes.append(plugin.__class__)
+        return options_classes
+
     def add_plugin(self, plugin):
         """
         Add a :class:`ievv_opensource.utils.ievvbuildstatic.lessbuild.Plugin`.
@@ -324,6 +332,12 @@ class App(LogMixin):
                         for docbuilder_class in self.docbuilder_classes)
                 ))
 
+    def add_deferred_success(self, message):
+        self.apps.add_deferred_success('[{}] {}'.format(self.appname, message))
+
+    def add_deferred_warning(self, message):
+        self.apps.add_deferred_warning('[{}] {}'.format(self.appname, message))
+
 
 class Apps(LogMixin):
     """
@@ -342,6 +356,9 @@ class Apps(LogMixin):
         self.command_error_message = None
         self.help_header = kwargs.pop('help_header', None)
         self.mode = self.MODE_DEVELOP
+        self._warnings = []
+        self._successes = []
+        self.options = {}
         for app in apps:
             self.add_app(app)
 
@@ -397,6 +414,7 @@ class Apps(LogMixin):
         """
         for app in self.iterapps(appnames=appnames):
             app.run(skipgroups=skipgroups, includegroups=includegroups)
+        self.log_deferred_messages()
 
     def watch(self, appnames=None, skipgroups=None, includegroups=None):
         """
@@ -449,3 +467,31 @@ class Apps(LogMixin):
 
     def is_in_production_mode(self):
         return self.mode == self.MODE_PRODUCTION
+
+    def add_deferred_warning(self, message):
+        self._warnings.append(message)
+
+    def add_deferred_success(self, message):
+        self._successes.append(message)
+
+    def log_deferred_messages(self):
+        if self._successes:
+            self.get_logger().success('Success messages:')
+            for message in self._successes:
+                self.get_logger().success('- {}'.format(message))
+        if self._warnings:
+            self.get_logger().warning('Warnings:')
+            for message in self._warnings:
+                self.get_logger().warning('- {}'.format(message))
+        self._successes = []
+        self._warnings = []
+
+    def add_cli_arguments(self, parser):
+        options_classes = set()
+        for app in self.iterapps():
+            options_classes.update(app.get_options_classes())
+        for option_class in options_classes:
+            option_class.add_cli_arguments(parser=parser)
+
+    def set_options(self, options):
+        self.options = options

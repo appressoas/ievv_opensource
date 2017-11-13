@@ -2,6 +2,8 @@ import json
 import os
 from collections import OrderedDict
 
+import shutil
+
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
 
@@ -20,6 +22,19 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
 
     Base class for npm and yarn installers.
     """
+    @classmethod
+    def add_cli_arguments(cls, parser):
+        parser.add_argument('--{}-clean-node-modules'.format(cls.optionprefix),
+                            dest='clean_node_modules',
+                            action='store_true', required=False, default=False,
+                            help='Remove node_modules before installing node packages.')
+        parser.add_argument('--{}-link'.format(cls.optionprefix),
+                            dest='npmlink',
+                            action='append',
+                            metavar='PACKAGENAME',
+                            required=False,
+                            help='Link specified javascript package. Can be repeated multiple times.')
+
     def __init__(self, *args, **kwargs):
         super(AbstractNpmInstaller, self).__init__(*args, **kwargs)
         self.queued_packages = OrderedDict()
@@ -164,6 +179,9 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
         packages = package_json_dict.get(key, {})
         return package in packages
 
+    def get_node_modules_directory(self):
+        return self.app.get_source_path('node_modules')
+
     def find_executable(self, executablename):
         """
         Find an executable named ``executablename``.
@@ -203,17 +221,23 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
     def install(self):
         self.get_logger().command_start(
             'Installing npm packages for {}'.format(self.app.get_source_path()))
-        if self.packagejson_exists():
-            self.install_packages_from_packagejson()
-        else:
+        if self.get_option('clean_node_modules', False):
+            self.remove_node_modules_directory()
+        self.handle_linked_packages()
+        if not self.packagejson_exists():
             self.create_packagejson()
+        self.install_packages_from_packagejson()
         self.install_queued_packages()
         self.get_logger().command_success('Install npm packages succeeded :)')
+        self.add_deferred_success('Install npm packages succeeded :)')
 
     def install_packages_from_packagejson(self):
         raise NotImplementedError()
 
     def install_npm_package(self, package, properties):
+        raise NotImplementedError()
+
+    def uninstall_npm_package(self, packagename):
         raise NotImplementedError()
 
     def run_packagejson_script(self, script, args=None):
@@ -229,3 +253,83 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
     def initialize(self):
         if os.path.exists(self.get_packagejson_path()):
             self.install()
+
+    def remove_node_modules_directory(self):
+        """
+        Remove node_modules directory.
+        """
+        if os.path.exists(self.get_node_modules_directory()):
+            shutil.rmtree(self.get_node_modules_directory())
+
+    def get_linked_packages(self):
+        """
+        Get all the linked packages in the node_modules directory.
+        (packages added with npm link).
+
+        """
+        node_modules_directory = self.get_node_modules_directory()
+        linked_packages = set()
+        if os.path.exists(node_modules_directory):
+            for filename in os.listdir(node_modules_directory):
+                path = os.path.join(node_modules_directory, filename)
+                if os.path.islink(path):
+                    linked_packages.add(filename)
+        return linked_packages
+
+    def _remove_linked_packages(self, linked_packages):
+        for packagename in linked_packages:
+            self._unlink_package(packagename=packagename)
+            path = os.path.join(self.get_node_modules_directory(), packagename)
+            if os.path.exists(path):
+                os.remove(path)
+
+    def _link_package(self, packagename):
+        self.get_logger().info('Linking package {!r}'.format(packagename))
+        self.link_package(packagename=packagename)
+        self.add_deferred_success(
+            'linked package {}'.format(packagename)
+        )
+
+    def link_package(self, packagename):
+        raise NotImplementedError()
+
+    def _unlink_package(self, packagename):
+        self.get_logger().info('Unlinking package {!r}'.format(packagename))
+        self.unlink_package(packagename=packagename)
+        self.add_deferred_warning(
+            'unlinked package {}'.format(packagename)
+        )
+
+    def unlink_package(self, packagename):
+        raise NotImplementedError()
+
+    def get_requested_link_packages_from_options(self):
+        return self.get_option('npmlink', []) or []
+
+    def handle_linked_packages(self):
+        linked_packages = self.get_linked_packages()
+        if self.is_in_production_mode() and linked_packages:
+            self.get_logger().warning(
+                'There are linked packages ({linked_packages!r}) in {node_modules_directory!r}. '
+                'Since we are running in production mode, we remove the node_modules directory '
+                'to make sure we get a prestine build.'.format(
+                    linked_packages=linked_packages,
+                    node_modules_directory=self.get_node_modules_directory()
+                ))
+            self.remove_node_modules_directory()
+        else:
+            requested_link_packages = set(self.get_requested_link_packages_from_options())
+            packages_to_unlink = linked_packages.difference(requested_link_packages)
+            packages_to_link = requested_link_packages.difference(linked_packages)
+            if packages_to_unlink:
+                self.get_logger().warning(
+                    'There are linked packages ({linked_packages!r}) in {node_modules_directory!r} '
+                    'that has not been specified using command line options. '
+                    'Unlinking these packages.'.format(
+                        linked_packages=packages_to_unlink,
+                        node_modules_directory=self.get_node_modules_directory()
+                    ))
+                self._remove_linked_packages(
+                    linked_packages=packages_to_unlink)
+            for packagename in packages_to_link:
+                self._link_package(packagename=packagename)
