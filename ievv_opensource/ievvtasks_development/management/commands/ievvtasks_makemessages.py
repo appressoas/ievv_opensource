@@ -35,7 +35,7 @@ class Command(BaseIevvTasksCommand):
             'not_for_deploy/*',
         ])
         extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS', [
-            'js'])
+            'js', 'jsx'])
         self.__makemessages(ignore=ignore,
                             extensions=extensions,
                             domain='djangojs')
