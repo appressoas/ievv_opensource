@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
+    'django_rq',
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
@@ -111,7 +112,11 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '[%(levelname)s %(asctime)s %(name)s %(pathname)s:%(lineno)s] %(message)s'
-        }
+        },
+        "rq_console": {
+            "format": "%(asctime)s %(message)s",
+            "datefmt": "%H:%M:%S",
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -123,6 +128,12 @@ LOGGING = {
             'level': 'DEBUG',
             'formatter': 'verbose',
             'class': 'logging.StreamHandler'
+        },
+        "rq_console": {
+            "level": "DEBUG",
+            "class": "rq.utils.ColorizingStreamHandler",
+            "formatter": "rq_console",
+            "exclude": ["%(asctime)s"],
         }
     },
     'loggers': {
@@ -150,6 +161,10 @@ LOGGING = {
             'handlers': ['stderr'],
             'level': 'WARNING',
             'propagate': False
+        },
+        "rq.worker": {
+            "handlers": ["rq_console"],
+            "level": "DEBUG"
         },
         '': {
             'handlers': ['stderr'],
@@ -184,19 +199,36 @@ IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
 
 IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
 
-
-IEVV_BATCHFRAMEWORK_CELERY_APP = 'ievv_opensource.demo.celery_app'
+# Redis broker
 BROKER_URL = 'redis://localhost:6381'
-CELERY_RESULT_BACKEND = 'redis://localhost:6381'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Europe/Oslo'
-CELERY_IMPORTS = [
-    # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
-    'ievv_opensource.ievv_batchframework.celery_tasks',
-]
-CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
-                          '[%(name)s] ' \
-                          '[%(task_name)s(%(task_id)s)] ' \
-                          '%(message)s'
+
+# TODO: REMOVE CELERY settings.
+# IEVV_BATCHFRAMEWORK_CELERY_APP = 'ievv_opensource.demo.celery_app'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6381'
+# CELERY_ACCEPT_CONTENT = ['application/json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'Europe/Oslo'
+# CELERY_IMPORTS = [
+#     # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
+#     'ievv_opensource.ievv_batchframework.celery_tasks',
+# ]
+# CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
+#                           '[%(name)s] ' \
+#                           '[%(task_name)s(%(task_id)s)] ' \
+#                           '%(message)s'
+
+
+# RQ queue setup.
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6381,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
+    },
+    'highpriority': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6381/0'),  # If you're on Heroku
+        'DEFAULT_TIMEOUT': 500,
+    },
+}
