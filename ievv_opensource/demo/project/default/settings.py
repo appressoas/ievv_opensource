@@ -202,23 +202,6 @@ IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
 # Redis broker
 BROKER_URL = 'redis://localhost:6381'
 
-# TODO: REMOVE CELERY settings.
-# IEVV_BATCHFRAMEWORK_CELERY_APP = 'ievv_opensource.demo.celery_app'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6381'
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'Europe/Oslo'
-# CELERY_IMPORTS = [
-#     # 'ievv_opensource.ievv_elasticsearch2.indexingmanager.celery_tasks',
-#     'ievv_opensource.ievv_batchframework.celery_tasks',
-# ]
-# CELERYD_TASK_LOG_FORMAT = '[%(asctime)s: %(levelname)s/%(processName)s] ' \
-#                           '[%(name)s] ' \
-#                           '[%(task_name)s(%(task_id)s)] ' \
-#                           '%(message)s'
-
-
 # RQ queue setup.
 RQ_QUEUES = {
     'default': {

@@ -5,8 +5,6 @@ from collections import OrderedDict
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.utils.module_loading import import_string
-import django_rq
 
 from ievv_opensource.utils.singleton import Singleton
 
@@ -465,34 +463,6 @@ class ActionGroup(object):
         batchoperation = BatchOperation.objects.create_asynchronous(**batchoperation_options)
         return batchoperation
 
-    # def run_asynchronous(self, **kwargs):
-    #     """
-    #     Args:
-    #         kwargs: Kwargs for :class:`.Action`.
-    #     """
-    #     batchoperation = self.create_batchoperation(**kwargs)
-    #     full_kwargs = {
-    #         'actiongroup_name': self.name,
-    #         'batchoperation_id': batchoperation.id
-    #     }
-    #     full_kwargs.update(kwargs)
-    #
-    #     # Remove the kwargs that is stored in the batchoperation
-    #     full_kwargs.pop('context_object', None)
-    #     full_kwargs.pop('started_by', None)
-    #
-    #     celeryapp = Registry.get_instance().celery_app
-    #     route_to_alias = self.get_route_to_alias(**kwargs)
-    #     celeryapp.send_task(
-    #         name=self.registry.route_to_map[route_to_alias],
-    #         actiongroup_name=self.name,
-    #         kwargs=full_kwargs)
-    #     return ActionGroupExecutionInfo(
-    #         actiongroup=self,
-    #         mode=self.MODE_ASYNCHRONOUS,
-    #         route_to_alias=route_to_alias,
-    #         batchoperation=batchoperation)
-
     def run_asynchronous(self, **kwargs):
         """
         Args:
@@ -549,32 +519,14 @@ class Registry(Singleton):
     """
     The registry of :class:`.ActionGroup` objects.
     """
-    # TODO: REMOVE CELERY alias settings
-    # ROUTE_TO_ALIAS_DEFAULT = 'default'
-    # ROUTE_TO_ALIAS_HIGHPRIORITY = 'highpriority'
     ROUTE_TO_TASK_ALIAS_DEFAULT = 'default'
     ROUTE_TO_TASK_ALIAS_HIGHPRIORITY = 'highpriority'
 
     def __init__(self):
         self.actiongroups = OrderedDict()
-        # self.route_to_task_map = {}
         self.queue_to_task_map = {}
-        # TODO: REMOVE CELERY __celery_app
-        # self.__celery_app = None
-        self.__rq_job = None
         self.__add_default_route_to_aliases()
         super(Registry, self).__init__()
-
-    # TODO: REMOVE CELERY, deprecated by RQ
-    # def __add_default_route_to_aliases(self):
-    #     self.add_route_to_alias(
-    #         route_to_alias=self.ROUTE_TO_ALIAS_DEFAULT,
-    #         route_to_callable='ievv_opensource.ievv_batchframework.celery_tasks.default',
-    #     )
-    #     self.add_route_to_alias(
-    #         route_to_alias=self.ROUTE_TO_ALIAS_HIGHPRIORITY,
-    #         route_to_callable='ievv_opensource.ievv_batchframework.celery_tasks.highpriority',
-    #     )
 
     def __add_default_route_to_aliases(self):
         from ievv_opensource.ievv_batchframework.rq_tasks import default, highpriority
@@ -586,16 +538,6 @@ class Registry(Singleton):
             route_to_alias=self.ROUTE_TO_TASK_ALIAS_HIGHPRIORITY,
             task_callable=highpriority,
         )
-
-    # def add_route_to_alias(self, route_to_alias, route_to_callable):
-    #     """
-    #     Add a route-to alias.
-    #
-    #     Args:
-    #         route_to_alias (str): The alias.
-    #         route_to_callable (str): The pythonpath of a Celery task as a string.
-    #     """
-    #     self.route_to_map[route_to_alias] = route_to_callable
 
     def add_route_to_alias(self, route_to_alias, task_callable):
         """
@@ -657,13 +599,3 @@ class Registry(Singleton):
         .. seealso:: :meth:`.get_actiongroup` and :meth:`.ActionGroup.run`.
         """
         return self.get_actiongroup(actiongroup_name=actiongroup_name).run(**kwargs)
-
-    # TODO: REMOVE CELERY when verified.
-    # @property
-    # def celery_app(self):
-    #     """
-    #     Property that gets the Celery app used by the registry to execute asynchronous tasks.
-    #     """
-    #     if self.__celery_app is None:
-    #         self.__celery_app = import_string(settings.IEVV_BATCHFRAMEWORK_CELERY_APP)
-    #     return self.__celery_app
