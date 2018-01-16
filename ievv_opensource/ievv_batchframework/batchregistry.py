@@ -3,7 +3,6 @@ import logging
 import traceback
 from collections import OrderedDict
 
-from celery.utils.log import get_task_logger
 from django.conf import settings
 
 from ievv_opensource.utils.singleton import Singleton
@@ -168,10 +167,7 @@ class Action(object):
         Get the logger for this action.
         """
         logname = self.__class__.get_name()
-        if self.executed_by_celery:
-            return get_task_logger(logname)
-        else:
-            return logging.getLogger(logname)
+        return logging.getLogger(logname)
 
     @property
     def executed_by_celery(self):
