@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 
 from ievv_opensource.utils.ievvdevrun.runnables import base
@@ -31,12 +32,21 @@ class RunnableThread(base.ShellCommandRunnableThread):
 
     def get_command_config(self):
         elasticsearch_version = getattr(settings, 'IEVV_ELASTICSEARCH_MAJOR_VERSION', 1)
+        command_config = {
+            'executable': self.elasticsearch_executable
+        }
         if elasticsearch_version == 1:
             args = ['--config={}'.format(self.configpath)]
-        else:
+            command_config.update({'args': args})
+        elif elasticsearch_version == 2:
             args = ['--path.conf={}'.format(self.configpath)]
-
-        return {
-            'executable': self.elasticsearch_executable,
-            'args': args
-        }
+            command_config.update({'args': args})
+        elif elasticsearch_version == 5:
+            args = ['-Epath.conf={}'.format(self.configpath)]
+            command_config.update({'args': args})
+        else:
+            raise ValueError('Elasticsearch {} is not supported yet'.format(elasticsearch_version))
+            # new_environment = os.environ.copy()
+            # new_environment['ES_CONF_PATH'] = self.configpath
+            # command_config.update({'_env': new_environment})
+        return command_config
