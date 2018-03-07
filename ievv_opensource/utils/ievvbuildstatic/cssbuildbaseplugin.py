@@ -31,7 +31,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
                         "block-no-empty": None,
                         "color-no-invalid-hex": True,
                         "comment-empty-line-before": ["always", {
-                            "ignore": ["stylelint-commands", "between-comments"],
+                            "ignore": ["stylelint-commands", "after-comment"],
                         }],
                         "declaration-colon-space-after": "always",
                         "indentation": 4,
@@ -55,7 +55,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             "block-no-empty": None,
             "color-no-invalid-hex": True,
             "comment-empty-line-before": ["always", {
-                "ignore": ["stylelint-commands", "between-comments"],
+                "ignore": ["stylelint-commands", "after-comment"],
             }],
             "declaration-colon-space-after": "always",
             "indentation": 4,
@@ -96,7 +96,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             self.app.get_installer('npm').queue_install(
                 'stylelint', version=self.get_stylelint_version())
 
-    def build_css(self):
+    def build_css(self, temporary_directory):
         """
         Override this method and implement the code to build the css.
         """
@@ -183,7 +183,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
         temporary_directory = self.make_temporary_build_directory()
         try:
             self.preprocess_styles(temporary_directory=temporary_directory)
-            self.build_css()
+            self.build_css(temporary_directory=temporary_directory)
             self.postprocess_styles(temporary_directory=temporary_directory)
         except CssBuildException:
             pass
