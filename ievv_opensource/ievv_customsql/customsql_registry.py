@@ -61,7 +61,9 @@ class AbstractCustomSql(object):
                 So if the file with this class is in ``path/to/customsql.py``,
                 path will be relative to ``path/to/customsqlcode/``.
         """
-        return open(self.make_sql_file_path(path), 'rb').read().decode('utf-8')
+        with open(self.make_sql_file_path(path), 'rb') as f:
+            sql = f.read().decode('utf-8')
+        return sql
 
     def execute_sql_from_file(self, path):
         """
