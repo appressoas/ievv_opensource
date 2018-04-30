@@ -72,3 +72,6 @@ class DevelopEmail(models.Model):
             if attachmentdata['filename']:
                 attachmentsdict[attachmentdata['filename']] = attachmentdata
         return attachmentsdict
+
+    def __str__(self):
+        return '#{} - {}'.format(self.id, self.subject_with_fallback)
