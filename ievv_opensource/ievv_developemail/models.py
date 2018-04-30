@@ -10,11 +10,15 @@ class DevelopEmail(models.Model):
     from_email = models.TextField(
         null=False, blank=True, default='',
         db_index=True)
-    recipients = models.TextField(null=False, blank=True, default='')
+    to_emails = models.TextField(null=False, blank=True, default='')
     raw_message = models.TextField(null=False, blank=True, default='')
 
     class Meta:
         ordering = ['-created_datetime']
+
+    @property
+    def subject_with_fallback(self):
+        return self.subject.strip() or '(No subject)'
 
     @property
     def message(self):

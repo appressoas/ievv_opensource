@@ -22,7 +22,7 @@ class TestDevelopEmailBackend(test.TestCase):
         developemail = DevelopEmail.objects.first()
         self.assertEqual(developemail.subject, 'Testsubject')
         self.assertEqual(developemail.from_email, 'test@example.com')
-        self.assertEqual(developemail.recipients, 'recipient@example.com')
+        self.assertEqual(developemail.to_emails, 'recipient@example.com')
         self.assertEqual(developemail.plaintext_message, 'Testmessage')
 
     def test_send_messages_html(self):

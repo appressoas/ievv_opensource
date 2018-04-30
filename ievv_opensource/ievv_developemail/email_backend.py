@@ -18,7 +18,7 @@ class DevelopEmailBackend(BaseEmailBackend):
             developemail = DevelopEmail(
                 subject=email_message.subject,
                 from_email=email_message.from_email,
-                recipients=', '.join(map(force_text, email_message.to)),
+                to_emails=', '.join(map(force_text, email_message.to)),
                 raw_message=raw_message
             )
 
