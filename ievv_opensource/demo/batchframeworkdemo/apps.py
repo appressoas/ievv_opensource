@@ -9,6 +9,11 @@ class HelloWorldAction(ievv_batchframework.Action):
         self.logger.info('Hello world! %r', self.kwargs)
 
 
+class HelloWorldAsyncAction(ievv_batchframework.Action):
+    def execute(self):
+        self.logger.info('\n\n\n\n\n\n\n\nHello world, async! %r\n\n\n\n\n', self.kwargs)
+
+
 class BatchFrameworkDemoAppConfig(AppConfig):
     name = 'ievv_opensource.demo.batchframeworkdemo'
     verbose_name = "IEVV Batchframework demo"
@@ -21,3 +26,12 @@ class BatchFrameworkDemoAppConfig(AppConfig):
                 actions=[
                     HelloWorldAction
                 ]))
+        batchregistry.Registry.get_instance().add_actiongroup(
+            batchregistry.ActionGroup(
+                name='batchframeworkdemo_helloworld_async',
+                mode=batchregistry.ActionGroup.MODE_ASYNCHRONOUS,
+                actions=[
+                    HelloWorldAsyncAction
+                ]
+            )
+        )

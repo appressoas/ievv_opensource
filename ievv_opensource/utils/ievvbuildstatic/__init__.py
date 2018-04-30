@@ -19,6 +19,7 @@ from . import run_jstests  #noqa
 from . import autosetup_jsdoc  #noqa
 from . import autosetup_esdoc  #noqa
 from . import npmrun_jsbuild  # noqa
+from . import npmrun  # noqa
 
 __all__ = [
     'utils',

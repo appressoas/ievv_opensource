@@ -17,6 +17,7 @@ class NpmInstaller(AbstractNpmInstaller):
     NPM installer.
     """
     name = 'npminstall'
+    optionprefix = 'npm'
 
     def __init__(self, *args, **kwargs):
         super(NpmInstaller, self).__init__(*args, **kwargs)

@@ -13,5 +13,6 @@ default_urls = [
     url(r'^cradmin_activate_account/', include('django_cradmin.apps.cradmin_activate_account.urls')),
     url(r'^cradmin_register_account/', include('django_cradmin.apps.cradmin_register_account.urls')),
     url(r'^djangoadmin/', include(admin.site.urls)),
+    url(r'^django-rq/', include('django_rq.urls')),
     # url(r'^ievv_elasticsearch2browser/', include('ievv_opensource.ievv_elasticsearch2browser.urls')),
 ]

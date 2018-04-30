@@ -123,6 +123,53 @@ The patterns to ignore when making javascript translations. Defaults to::
     ]
 
 
+.. setting:: IEVVTASKS_MAKEMESSAGES_PRE_MANAGEMENT_COMMANDS
+
+IEVVTASKS_MAKEMESSAGES_PRE_MANAGEMENT_COMMANDS
+==============================================
+Iterable of managemement commands to run before running makemessages. Example::
+
+    IEVVTASKS_MAKEMESSAGES_PRE_MANAGEMENT_COMMANDS = [
+        {
+            'name': 'ievvtasks_buildstatic',
+            'options': {
+                'includegroups': ['i18n']
+            }
+        }
+    ]
+
+Defaults to empty list.
+
+The items in the iterable can be one of:
+
+- A string with the name of a management command (for commands without any
+  arguments or options).
+- A dict with ``name``, ``args``, and ``options`` keys. The
+  ``name`` key is required, but ``args`` and ``options`` are
+  optional. ``args`` and ``options`` is just forwarded to
+  ``django.core.management.call_command``.
+
+
+.. setting:: IEVVTASKS_MAKEMESSAGES_EXTENSIONS
+
+IEVVTASKS_MAKEMESSAGES_EXTENSIONS
+=================================
+Extensions to look for strings marked for translations in
+normal python/django code (for the ``django`` --domain for makemessages).
+
+Defaults to ``['py', 'html', 'txt']``.
+
+
+.. setting:: IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS
+
+IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS
+============================================
+Extensions to look for strings marked for translations in
+javascript code (for the ``djangojs`` --domain for makemessages).
+
+Defaults to ``['js']``.
+
+
 
 **************
 ievvtasks_docs

@@ -35,7 +35,10 @@ class ReadOnlyAdminPreMixin(object):
         Returns all the fields on the model,
         so all fields are read only.
         """
-        return [f.name for f in self.model._meta.get_fields()]
+        return [f.name for f in self.model._meta.get_fields() if f.concrete]
+
+    def get_fields(self, request, obj=None):
+        return self.get_readonly_fields(request, obj=obj)
 
     def has_add_permission(self, request):
         """

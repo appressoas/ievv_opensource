@@ -3,12 +3,13 @@ import shutil
 
 from future.utils import python_2_unicode_compatible
 
+from ievv_opensource.utils.ievvbuildstatic.options_mixin import OptionsMixin
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchdogWatchConfig
 from ievv_opensource.utils.logmixin import LogMixin
 
 
 @python_2_unicode_compatible
-class Plugin(LogMixin):
+class Plugin(LogMixin, OptionsMixin):
     """
     Base class for all plugins in ``ievvbuildstatic``.
     """
@@ -179,3 +180,9 @@ class Plugin(LogMixin):
                     shutil.rmtree(absolute_path)
                 else:
                     os.remove(absolute_path)
+
+    def add_deferred_success(self, message):
+        self.app.add_deferred_success('[{}] {}'.format(self.name, message))
+
+    def add_deferred_warning(self, message):
+        self.app.add_deferred_warning('[{}] {}'.format(self.name, message))

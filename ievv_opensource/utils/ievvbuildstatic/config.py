@@ -23,7 +23,9 @@ class App(LogMixin):
                  destinationfolder='static',
                  keep_temporary_files=False,
                  installers_config=None,
-                 docbuilder_classes=None):
+                 docbuilder_classes=None,
+                 default_skipgroups=None,
+                 default_includegroups=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -42,6 +44,8 @@ class App(LogMixin):
         self.plugins = []
         self.docbuilder_classes = docbuilder_classes or self.get_default_docbuilder_classes()
         self.keep_temporary_files = keep_temporary_files
+        self.default_skipgroups = default_skipgroups or []
+        self.default_includegroups = default_includegroups or []
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
         for plugin in plugins:
@@ -61,6 +65,14 @@ class App(LogMixin):
             installers_config[alias].update(overrides)
         return installers_config
 
+    def get_options_classes(self):
+        options_classes = []
+        for installer_config in self.installers_config.values():
+            options_classes.append(installer_config['installer_class'])
+        for plugin in self.plugins:
+            options_classes.append(plugin.__class__)
+        return options_classes
+
     def add_plugin(self, plugin):
         """
         Add a :class:`ievv_opensource.utils.ievvbuildstatic.lessbuild.Plugin`.
@@ -68,19 +80,23 @@ class App(LogMixin):
         plugin.app = self
         self.plugins.append(plugin)
 
-    def iterplugins(self, skipgroups=None):
-        skipgroups = skipgroups or []
+    def iterplugins(self, skipgroups=None, includegroups=None):
+        skipgroups = skipgroups or self.default_skipgroups
+        includegroups = includegroups or self.default_includegroups
+        skipgroups = {group for group in skipgroups if group not in includegroups}
         for plugin in self.plugins:
+            if includegroups and plugin.group not in includegroups:
+                continue
             if plugin.group and plugin.group in skipgroups:
                 continue
             yield plugin
 
-    def run(self, skipgroups=None):
+    def run(self, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within the app.
         """
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.runwrapper()
 
     def _make_json_appconfig_dict(self):
@@ -108,7 +124,7 @@ class App(LogMixin):
         appconfig_dict[plugin_name] = config_dict
         self._save_json_appconfig(appconfig_dict=appconfig_dict)
 
-    def install(self, skipgroups=None):
+    def install(self, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within the app.
@@ -117,11 +133,11 @@ class App(LogMixin):
         for alias in self.installers_config.keys():
             installer = self.get_installer(alias=alias)
             installer.initialize()
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.install()
         for installer in self.installers.values():
             installer.install()
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             plugin.post_install()
 
     def get_app_config(self):
@@ -228,12 +244,12 @@ class App(LogMixin):
             absolute_path = '{}{}'.format(path, new_extension)
         return absolute_path
 
-    def watch(self, skipgroups=None):
+    def watch(self, skipgroups=None, includegroups=None):
         """
         Start a watcher thread for each plugin.
         """
         watchconfigs = []
-        for plugin in self.iterplugins(skipgroups=skipgroups):
+        for plugin in self.iterplugins(skipgroups=skipgroups, includegroups=includegroups):
             watchconfig = plugin.watch()
             if watchconfig:
                 watchconfigs.append(watchconfig)
@@ -316,6 +332,12 @@ class App(LogMixin):
                         for docbuilder_class in self.docbuilder_classes)
                 ))
 
+    def add_deferred_success(self, message):
+        self.apps.add_deferred_success('[{}] {}'.format(self.appname, message))
+
+    def add_deferred_warning(self, message):
+        self.apps.add_deferred_warning('[{}] {}'.format(self.appname, message))
+
 
 class Apps(LogMixin):
     """
@@ -334,6 +356,9 @@ class Apps(LogMixin):
         self.command_error_message = None
         self.help_header = kwargs.pop('help_header', None)
         self.mode = self.MODE_DEVELOP
+        self._warnings = []
+        self._successes = []
+        self.options = {}
         for app in apps:
             self.add_app(app)
 
@@ -356,13 +381,13 @@ class Apps(LogMixin):
         """
         return self.apps[appname]
 
-    def install(self, appnames=None, skipgroups=None):
+    def install(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.install`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.install(skipgroups=skipgroups)
+            app.install(skipgroups=skipgroups, includegroups=includegroups)
 
     def log_help_header(self):
         if self.help_header:
@@ -382,15 +407,16 @@ class Apps(LogMixin):
             if include:
                 yield app
 
-    def run(self, appnames=None, skipgroups=None):
+    def run(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
         for app in self.iterapps(appnames=appnames):
-            app.run(skipgroups=skipgroups)
+            app.run(skipgroups=skipgroups, includegroups=includegroups)
+        self.log_deferred_messages()
 
-    def watch(self, appnames=None, skipgroups=None):
+    def watch(self, appnames=None, skipgroups=None, includegroups=None):
         """
         Start watcher threads for all folders that at least one
         :class:`plugin <ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin>`
@@ -400,7 +426,7 @@ class Apps(LogMixin):
         """
         watchconfigpool = WatchConfigPool()
         for app in self.iterapps(appnames=appnames):
-            watchconfigpool.extend(app.watch(skipgroups=skipgroups))
+            watchconfigpool.extend(app.watch(skipgroups=skipgroups, includegroups=includegroups))
         all_observers = watchconfigpool.watch()
         try:
             while True:
@@ -441,3 +467,31 @@ class Apps(LogMixin):
 
     def is_in_production_mode(self):
         return self.mode == self.MODE_PRODUCTION
+
+    def add_deferred_warning(self, message):
+        self._warnings.append(message)
+
+    def add_deferred_success(self, message):
+        self._successes.append(message)
+
+    def log_deferred_messages(self):
+        if self._successes:
+            self.get_logger().success('Success messages:')
+            for message in set(self._successes):
+                self.get_logger().success('- {}'.format(message))
+        if self._warnings:
+            self.get_logger().warning('Warnings:')
+            for message in set(self._warnings):
+                self.get_logger().warning('- {}'.format(message))
+        self._successes = []
+        self._warnings = []
+
+    def add_cli_arguments(self, parser):
+        options_classes = set()
+        for app in self.iterapps():
+            options_classes.update(app.get_options_classes())
+        for option_class in options_classes:
+            option_class.add_cli_arguments(parser=parser)
+
+    def set_options(self, options):
+        self.options = options

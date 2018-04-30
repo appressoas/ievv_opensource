@@ -2,20 +2,31 @@ import os
 
 from django.conf import settings
 from django.core import management
-from django.core.management.base import BaseCommand
+
+from ievv_opensource.ievvtasks_common.base_command import BaseIevvTasksCommand
 
 
-class Command(BaseCommand):
+class Command(BaseIevvTasksCommand):
     help = 'Run makemessages for the languages specified in the ' \
            'IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES setting.'
+
+    def __makemessages(self, ignore, extensions, domain):
+        management.call_command(
+            'makemessages',
+            locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
+            ignore=ignore,
+            extensions=extensions,
+            domain=domain)
 
     def __build_python_translations(self):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_IGNORE', [
             'static/*'
         ])
-        management.call_command('makemessages',
-                                locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
-                                ignore=ignore)
+        extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_EXTENSIONS', [
+            'py', 'html', 'txt'])
+        self.__makemessages(ignore=ignore,
+                            extensions=extensions,
+                            domain='django')
 
     def __build_javascript_translations(self):
         ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
@@ -23,12 +34,19 @@ class Command(BaseCommand):
             'bower_components/*',
             'not_for_deploy/*',
         ])
-        management.call_command('makemessages',
-                                domain='djangojs',
-                                locale=settings.IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES,
-                                ignore=ignore)
+        extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS', [
+            'js', 'jsx'])
+        self.__makemessages(ignore=ignore,
+                            extensions=extensions,
+                            domain='djangojs')
+
+    def __run_pre_management_commands(self):
+        management_commands = getattr(
+            settings, 'IEVVTASKS_MAKEMESSAGES_PRE_MANAGEMENT_COMMANDS', [])
+        self.run_management_commands(management_commands)
 
     def handle(self, *args, **options):
+        self.__run_pre_management_commands()
         current_directory = os.getcwd()
         for directory in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
             directory = os.path.abspath(directory)

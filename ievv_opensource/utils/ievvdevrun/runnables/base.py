@@ -85,7 +85,7 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         sending the command config as a parameter to this class
         in your django settings::
 
-            IEVVTASKS_DEVELOPRUN_THREADLIST = {
+            IEVVTASKS_DEVRUN_RUNNABLES = {
                 'default': ievvdevrun.config.RunnableThreadList(
                     ievvdevrun.runnables.base.ShellCommandRunnableThread(
                         name='Django development server',

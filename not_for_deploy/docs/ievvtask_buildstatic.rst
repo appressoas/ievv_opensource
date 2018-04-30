@@ -222,6 +222,9 @@ Overview
    browserify_reactjsbuild.Plugin
    autosetup_jsdoc.Plugin
    autosetup_esdoc.Plugin
+   npmrun.Plugin
+   npmrun_jsbuild.Plugin
+   run_jstests.Plugin
 
 
 Details
@@ -262,6 +265,15 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_esdoc
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.autosetup_esdoc
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.npmrun
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.npmrun
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.npmrun_jsbuild
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.npmrun_jsbuild
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.run_jstests
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.run_jstests
 
 
 ************
