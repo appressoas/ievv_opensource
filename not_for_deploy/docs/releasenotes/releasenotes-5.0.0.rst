@@ -10,7 +10,7 @@ What is new?
   ``--buildstatic-docs`` to get the old default behavior.
 - ``ievv_developemail``: New module that provides a develop email backend
   that makes all sent emails browsable through Django admin. See :doc:`../ievv_developemail` for
-  form details.
+  more details.
 
 
 ****************
