@@ -15,13 +15,14 @@ SECRET_KEY = 'y%j0x%=7a^sf53m*s^5nbmfe0_t13d*oibfx#m#*wz1x+k6+m1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': DBSETTINGS
 }
 DATABASES['default']['PORT'] = 23653
 
+LOGIN_URL = '/cradmin_authenticate/login'
 
 # Application definition
 
@@ -32,7 +33,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djcelery',
     'django_rq',
     'sorl.thumbnail',
     'django_dbdev',
@@ -201,18 +201,18 @@ IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
 IEVVTASKS_DOCS_DASH_NAME = 'ievv_opensource'
 
 # Redis broker
-BROKER_URL = 'redis://localhost:6381'
+BROKER_URL = 'redis://localhost:6731'
 
 # RQ queue setup.
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
-        'PORT': 6381,
+        'PORT': 6731,
         'DB': 0,
         'DEFAULT_TIMEOUT': 360,
     },
     'highpriority': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6381/0'),  # If you're on Heroku
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6731/0'),  # If you're on Heroku
         'DEFAULT_TIMEOUT': 500,
     },
 }

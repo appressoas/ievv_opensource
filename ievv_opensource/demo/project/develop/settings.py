@@ -78,8 +78,8 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
 IEVVTASKS_DEVRUN_RUNNABLES = {
     'default': ievvdevrun.config.RunnableThreadList(
         ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
-        ievvdevrun.runnables.django_runserver.RunnableThread(port=9001),
-        ievvdevrun.runnables.redis_server.RunnableThread(port='6381'),
+        ievvdevrun.runnables.django_runserver.RunnableThread(port=9005),
+        ievvdevrun.runnables.redis_server.RunnableThread(port='6731'),
         # ievvdevrun.runnables.celery_worker.RunnableThread(app='ievv_opensource.demo'),
         ievvdevrun.runnables.rq_worker.RunnableThread(),
         # ievvdevrun.runnables.elasticsearch.RunnableThread(configpath='not_for_deploy/elasticsearch.unittest/'),
