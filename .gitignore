@@ -46,11 +46,7 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 /elasticsearch_develop/
 /elasticsearch_unittest/
 /dump.rdb
-/.idea/dataSources.xml
-/.idea/dataSources.local.xml
-/.idea/dataSources.ids
-/.idea/dataSources/
-/.idea/jsLibraryMappings.xml
+/.idea/
 
 /ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
 /ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
