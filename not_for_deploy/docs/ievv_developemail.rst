@@ -40,7 +40,7 @@ We provide the ``ievv_developemail_send_testmail`` management script for sending
 test emails. It can be useful just to check that emails are sent, but also
 for testing ``cradmin_email`` styling etc.
 
-In its simplest form:
+In its simplest form::
 
     $ python manage.py ievv_developemail_send_testmail --to "test@example.com"
 
