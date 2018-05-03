@@ -23,7 +23,7 @@ class DevelopEmail(models.Model):
     @property
     def message(self):
         if not hasattr(self, '_message'):
-            self._message = email.message_from_string(self.raw_message)
+            self._message = email.message_from_bytes(self.raw_message.encode('utf-8'))
         return self._message
 
     def _get_message(self, content_type, allow_not_multipart_fallback=False):
