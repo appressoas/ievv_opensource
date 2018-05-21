@@ -40,7 +40,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     "appresso_sphinx_extensions.settings",
