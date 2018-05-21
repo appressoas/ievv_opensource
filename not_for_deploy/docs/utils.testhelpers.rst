@@ -3,6 +3,8 @@
 #########################################
 
 
+.. _utils.testhelpers.testmigrations:
+
 *************************
 Testing Django migrations
 *************************
