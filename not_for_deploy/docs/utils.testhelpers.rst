@@ -64,6 +64,8 @@ To test this, you can write a test case like this::
         migrate_to = '0002_suffix_name_with_stuff'
 
         def test_migrate_works(self):
+
+            # Add some data to the model using the ``apps_before`` model state
             Node = self.apps_before.get_model('myapp', 'Node')
             node1_id = Node.objects.create(
                 name='Node1'
@@ -72,17 +74,20 @@ To test this, you can write a test case like this::
                 name='Node2'
             ).id
 
+            # Migrate (run the 0002_suffix_name_with_stuff migration)
             self.migrate()
 
+            # Test using the ``apps_after`` model state.
             Node = self.apps_after.get_model('myapp', 'Node')
             self.assertEqual(Node.objects.get(id=node1_id).name, 'Node1 STUFF')
             self.assertEqual(Node.objects.get(id=node2_id).name, 'Node2 STUFF')
 
         def test_reverse_migrate_works(self):
+
             # First, we migrate to get to a state where we can reverse the migration
             self.migrate()
 
-            # Add some data to the model using the ``apps_after`` state
+            # Add some data to the model using the ``apps_after`` model state
             Node = self.apps_after.get_model('myapp', 'Node')
             node1_id = Node.objects.create(
                 name='Node1 STUFF'
@@ -94,7 +99,7 @@ To test this, you can write a test case like this::
             # Reverse the migration
             self.reverse_migrate()
 
-            # Test using
+            # Test using the ``apps_before`` model state.
             Node = self.apps_before.get_model('myapp', 'Node')
             self.assertEqual(Node.objects.get(id=node1_id).name, 'Node1')
             self.assertEqual(Node.objects.get(id=node2_id).name, 'Node2')
