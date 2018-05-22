@@ -40,6 +40,15 @@ class MigrationTestCase(test.TransactionTestCase):
     #: use with ``python manage.py makemigrations <app_label>`` to create the migration.
     app_label = None
 
+    #: Dependencies. A list of ``(app_label, migration_name)`` tuples.
+    migrate_dependencies = None
+
+    #: Same as :obj:`~.MigrationTestCase.migrate_dependencies`, but ONLY for :obj:`~.MigrationTestCase.migrate_from`.
+    migrate_from_dependencies = None
+
+    #: Same as :obj:`~.MigrationTestCase.migrate_dependencies`, but ONLY for :obj:`~.MigrationTestCase.migrate_from`.
+    migrate_to_dependencies = None
+
     #: The name of the migration to migrate from.
     #: Can be the full name, or just the number (I.E.: ``0002`` or ``0002_something``.
     migrate_from = None
@@ -48,15 +57,51 @@ class MigrationTestCase(test.TransactionTestCase):
     #: Can be the full name, or just the number (I.E.: ``0003`` or ``0003_something``.
     migrate_to = None
 
+    @classmethod
+    def _validate_dependency_list(cls, migration_list_name):
+        migration_list = getattr(cls, migration_list_name)
+        if not migration_list:
+            return
+        for app_label, migration_name in migration_list:
+            if app_label == cls.app_label:
+                raise ValueError(
+                    'The "{}" attribute can not contain any migrations with the '
+                    'same app_label as the "app_label" attribute ({})'.format(
+                        app_label, cls.app_label
+                    )
+                )
+
+    @classmethod
+    def _validate_class_variables(cls):
+        if not cls.app_label or not cls.migrate_from or not cls.migrate_to:
+            raise ValueError('app_label, migrate_from and migrate_to must be specified.')
+        cls._validate_dependency_list('migrate_from_dependencies')
+        cls._validate_dependency_list('migrate_to_dependencies')
+        cls._validate_dependency_list('migrate_dependencies')
+
+    @classmethod
+    def setUpClass(cls):
+        cls._validate_class_variables()
+
+    def _build_migration_list(self, migration_name, migrate_dependencies=None):
+        migration_list = []
+        if migrate_dependencies:
+            migration_list.extend(migrate_dependencies)
+        migration_list.append((self.app_label, migration_name))
+        return migration_list
+
     def setUp(self):
         """
         Perform required setup.
 
         If you override ``setUp()``, you must call ``super().setUp()``!
         """
-        if not self.app_label or not self.migrate_from or not self.migrate_to:
-            raise ValueError('app_label, migrate_from and migrate_to must be specified.')
-        self._migrate_from_list = [(self.app_label, self.migrate_from)]
+        self._migrate_from_list = self._build_migration_list(
+            self.migrate_from,
+            migrate_dependencies=self.migrate_from_dependencies or self.migrate_dependencies)
+        self._migrate_to_list = self._build_migration_list(
+            self.migrate_to,
+            migrate_dependencies=self.migrate_to_dependencies or self.migrate_dependencies)
         self._migrate_to_list = [(self.app_label, self.migrate_to)]
         self._apps_before = self._get_apps_for_migration(self._migrate_from_list)
         self._apps_after = None
@@ -68,8 +113,8 @@ class MigrationTestCase(test.TransactionTestCase):
         full_names = []
         for app_label, migration_name in migration_states:
             if migration_name != 'zero':
-                migration_name = loader.get_migration_by_prefix(app_label, migration_name).name
-                full_names.append((app_label, migration_name))
+                migration = loader.get_migration_by_prefix(app_label, migration_name)
+                full_names.append((app_label, migration.name))
         state = loader.project_state(full_names)
         return state.apps
 
