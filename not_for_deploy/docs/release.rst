@@ -9,4 +9,4 @@ How to release a new version of ievv_opensource
 2. Commit.
 3. Tag the commit with ``<version>``.
 4. Push (``git push && git push --tags``).
-5. Release to pypi (``python setup.py sdist && twine upload dist/ievv-opensource-<version>.tar.gz``).
+5. Release to pypi (``python setup.py sdist && twine upload dist/ievv_opensource-<version>.tar.gz``).
