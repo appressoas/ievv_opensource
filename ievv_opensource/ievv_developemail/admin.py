@@ -46,7 +46,7 @@ class DevelopEmailAdmin(admin.ModelAdmin):
     get_subject.admin_order_field = 'subject'
 
     def get_urls(self):
-        urls = super().get_urls()
+        urls = super(DevelopEmailAdmin, self).get_urls()
         my_urls = [
             url(r'^(\d+)/as_html/$',
                 self.admin_site.admin_view(self.as_html_view),

@@ -1,4 +1,10 @@
-import email
+try:
+    from email import message_from_bytes
+except ImportError:
+    import email
+    def message_from_bytes(bytestring):
+        return email.message_from_string(bytestring.decode('utf-8'))
+
 from collections import OrderedDict
 
 from django.db import models
@@ -23,7 +29,7 @@ class DevelopEmail(models.Model):
     @property
     def message(self):
         if not hasattr(self, '_message'):
-            self._message = email.message_from_bytes(self.raw_message.encode('utf-8'))
+            self._message = message_from_bytes(self.raw_message.encode('utf-8'))
         return self._message
 
     def _get_message(self, content_type, allow_not_multipart_fallback=False):
