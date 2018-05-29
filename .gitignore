@@ -27,8 +27,7 @@ node_modules/
 bower_components/
 
 # Ignore user-specific pycharm settings
-.idea/workspace.xml
-.idea/tasks.xml
+/.idea/
 
 /django_media_root/
 
