@@ -2,9 +2,7 @@ try:
     from email import message_from_bytes
 except ImportError:
     # For python 2.x compatibility
-    import email
-    def message_from_bytes(bytestring):
-        return email.message_from_string(bytestring.decode('utf-8'))
+    from future.backports.email import message_from_bytes
 
 from collections import OrderedDict
 
