@@ -36,9 +36,9 @@ class Command(BaseCommand, LogMixin, ShellCommandMixin):
         parser.add_argument('--fail-on-warning', dest='fail_on_warning',
                             required=False, action='store_true',
                             help='Fail on warning.')
-        parser.add_argument('--no-buildstatic-docs', dest='include_buildstatic_docs',
-                            action='store_false', default=True,
-                            help='Do not include ievv buildstatic docs.')
+        parser.add_argument('--buildstatic-docs', dest='include_buildstatic_docs',
+                            action='store_false', default=False,
+                            help='Include ievv buildstatic docs.')
         parser.add_argument('--loglevel', dest='loglevel',
                             required=False, default='stdout',
                             choices=['debug', 'stdout', 'info', 'warning', 'error'],

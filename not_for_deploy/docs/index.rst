@@ -33,6 +33,7 @@ Apps
    ievv_elasticsearch
    ievv_customsql
    ievv_jsbase
+   ievv_developemail
 
 
 ********
@@ -73,6 +74,7 @@ Utilities
    utils.ievv_colorize
    utils.choices_with_meta
    utils.validate_redirect_url
+   utils.testhelpers
 
 
 ************

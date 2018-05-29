@@ -284,30 +284,45 @@ class ChoicesWithMeta(object):
         """
         return self.choices.keys()
 
-    def iterchoices(self):
+    def iterchoices(self, *extra_choices):
         """
         Iterate over the choices yielding :class:`.Choice` objects in the added order.
-        """
-        return iter(self.choices.values())
 
-    def iter_as_django_choices_short(self):
+        Args:
+            *extra_choices: Extra choices. Zero or more extra choices (:class:`.Choice` objects) to
+                yield at the end. Can be used in cases where you allow invalid choices if they are
+                already set (so you want to include the current invalid choice along with the
+                correct choices).
+        """
+        for choice in self.choices.values():
+            yield choice
+        for choice in extra_choices:
+            yield choice
+
+    def iter_as_django_choices_short(self, *extra_choices):
         """
         Iterate over the choices as a Django choices list,
         where each item is a ``(value, label)``-tuple.
 
         Uses :meth:`.Choice.get_short_label` to create the ``label``.
+
+        Args:
+            *extra_choices: See :meth:`.iterchoices`.
         """
-        for choice in self.iterchoices():
+        for choice in self.iterchoices(*extra_choices):
             yield choice.value, choice.get_short_label()
 
-    def iter_as_django_choices_long(self):
+    def iter_as_django_choices_long(self, *extra_choices):
         """
         Iterate over the choices as a Django choices list,
         where each item is a ``(value, label)``-tuple.
 
         Uses :meth:`.Choice.get_long_label` to create the ``label``.
+
+        Args:
+            *extra_choices: See :meth:`.iterchoices`.
         """
-        for choice in self.iterchoices():
+        for choice in self.iterchoices(*extra_choices):
             yield choice.value, choice.get_long_label()
 
     def get_values_as_list(self):
