@@ -75,6 +75,7 @@ Utilities
    utils.choices_with_meta
    utils.validate_redirect_url
    utils.testhelpers
+   utils.validation_error_util
 
 
 ************

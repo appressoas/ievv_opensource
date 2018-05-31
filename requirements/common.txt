@@ -53,6 +53,9 @@ transifex-client==0.11b3
 # For building Dash docs
 doc2dash==2.0.2
 
+# For the very few utils using django-rest-framework - only required to use certain utils
+djangorestframework==3.8.2
+
 # Pull inn development packages from GIT
 -r common.gitpackages.txt
 
