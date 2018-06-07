@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from model_mommy.timezone import now
-from psycopg2._range import DateTimeTZRange, DateRange
+from psycopg2.extras import DateTimeTZRange, DateRange
 
 
 def generate_datetime_range():
