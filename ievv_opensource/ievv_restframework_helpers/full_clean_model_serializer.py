@@ -8,7 +8,16 @@ from ievv_opensource.utils.validation_error_util import ValidationErrorUtil
 
 
 class FullCleanModelSerializer(serializers.ModelSerializer):
-    def _clean_instance(self, instance):
+    """
+    A ``rest_framework.serializers.ModelSerializer`` subclass
+    that calls full_clean() on the model instance before saving.
+    """
+    def clean_model_instance(self, instance):
+        """
+        Clean the model instance (full_clean()) and ensures any
+        ``django.core.exceptions.ValidationError`` raised is re-raised as a
+        ``rest_framework.exceptions.ValidationError``.
+        """
         try:
             instance.full_clean()
         except ValidationError as e:
@@ -49,7 +58,7 @@ class FullCleanModelSerializer(serializers.ModelSerializer):
                 many_to_many[field_name] = validated_data.pop(field_name)
 
         instance = ModelClass(**validated_data)
-        self._clean_instance(instance)
+        self.clean_model_instance(instance)
         try:
             instance.save()
         except TypeError:
@@ -93,6 +102,6 @@ class FullCleanModelSerializer(serializers.ModelSerializer):
             else:
                 setattr(instance, attr, value)
 
-        self._clean_instance(instance)
+        self.clean_model_instance(instance)
         instance.save()
         return instance
