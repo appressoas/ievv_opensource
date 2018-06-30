@@ -112,3 +112,24 @@ class DestinationPath(AbstractDjangoAppPath):
     @property
     def abspath(self):
         return self.get_approot_relative_path(self.appname, 'static', self.appname, self.version, *self.path)
+
+
+class AppPath(AbstractDjangoAppPath):
+    """
+    A path to a file or directory within the root directory of
+    a :class:`ievv_opensource.utils.ievvbuildstatic.config.App`.
+    """
+    def __init__(self, appname, *path):
+        """
+        Args:
+            appname: The name of the Django app.
+            *path: The path relative to the root directory of the
+                :class:`ievv_opensource.utils.ievvbuildstatic.config.App`
+                identified by ``appname``. Same format as :func:`os.path.join`.
+        """
+        self.appname = appname
+        self.path = path
+
+    @property
+    def abspath(self):
+        return self.get_approot_relative_path(self.appname, *self.path)
