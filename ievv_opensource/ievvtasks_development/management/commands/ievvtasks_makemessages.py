@@ -18,22 +18,34 @@ class Command(BaseIevvTasksCommand):
             extensions=extensions,
             domain=domain)
 
-    def __build_python_translations(self):
-        ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_IGNORE', [
+    def __build_python_translations(self, config):
+        if not config.get('python'):
+            self.stdout.write(
+                'Skipping python translations due to config["python"] != True. Config: {!r}'.format(
+                    config))
+            return
+        default_ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_IGNORE', [
             'static/*'
         ])
+        ignore = config.get('python_ignore', default_ignore)
         extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_EXTENSIONS', [
             'py', 'html', 'txt'])
         self.__makemessages(ignore=ignore,
                             extensions=extensions,
                             domain='django')
 
-    def __build_javascript_translations(self):
-        ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
+    def __build_javascript_translations(self, config):
+        if not config.get('javascript'):
+            self.stdout.write(
+                'Skipping javascript translations due to config["javascript"] != True. Config: {!r}'.format(
+                    config))
+            return
+        default_ignore = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE', [
             'node_modules/*',
             'bower_components/*',
             'not_for_deploy/*',
         ])
+        ignore = config.get('javascript_ignore', default_ignore)
         extensions = getattr(settings, 'IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_EXTENSIONS', [
             'js', 'jsx'])
         self.__makemessages(ignore=ignore,
@@ -48,12 +60,18 @@ class Command(BaseIevvTasksCommand):
     def handle(self, *args, **options):
         self.__run_pre_management_commands()
         current_directory = os.getcwd()
-        for directory in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
-            directory = os.path.abspath(directory)
+        for config in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
+            if not isinstance(config, dict):
+                config = {
+                    'javascript': True,
+                    'python': True,
+                    'directory': config
+                }
+            directory = os.path.abspath(config['directory'])
             self.stdout.write('Running makemessages for python files in {}'.format(directory))
             os.chdir(directory)
-            self.__build_python_translations()
+            self.__build_python_translations(config)
             if getattr(settings, 'IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS', False):
                 self.stdout.write('Running makemessages for javascript files in {}'.format(directory))
-                self.__build_javascript_translations()
+                self.__build_javascript_translations(config)
             os.chdir(current_directory)

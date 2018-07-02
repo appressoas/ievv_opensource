@@ -11,6 +11,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         current_directory = os.getcwd()
         for directory in getattr(settings, 'IEVVTASKS_MAKEMESSAGES_DIRECTORIES', [current_directory]):
+            if isinstance(directory, dict):
+                directory = directory['directory']
             os.chdir(directory)
             management.call_command('compilemessages')
             os.chdir(current_directory)

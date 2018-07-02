@@ -103,6 +103,24 @@ the following setting::
         'myproject/themeapp',
     ]
 
+Just adding strings to ``IEVVTASKS_MAKEMESSAGES_DIRECTORIES`` is just a shortcut.
+You can add dicts instead::
+
+    IEVVTASKS_MAKEMESSAGES_DIRECTORIES = [
+        {
+            'directory': 'myproject/usersapp',
+        },
+        {
+            'directory': 'myproject/themeapp',
+            'python': True,  # Build python translations
+            'javascript': True,  # Build javascript translations
+            # 'javascript_ignore': ['something/*'],  # Override IEVVTASKS_MAKEMESSAGES_JAVASCRIPT_IGNORE for the directory
+            # 'python_ignore': ['something/*'],  # Override IEVVTASKS_MAKEMESSAGES_IGNORE for the directory
+        }
+    ]
+
+
+
 .. setting:: IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
 
 IEVVTASKS_MAKEMESSAGES_BUILD_JAVASCRIPT_TRANSLATIONS
