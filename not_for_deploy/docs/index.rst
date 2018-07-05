@@ -36,6 +36,7 @@ Apps
    ievv_developemail
    ievv_model_mommy_extras
    ievv_restframework_helpers
+   ievv_sms
 
 
 ********

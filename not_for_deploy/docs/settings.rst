@@ -481,6 +481,19 @@ If this is ``True``, all actions will be executed syncronously. Read more about
 this in :ref:`ievv_batchframework_develop_asyncronous`.
 
 
+********
+ievv_sms
+********
+
+.. setting:: IEVV_SMS_DEFAULT_BACKEND_ID
+
+IEVV_SMS_DEFAULT_BACKEND_ID
+===========================
+The default backend ID to use for SMS sending. Example::
+
+    IEVV_SMS_DEFAULT_BACKEND_ID = 'debugprint'
+
+
 
 *****
 utils

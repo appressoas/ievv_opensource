@@ -14,7 +14,7 @@ For now it only adds support for::
 *****
 Setup
 *****
-To use this, you only need to add it ::
+To use this, you only need to add it to your ``INSTALLED_APPS`` setting::
 
     INSTALLED_APPS = [
         # Other apps ...

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_developemail',
     'ievv_opensource.ievv_elasticsearch',
     'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
+    'ievv_opensource.ievv_sms',
 ]
 
 MIDDLEWARE = [
@@ -217,3 +218,6 @@ RQ_QUEUES = {
         'DEFAULT_TIMEOUT': 500,
     },
 }
+
+
+IEVV_SMS_DEFAULT_BACKEND_ID = 'debugprint'
