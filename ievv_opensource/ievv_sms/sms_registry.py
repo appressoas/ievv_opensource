@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import re
 from django.conf import settings
 
 from ievv_opensource.utils.singleton import Singleton
@@ -58,6 +59,8 @@ class AbstractSmsBackend(object):
     without the ``backend_id`` argument, and the SMS will be sent
     with the print backend.
     """
+    STRIP_WHITESPACE_PATTERN = re.compile(r'\s+')
+
     @classmethod
     def get_backend_id(cls):
         """
@@ -82,7 +85,6 @@ class AbstractSmsBackend(object):
         self.phone_number = phone_number
         self.message = message
         self.kwargs = kwargs
-        self.clean()
 
     def clean_phone_number(self, phone_number):
         """
@@ -128,6 +130,9 @@ class AbstractSmsBackend(object):
 
         If you need to clean extra kwargs, you should override this method,
         but make sure you call ``super().clean()``.
+
+        Raises:
+             django.core.exceptions.ValidationError: If validation fails.
         """
         self.cleaned_phone_number = self.clean_phone_number(phone_number=self.phone_number)
         self.cleaned_message = self.clean_message(message=self.message)
@@ -266,12 +271,17 @@ class Registry(Singleton):
             backend_id: See :meth:`.make_backend_instance`.
             **kwargs: See :meth:`.make_backend_instance`.
 
+        Raises:
+             django.core.exceptions.ValidationError: If validation of the phone number,
+                message or kwargs fails.
+
         Returns:
             .AbstractSmsBackend: An instance of a subclass of :class:`.AbstractSmsBackend`.
         """
         backend = self.make_backend_instance(
             phone_number=phone_number, message=message,
             backend_id=backend_id, **kwargs)
+        backend.clean()
         backend.send()
         return backend
 
