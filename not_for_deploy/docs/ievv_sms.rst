@@ -85,3 +85,9 @@ Debug/develop backends
 ======================
 .. currentmodule:: ievv_opensource.ievv_sms.backends.debugprint
 .. automodule:: ievv_opensource.ievv_sms.backends.debugprint
+
+
+PSWIN backend
+=============
+.. currentmodule:: ievv_opensource.ievv_sms.backends.pswin
+.. automodule:: ievv_opensource.ievv_sms.backends.pswin

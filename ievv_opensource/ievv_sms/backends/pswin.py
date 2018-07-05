@@ -81,4 +81,7 @@ class Backend(sms_registry.AbstractSmsBackend):
         }
 
     def send(self):
+        """
+        Send the message using pswin.
+        """
         requests.post(self.pswin_base_url, params=self.pswin_postdata)
