@@ -142,6 +142,15 @@ class AbstractSmsBackend(object):
         """
         raise NotImplementedError()
 
+    def __str__(self):
+        return '{}.{}(phone_number={!r}, message={!r}, kwargs={!r})'.format(
+            self.__class__.__module__, self.__class__.__name__,
+            self.phone_number, self.message, self.kwargs
+        )
+
+    def __repr__(self):
+        return str(self)
+
 
 class Registry(Singleton):
     """
@@ -290,3 +299,29 @@ class MockableRegistry(Registry):
     def __init__(self):
         self._instance = None  # Ensure the singleton-check is not triggered
         super(MockableRegistry, self).__init__()
+
+
+def send_sms(phone_number, message, backend_id=None, **kwargs):
+    """
+    Send SMS message.
+
+    Just a shortcut for :meth:`.Registry.send`
+    (``Registry.get_instance().send(...)``).
+
+    Args:
+        phone_number (str): The phone number to send the message to.
+        message (str): The message to send.
+        backend_id (str): The ID of the backend to use for sending.
+            If this is ``None``, we use the default backend
+            (see :meth:`.get_default_backend_id`).
+        **kwargs: Extra kwargs for the :class:`.AbstractSmsBackend`
+            constructor.
+
+    Returns:
+        .AbstractSmsBackend: An instance of a subclass of :class:`.AbstractSmsBackend`.
+    """
+    return Registry.get_instance().send(
+        phone_number=phone_number,
+        message=message,
+        backend_id=backend_id,
+        **kwargs)

@@ -25,18 +25,16 @@ Sending SMS
 ***********
 Send an SMS using the default backend with::
 
-    from ievv_opensource.ievv_sms import sms_registry
-    sms_registry.Registry.get_instance().send(
-        phone_number='12345678',
-        message='This is a test')
+    from ievv_opensource.ievv_sms.sms_registry import send_sms
+    send_sms(phone_number='12345678', message='This is a test')
 
 Send using another backend using the ``backend_id`` argument::
 
-    from ievv_opensource.ievv_sms import sms_registry
-    sms_registry.Registry.get_instance().send(
-        phone_number='12345678',
-        message='This is a test',
-        backend_id='some_backend_id')
+    from ievv_opensource.ievv_sms.sms_registry import send_sms
+    send_sms(phone_number='12345678', message='This is a test',
+             backend_id='some_backend_id')
+
+See :func:`ievv_opensource.ievv_sms.sms_registry.send_sms` for more details.
 
 
 *************************
@@ -57,6 +55,12 @@ of a backend in the :setting:`IEVV_SMS_DEFAULT_BACKEND_ID` setting.
 ********
 Core API
 ********
+
+send_sms()
+==========
+
+.. currentmodule:: ievv_opensource.ievv_sms.sms_registry
+.. autofunction:: ievv_opensource.ievv_sms.sms_registry.send_sms
 
 
 AbstractSmsBackend
