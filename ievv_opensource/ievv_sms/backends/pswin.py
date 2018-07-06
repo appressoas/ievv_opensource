@@ -1,7 +1,7 @@
 import requests
-import re
-from ievv_opensource.ievv_sms import sms_registry
 from django.conf import settings
+
+from ievv_opensource.ievv_sms import sms_registry
 
 
 class Backend(sms_registry.AbstractSmsBackend):
