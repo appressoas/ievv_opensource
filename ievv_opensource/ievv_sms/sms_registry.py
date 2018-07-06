@@ -143,7 +143,7 @@ class AbstractSmsBackend(object):
 
         Must be overridden in subclasses.
 
-        Should send ``self.cleaned_message`` to ``self.clean_phone_number``.
+        Should send ``self.cleaned_message`` to ``self.cleaned_phone_number``.
         """
         raise NotImplementedError()
 
