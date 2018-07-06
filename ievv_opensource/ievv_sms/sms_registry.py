@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import re
+
 from django.conf import settings
 
 from ievv_opensource.utils.singleton import Singleton
@@ -69,6 +70,15 @@ class AbstractSmsBackend(object):
         Defaults to the full python path for the class.
         """
         return '{}.{}'.format(cls.__module__, cls.__name__)
+
+    @classmethod
+    def validate_backend_setup(cls):
+        """
+        Validate backend setup (required settings, etc).
+
+        Raises:
+            .SmsBackendSetupError: When the setup validation fails.
+        """
 
     def __init__(self, phone_number, message, **kwargs):
         """
