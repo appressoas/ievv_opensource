@@ -8,6 +8,8 @@ class ModelSmsAppConfig(AppConfig):
     def ready(self):
         from ievv_opensource.ievv_sms import sms_registry
         from ievv_opensource.ievv_sms.backends import debugprint
+        from ievv_opensource.ievv_sms.backends import pswin
         registry = sms_registry.Registry.get_instance()
         registry.add(debugprint.Backend)
         registry.add(debugprint.Latin1Backend)
+        registry.add(pswin.Backend)
