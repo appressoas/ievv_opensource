@@ -91,3 +91,8 @@ PSWIN backend
 =============
 .. currentmodule:: ievv_opensource.ievv_sms.backends.pswin
 .. automodule:: ievv_opensource.ievv_sms.backends.pswin
+
+DebugSmsMessage backend
+=============
+.. currentmodule:: ievv_opensource.ievv_sms.backends.debug_dbstore
+.. automodule:: ievv_opensource.ievv_sms.backends.debug_dbstore
