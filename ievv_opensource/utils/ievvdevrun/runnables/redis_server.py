@@ -51,7 +51,7 @@ class RunnableThread(base.ShellCommandRunnableThread):
         return 'Redis server'
 
     def get_command_config(self):
-        args = ['--port', self.port]
+        args = ['--port', str(self.port)]
         if self.config_path:
             args.insert(0, self.config_path)
         return {
