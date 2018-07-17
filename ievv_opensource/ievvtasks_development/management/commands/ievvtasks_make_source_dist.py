@@ -2,6 +2,8 @@ import json
 import os
 
 import re
+import shutil
+
 import sh
 import sys
 
@@ -215,7 +217,7 @@ class Command(BaseCommand):
         not exist, we assume all old build folder should be deleted.
         """
         build_version_folder_regex = getattr(
-            settings, 'IEVVTASKS_MAKE_SOURCE_DIST_PRODUCTION_BUILD_VERSION_FOLDER_REGEX', r'^\d+$')
+            settings, 'IEVVTASKS_MAKE_SOURCE_DIST_PRODUCTION_BUILD_VERSION_FOLDER_REGEX', r'^\d+(a|alpha)?$')
         if build_version_folder_regex:
             return re.match(build_version_folder_regex, dir_name)
         return False
@@ -239,7 +241,7 @@ class Command(BaseCommand):
                         delete_version_paths.append(absolute_path)
         return delete_version_paths
 
-    def remove_old_production_builds(self):
+    def remove_old_static_builds(self):
         """
         Remove old production builds.
         """
@@ -247,7 +249,10 @@ class Command(BaseCommand):
         for version_folder_path in self.__get_version_build_folders_to_delete():
             self.stdout.write(' -- Deleting: {}'.format(version_folder_path))
             git = sh.Command('git')
-            git(['rm', '-r', version_folder_path])
+            try:
+                git(['rm', '-r', version_folder_path])
+            except sh.ErrorReturnCode:
+                shutil.rmtree(version_folder_path)
 
     def make_source_dist(self):
         self.__run_shell_command(sys.executable, args=['setup.py', 'sdist'])
@@ -268,7 +273,7 @@ class Command(BaseCommand):
             return
 
         if not self.keep_old_static:
-            self.remove_old_production_builds()
+            self.remove_old_static_builds()
 
         self.current_version = self.get_version_from_version_json()
         self.build_and_commit()
