@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from ievv_opensource.ievv_sms.models import DebugSmsMessage
 
+
 @admin.register(DebugSmsMessage)
 class DebugSmsMessageAdmin(admin.ModelAdmin):
     list_per_page = 20
