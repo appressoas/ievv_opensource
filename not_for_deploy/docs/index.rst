@@ -79,6 +79,7 @@ Utilities
    utils.validate_redirect_url
    utils.testhelpers
    utils.validation_error_util
+   utils.datetime_format
 
 
 ************

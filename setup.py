@@ -24,6 +24,7 @@ setup(
         'termcolor',
         'psutil',
         'future',
+        'arrow',
     ],
     entry_points={
         'console_scripts': [
