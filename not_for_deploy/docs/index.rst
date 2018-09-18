@@ -80,6 +80,7 @@ Utilities
    utils.testhelpers
    utils.validation_error_util
    utils.datetime_format
+   utils.model_field_choices
 
 
 ************
