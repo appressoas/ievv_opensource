@@ -44,6 +44,14 @@ class Choice(object):
         else:
             self.attributename = attributename
 
+    @classmethod
+    def get_classpath(cls):
+        return f'{cls.__module__}.{cls.__name__}'
+
+    @property
+    def classpath(self):
+        return self.__class__.get_classpath()
+
     def _value_to_attributename(self, value):
         valuestring = str(value)
         attributename = valuestring.upper().replace('-', '_').replace(' ', '_')
@@ -74,6 +82,23 @@ class Choice(object):
 
     def __str__(self):
         return self.value
+
+    @property
+    def translated_label(self):
+        from django.utils.translation import ugettext
+        return ugettext(self.label)
+
+    @property
+    def translated_description(self):
+        from django.utils.translation import ugettext
+        return ugettext(self.description)
+
+    def as_serializable_data(self):
+        return {
+            'value': self.value,
+            'label': self.translated_label,
+            'description': self.translated_description
+        }
 
 
 class ChoicesWithMeta(object):
