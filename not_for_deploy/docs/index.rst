@@ -73,6 +73,7 @@ Utilities
    utils.logmixin
    utils.shellcommandmixin
    utils.singleton
+   utils.class_registry_singleton
    utils.text
    utils.ievv_colorize
    utils.choices_with_meta
