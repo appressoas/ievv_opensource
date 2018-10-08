@@ -24,6 +24,18 @@ class AbstractRegistryItem:
     def registry_key(self):
         return self.__class__.get_registry_key()
 
+    @classmethod
+    def on_add_to_registry(cls, registry):
+        """
+        Called automatically when the class is added to a :class:`.ClassRegistrySingleton`.
+        """
+
+    @classmethod
+    def on_remove_from_registry(cls, registry):
+        """
+        Called automatically when the class is removed from a :class:`.ClassRegistrySingleton`.
+        """
+
 
 class RegistryItemWrapper:
     """
@@ -256,11 +268,14 @@ class ClassRegistrySingleton(Singleton):
             :obj:`~.AbstractRegistryItem.get_registry_key()` is already
             in the registry.
         """
-        if cls.get_registry_key() in self._classmap:
+        key = cls.get_registry_key()
+        if key in self._classmap:
             raise DuplicateKeyError(
                 registry=self,
-                key=cls.get_registry_key())
-        self.add_or_replace(cls, **default_instance_kwargs)
+                key=key)
+        self._classmap[key] = RegistryItemWrapper(
+            cls=cls, default_instance_kwargs=default_instance_kwargs)
+        self._classmap[key].cls.on_add_to_registry(registry=self)
 
     def add_or_replace(self, cls, **default_instance_kwargs):
         """
@@ -272,8 +287,10 @@ class ClassRegistrySingleton(Singleton):
             cls: A :class:`.AbstractRegistryItem` class (NOT AN OBJECT/INSTANCE).
             **default_instance_kwargs: Default instance kwargs.
         """
-        self._classmap[cls.get_registry_key()] = RegistryItemWrapper(
-            cls=cls, default_instance_kwargs=default_instance_kwargs)
+        key = cls.get_registry_key()
+        if key in self._classmap:
+            self.remove(key)
+        self.add(cls, **default_instance_kwargs)
 
     def replace(self, cls, **default_instance_kwargs):
         """
@@ -304,6 +321,7 @@ class ClassRegistrySingleton(Singleton):
         """
         if key not in self:
             raise KeyError
+        self._classmap[key].cls.on_remove_from_registry(registry=self)
         del self._classmap[key]
 
     def remove_if_in_registry(self, key):
