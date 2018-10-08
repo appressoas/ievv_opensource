@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from ievv_opensource.utils.singleton import Singleton
 
 
@@ -169,7 +171,7 @@ class ClassRegistrySingleton(Singleton):
 
     def __init__(self):
         super().__init__()
-        self._classmap = {}
+        self._classmap = OrderedDict()
 
     def get_registry_item_wrapper_class(self):
         """
@@ -257,6 +259,14 @@ class ClassRegistrySingleton(Singleton):
             yield (cls.get_registry_key(),
                    cls.get_registry_key())
 
+    def _set(self, cls, **default_instance_kwargs):
+        key = cls.get_registry_key()
+        if key in self._classmap:
+            self._classmap[key].cls.on_remove_from_registry(registry=self)
+        self._classmap[key] = RegistryItemWrapper(
+            cls=cls, default_instance_kwargs=default_instance_kwargs)
+        self._classmap[key].cls.on_add_to_registry(registry=self)
+
     def add(self, cls, **default_instance_kwargs):
         """
         Add the provided ``cls`` to the registry.
@@ -273,9 +283,7 @@ class ClassRegistrySingleton(Singleton):
             raise DuplicateKeyError(
                 registry=self,
                 key=key)
-        self._classmap[key] = RegistryItemWrapper(
-            cls=cls, default_instance_kwargs=default_instance_kwargs)
-        self._classmap[key].cls.on_add_to_registry(registry=self)
+        self._set(cls, **default_instance_kwargs)
 
     def add_or_replace(self, cls, **default_instance_kwargs):
         """
@@ -288,9 +296,7 @@ class ClassRegistrySingleton(Singleton):
             **default_instance_kwargs: Default instance kwargs.
         """
         key = cls.get_registry_key()
-        if key in self._classmap:
-            self.remove(key)
-        self.add(cls, **default_instance_kwargs)
+        self._set(cls, **default_instance_kwargs)
 
     def replace(self, cls, **default_instance_kwargs):
         """
@@ -307,7 +313,7 @@ class ClassRegistrySingleton(Singleton):
         key = cls.get_registry_key()
         if key not in self._classmap:
             raise KeyError(f'{key!r} is not in the registry.')
-        self.add_or_replace(cls, **default_instance_kwargs)
+        self._set(cls, **default_instance_kwargs)
 
     def remove(self, key):
         """
@@ -331,7 +337,7 @@ class ClassRegistrySingleton(Singleton):
         """
         if key not in self:
             return
-        del self._classmap[key]
+        self.remove(key)
 
     def get_registry_item_instance(self, key, **kwargs):
         """
