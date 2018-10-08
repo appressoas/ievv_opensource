@@ -295,7 +295,6 @@ class ClassRegistrySingleton(Singleton):
             cls: A :class:`.AbstractRegistryItem` class (NOT AN OBJECT/INSTANCE).
             **default_instance_kwargs: Default instance kwargs.
         """
-        key = cls.get_registry_key()
         self._set(cls, **default_instance_kwargs)
 
     def replace(self, cls, **default_instance_kwargs):
