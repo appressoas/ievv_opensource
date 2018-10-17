@@ -23,6 +23,10 @@ class Backend(sms_registry.AbstractSmsBackend):
 
     The backend_id for this backend is ``pswin``.
     """
+    CHARACTER_REPLACE_MAP = {
+        '–': '-'
+    }
+
     @classmethod
     def get_backend_id(cls):
         return 'pswin'
@@ -41,6 +45,7 @@ class Backend(sms_registry.AbstractSmsBackend):
 
     @property
     def pswin_base_url(self):
+        # https://wiki.pswin.com/Gateway%20HTTP%20API.ashx#Submitting_SMS_24
         return 'https://simple.pswin.com'
 
     @property
@@ -59,6 +64,16 @@ class Backend(sms_registry.AbstractSmsBackend):
     def default_country_code(self):
         return self._pswin_default_country_code or settings.PSWIN_DEFAULT_COUNTRY_CODE
 
+    def replace_message_characters(self, message):
+        for from_char, to_char in self.CHARACTER_REPLACE_MAP.items():
+            message = message.replace(from_char, to_char)
+        return message
+
+    def clean_message(self, message):
+        message = self.replace_message_characters(message)
+        message = message.encode('latin-1', errors='ignore').decode('latin-1')
+        return message
+
     def clean_phone_number(self, phone_number):
         phone_number = self.STRIP_WHITESPACE_PATTERN.sub('', phone_number)
         if phone_number.startswith('00'):
@@ -76,8 +91,7 @@ class Backend(sms_registry.AbstractSmsBackend):
             'PW': self.pswin_password,
             'RCV': self.cleaned_phone_number,
             'SND': self.pswin_sender,
-            'TXT': self.cleaned_message.encode('ISO-8859-1'),
-            'Content-Type': 'text/html; ISO-8859-1'
+            'TXT': self.cleaned_message.encode('ISO-8859-1')
         }
 
     def send(self):
