@@ -5,8 +5,10 @@ from django.utils.module_loading import import_string
 
 
 class BasePhoneNumberHandler:
+    STRIP_WHITESPACE_PATTERN = re.compile(r'\s+')
+
     def __init__(self, phone_number, country_calling_code=None):
-        self.raw_phone_number = phone_number
+        self.raw_phone_number = phone_number or ''
         self._country_calling_code = country_calling_code
 
     def get_country_calling_code(self):
@@ -25,11 +27,31 @@ class BasePhoneNumberHandler:
         return False
 
     def get_cleaned_phone_number(self):
+        """
+        Get the cleaned phone number.
+
+        This returns `None` if we do not have (or can detect) a country calling code,
+        or if the phone number is blank.
+
+        If you just want to normalize the phone number, use :meth:`.get_normalized_phone_number`.
+        """
         country_code = self.get_country_calling_code()
         phone_number = self.get_phone_number_without_country_code()
         if not country_code or not phone_number:
             return None
         return f'+{country_code}{phone_number}'
+
+    def _strip_whitespace(self, string):
+        return self.STRIP_WHITESPACE_PATTERN.sub('', string)
+
+    def get_normalized_phone_number(self):
+        """
+        Get the normalized full phone number with country code (if there a country code can be detected).
+        """
+        cleaned_phone_number = self.get_cleaned_phone_number()
+        if cleaned_phone_number:
+            return cleaned_phone_number
+        return self._strip_whitespace(self.raw_phone_number)
 
 
 class NorwegianPhoneNumberHandler(BasePhoneNumberHandler):
@@ -40,7 +62,7 @@ class NorwegianPhoneNumberHandler(BasePhoneNumberHandler):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._clean_raw_phone_number = self.STRIP_WHITESPACE_PATTERN.sub('', self.raw_phone_number)
+        self._clean_raw_phone_number = self._strip_whitespace(self.raw_phone_number)
 
     def get_country_calling_code(self):
         if self._country_calling_code:
