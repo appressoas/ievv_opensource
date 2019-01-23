@@ -107,7 +107,7 @@ def get(phone_number):
     Get the configured phone number handler.
 
     Returns:
-        turafak.utils.invoice_requires_snailmail.BaseMobileNumberDetect: The currently configured
+        ievv_opensource.ievv_sms.phone_number_handler.BasePhoneNumberHandler: The currently configured
             phone number handler.
     """
     handler_class = _get_handler_class()
