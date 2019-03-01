@@ -17,13 +17,18 @@ class Backend(sms_registry.AbstractSmsBackend):
         return 'debugprint'
 
     def send(self):
+        print('**************')
+        print('opensource: ', self.send_as)
+        print('**************')
         print(
             '{border}\n'
             'DEBUG PRINT SMS:\n'
+            'Send as: {send_as}\n'
             'Phone number: {phone_number}\n'
             'Message: {message}\n'
             'Message length: {message_length}\n'
             '{border}\n'.format(
+                send_as=self.send_as,
                 phone_number=self.cleaned_phone_number,
                 message=self.cleaned_message,
                 message_length=len(self.cleaned_message),

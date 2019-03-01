@@ -36,3 +36,40 @@ class TestBackend(test.TestCase):
         self.assertEqual(
             backend.clean_phone_number(' 123 45 678 '),
             '4712345678')
+
+    @test.override_settings(PSWIN_SENDER='test')
+    def test_pswin_sender_from_setting(self):
+        backend = pswin.Backend(
+            phone_number='12345678',
+            message='test')
+        self.assertEqual(backend.pswin_sender, 'test')
+
+    def test_pswin_sender_from_send_as(self):
+        backend = pswin.Backend(
+            phone_number='12345678',
+            message='test',
+            send_as='A')
+        self.assertEqual(backend.pswin_sender, 'A')
+
+    def test_pswin_sender_from_pswin_sender_arg(self):
+        backend = pswin.Backend(
+            phone_number='12345678',
+            message='test',
+            pswin_sender='A')
+        self.assertEqual(backend.pswin_sender, 'A')
+
+    def test_pswin_sender_pswin_sender_arg_before_send_as(self):
+        backend = pswin.Backend(
+            phone_number='12345678',
+            message='test',
+            send_as='A',
+            pswin_sender='B')
+        self.assertEqual(backend.pswin_sender, 'B')
+
+    @test.override_settings(PSWIN_SENDER='A')
+    def test_pswin_sender_send_as_before_setting(self):
+        backend = pswin.Backend(
+            phone_number='12345678',
+            message='test',
+            send_as='B')
+        self.assertEqual(backend.pswin_sender, 'B')

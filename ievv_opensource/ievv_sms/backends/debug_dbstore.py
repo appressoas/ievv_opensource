@@ -19,5 +19,6 @@ class Backend(sms_registry.AbstractSmsBackend):
         db_record = DebugSmsMessage()
         db_record.phone_number = self.phone_number
         db_record.message = self.message
+        db_record.send_as = self.send_as or ''
         db_record.full_clean()
         db_record.save()

@@ -80,7 +80,7 @@ class AbstractSmsBackend(object):
             .SmsBackendSetupError: When the setup validation fails.
         """
 
-    def __init__(self, phone_number, message, **kwargs):
+    def __init__(self, phone_number, message, send_as=None, **kwargs):
         """
         All the arguments are forwarded from :meth:`.Registry.send` /
         :meth:`.Registry.make_backend_instance`.
@@ -94,6 +94,7 @@ class AbstractSmsBackend(object):
         """
         self.phone_number = phone_number
         self.message = message
+        self.send_as = send_as
         self.kwargs = kwargs
 
     def clean_phone_number(self, phone_number):

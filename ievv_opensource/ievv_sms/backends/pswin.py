@@ -58,7 +58,7 @@ class Backend(sms_registry.AbstractSmsBackend):
 
     @property
     def pswin_sender(self):
-        return self._pswin_sender or settings.PSWIN_SENDER
+        return self._pswin_sender or self.send_as or settings.PSWIN_SENDER
 
     @property
     def default_country_code(self):
