@@ -2,7 +2,8 @@
 #Django==1.9.7
 #Django==1.11.9
 #Django==1.11.20
-Django==2.0.13
+#Django==2.0.13
+Django==2.1.7
 
 django-crispy-forms==1.7.2
 python-dateutil==2.2
