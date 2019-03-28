@@ -52,7 +52,7 @@ With a custom message instead of the default lorem ipsum message::
 
     $ python manage.py ievv_developemail_send_testmail --to "test@example.com" --html --message-html "Dette er <em>en test lizzm</em>"
 
-Send using django_cradmin.apps.cradmin_email.emailutils.AbstractEmail::
+Send using cradmin_legacy.apps.cradmin_email.emailutils.AbstractEmail::
 
     $ python manage.py ievv_developemail_send_testmail --to "test@example.com" --html --use-cradmin-email
     .. or with custom message ..

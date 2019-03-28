@@ -1,6 +1,6 @@
 import elasticsearch_dsl
 from django import test
-from django_cradmin import datetimeutils
+from cradmin_legacy import datetimeutils
 from model_mommy import mommy
 
 from ievv_opensource import ievv_elasticsearch2

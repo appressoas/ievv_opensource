@@ -19,7 +19,7 @@ setup(
         'sh',
         'Django',
         'django_dbdev>=1.0.0',
-        'django_cradmin>=1.1.1',
+        'cradmin_legacy==1.3.0a0',
         'watchdog',
         'termcolor',
         'psutil',

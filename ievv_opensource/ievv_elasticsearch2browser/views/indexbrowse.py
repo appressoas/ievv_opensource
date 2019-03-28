@@ -1,10 +1,10 @@
 import json
 
 from django.views.generic import TemplateView
-from django_cradmin import crapp
-from django_cradmin.viewhelpers import listbuilder
-from django_cradmin.viewhelpers import listbuilderview
-from django_cradmin.viewhelpers.listfilter.basefilters.single.abstracttextinput import AbstractSearch
+from cradmin_legacy import crapp
+from cradmin_legacy.viewhelpers import listbuilder
+from cradmin_legacy.viewhelpers import listbuilderview
+from cradmin_legacy.viewhelpers.listfilter.basefilters.single.abstracttextinput import AbstractSearch
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer

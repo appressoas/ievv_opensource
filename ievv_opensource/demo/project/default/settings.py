@@ -34,13 +34,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_rq',
+    'django_cradmin.apps.cradmin_generic_token_with_metadata',
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
-    'django_cradmin',
-    'django_cradmin.apps.cradmin_authenticate',
-    'django_cradmin.apps.cradmin_temporaryfileuploadstore',
-    'django_cradmin.apps.cradmin_email',
+    'cradmin_legacy',
+    'cradmin_legacy.apps.cradmin_authenticate',
+    'cradmin_legacy.apps.cradmin_temporaryfileuploadstore',
+    'cradmin_legacy.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
@@ -83,13 +84,13 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                'django_cradmin.context_processors.cradmin',
+                'cradmin_legacy.context_processors.cradmin',
             ],
         },
     },
 ]
 
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
+ROOT_URLCONF = 'cradmin_legacy.demo.project.demo.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'

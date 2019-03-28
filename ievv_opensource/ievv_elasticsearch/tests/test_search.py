@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django_cradmin.datetimeutils import default_timezone_datetime
+from cradmin_legacy.datetimeutils import default_timezone_datetime
 from pyelasticsearch import ElasticHttpNotFoundError
 
 from ievv_opensource.ievv_elasticsearch import search
@@ -144,7 +144,7 @@ class TestPaginator(TestCase):
                 'match_all': {}
             }
         })
-        self.assertEquals(len(list(paginator)), 1)
+        self.assertEqual(len(list(paginator)), 1)
 
     def test_multiple_pages_first_page(self):
         self.searchapi.index(
@@ -168,7 +168,7 @@ class TestPaginator(TestCase):
             },
             'sort': {'name': {'order': 'asc'}}
         }, page_number=0, page_size=1)
-        self.assertEquals(list(paginator)[0].source['name'], 'User A')
+        self.assertEqual(list(paginator)[0].source['name'], 'User A')
         self.assertTrue(paginator.has_next())
         self.assertFalse(paginator.has_previous())
 
@@ -194,7 +194,7 @@ class TestPaginator(TestCase):
             },
             'sort': {'name': {'order': 'asc'}}
         }, page_number=1, page_size=1)
-        self.assertEquals(list(paginator)[0].source['name'], 'User B')
+        self.assertEqual(list(paginator)[0].source['name'], 'User B')
         self.assertTrue(paginator.has_next())
         self.assertTrue(paginator.has_previous())
 
@@ -220,6 +220,6 @@ class TestPaginator(TestCase):
             },
             'sort': {'name': {'order': 'asc'}}
         }, page_number=2, page_size=1)
-        self.assertEquals(list(paginator)[0].source['name'], 'User C')
+        self.assertEqual(list(paginator)[0].source['name'], 'User C')
         self.assertFalse(paginator.has_next())
         self.assertTrue(paginator.has_previous())

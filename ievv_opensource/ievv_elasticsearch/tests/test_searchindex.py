@@ -23,7 +23,7 @@ class TestAbstractIndex(TestCase):
         self.searchapi.refresh()
         self.searchapi.get(index=MyIndex.name, doc_type=ProductIndexDocument.doc_type, id=1)
         self.searchapi.get(index=MyIndex.name, doc_type=ProductIndexDocument.doc_type, id=2)
-        self.assertEquals(self.searchapi.wrapped_search_all().total, 2)
+        self.assertEqual(self.searchapi.wrapped_search_all().total, 2)
 
     def test_index_items_multiple_document_types(self):
         class MyIndex(autoindex.AbstractIndex):
@@ -43,4 +43,4 @@ class TestAbstractIndex(TestCase):
         self.searchapi.refresh()
         self.searchapi.get(index=MyIndex.name, doc_type=ProductIndexDocument.doc_type, id=1)
         self.searchapi.get(index=MyIndex.name, doc_type=NewsIndexDocument.doc_type, id=1)
-        self.assertEquals(self.searchapi.wrapped_search_all().total, 2)
+        self.assertEqual(self.searchapi.wrapped_search_all().total, 2)

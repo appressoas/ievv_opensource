@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from django.views.generic import View
-from django_cradmin.datetimeutils import default_timezone_datetime
+from cradmin_legacy.datetimeutils import default_timezone_datetime
 
 from ievv_opensource.ievv_elasticsearch import search
 from ievv_opensource.ievv_elasticsearch.viewhelpers import searchview
@@ -43,10 +43,10 @@ class TestViewMixin(TestCase):
         view = MySearchView()
         view.request = request
         paginator = view.get_paginator()
-        self.assertEquals(paginator.number_of_items_in_current_page, 2)
+        self.assertEqual(paginator.number_of_items_in_current_page, 2)
         resultitems = list(paginator)
-        self.assertEquals(resultitems[0].source['name'], 'User A')
-        self.assertEquals(resultitems[1].source['name'], 'User B')
+        self.assertEqual(resultitems[0].source['name'], 'User A')
+        self.assertEqual(resultitems[1].source['name'], 'User B')
         self.assertTrue(paginator.has_next())
         self.assertFalse(paginator.has_previous())
 
@@ -82,9 +82,9 @@ class TestViewMixin(TestCase):
         view = MySearchView()
         view.request = request
         paginator = view.get_paginator()
-        self.assertEquals(paginator.number_of_items_in_current_page, 1)
+        self.assertEqual(paginator.number_of_items_in_current_page, 1)
         resultitems = list(paginator)
-        self.assertEquals(resultitems[0].source['name'], 'User C')
+        self.assertEqual(resultitems[0].source['name'], 'User C')
         self.assertFalse(paginator.has_next())
         self.assertTrue(paginator.has_previous())
 
@@ -129,9 +129,9 @@ class TestSortMixin(TestCase):
         view.request = request
         paginator = view.get_paginator()
         resultitems = list(paginator)
-        self.assertEquals(resultitems[0].id, '1')
-        self.assertEquals(resultitems[1].id, '2')
-        self.assertEquals(resultitems[2].id, '3')
+        self.assertEqual(resultitems[0].id, '1')
+        self.assertEqual(resultitems[1].id, '2')
+        self.assertEqual(resultitems[2].id, '3')
 
     def test_default_specified(self):
         self.searchapi.index(
@@ -168,9 +168,9 @@ class TestSortMixin(TestCase):
         view.request = request
         paginator = view.get_paginator()
         resultitems = list(paginator)
-        self.assertEquals(resultitems[0].id, '1')
-        self.assertEquals(resultitems[1].id, '2')
-        self.assertEquals(resultitems[2].id, '3')
+        self.assertEqual(resultitems[0].id, '1')
+        self.assertEqual(resultitems[1].id, '2')
+        self.assertEqual(resultitems[2].id, '3')
 
     def test_alternative(self):
         self.searchapi.index(
@@ -207,9 +207,9 @@ class TestSortMixin(TestCase):
         view.request = request
         paginator = view.get_paginator()
         resultitems = list(paginator)
-        self.assertEquals(resultitems[0].id, '2')
-        self.assertEquals(resultitems[1].id, '1')
-        self.assertEquals(resultitems[2].id, '3')
+        self.assertEqual(resultitems[0].id, '2')
+        self.assertEqual(resultitems[1].id, '1')
+        self.assertEqual(resultitems[2].id, '3')
 
 
 class TestSearchMixin(TestCase):
@@ -243,7 +243,7 @@ class TestSearchMixin(TestCase):
         paginator = view.get_paginator()
         resultitems = list(paginator)
         ids = set([resultitem.id for resultitem in resultitems])
-        self.assertEquals(ids, {'1', '2'})
+        self.assertEqual(ids, {'1', '2'})
 
     def test_no_search_string(self):
         self.searchapi.index(
@@ -271,4 +271,4 @@ class TestSearchMixin(TestCase):
         paginator = view.get_paginator()
         resultitems = list(paginator)
         ids = set([resultitem.id for resultitem in resultitems])
-        self.assertEquals(ids, {'1', '2', '3'})
+        self.assertEqual(ids, {'1', '2', '3'})

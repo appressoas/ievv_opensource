@@ -18,11 +18,11 @@ class ModelmapperModel(models.Model):
     xboolean = models.BooleanField(default=False)
     date = models.DateField(default=datetime.date.today)
     datetime = models.DateTimeField(default=timezone.now)
-    parent = models.ForeignKey(ModelMapperForeignKeyModel)
+    parent = models.ForeignKey(ModelMapperForeignKeyModel, on_delete=models.CASCADE)
 
 
 class ModelMapperChildModel(models.Model):
-    parent = models.ForeignKey(ModelmapperModel, related_name='children')
+    parent = models.ForeignKey(ModelmapperModel, related_name='children', on_delete=models.CASCADE)
     size = models.IntegerField(default=0, blank=True)
 
     class Meta:

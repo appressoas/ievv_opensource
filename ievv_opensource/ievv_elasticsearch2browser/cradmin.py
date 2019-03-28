@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
-from django_cradmin import crinstance, crmenu
+from cradmin_legacy import crinstance, crmenu
 
 from ievv_opensource.ievv_elasticsearch2browser.views import indexbrowse
 

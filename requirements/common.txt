@@ -2,7 +2,7 @@
 #Django==1.9.7
 Django==1.11.9
 
-django-crispy-forms==1.6.0
+django-crispy-forms==1.7.2
 python-dateutil==2.2
 #psycopg2==2.6
 psycopg2==2.7.3.2
@@ -60,7 +60,7 @@ djangorestframework==3.8.2
 -r common.gitpackages.txt
 
 # django cradmin
-django-cradmin==2.0.0a18
+#django_cradmin==6.0.2
 
 # RQ
 rq==0.10.0

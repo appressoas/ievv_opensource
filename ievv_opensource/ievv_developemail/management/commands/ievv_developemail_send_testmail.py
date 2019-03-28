@@ -26,7 +26,7 @@ class Command(BaseCommand):
                                  'specified, we use a lorem ipsum message.')
         parser.add_argument('--use-cradmin-email', dest='use_cradmin_email',
                             required=False, action='store_true',
-                            help='Use django_cradmin.apps.cradmin_email.emailutils.AbstractEmail '
+                            help='Use cradmin_legacy.apps.cradmin_email.emailutils.AbstractEmail '
                                  'instead of just the send_mail() function.')
 
     def get_plaintext_message(self):
@@ -86,7 +86,7 @@ class Command(BaseCommand):
         return kwargs
 
     def make_cradmin_email(self):
-        from django_cradmin.apps.cradmin_email import emailutils
+        from cradmin_legacy.apps.cradmin_email import emailutils
 
         class CradminEmail(emailutils.AbstractEmail):
             html_message_template = 'ievv_developemail/cradmin_email/html_message.django.html'
