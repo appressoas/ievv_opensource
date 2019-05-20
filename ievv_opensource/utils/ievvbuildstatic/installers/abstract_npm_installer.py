@@ -219,17 +219,7 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
                 self.install_npm_package(package=package, properties=properties)
 
     def install(self):
-        self.get_logger().command_start(
-            'Installing npm packages for {}'.format(self.app.get_source_path()))
-        if self.get_option('clean_node_modules', False):
-            self.remove_node_modules_directory()
-        self.handle_linked_packages()
-        if not self.packagejson_exists():
-            self.create_packagejson()
-        self.install_packages_from_packagejson()
-        self.install_queued_packages()
-        self.get_logger().command_success('Install npm packages succeeded :)')
-        self.add_deferred_success('Install npm packages succeeded :)')
+        raise NotImplementedError()
 
     def install_packages_from_packagejson(self):
         raise NotImplementedError()

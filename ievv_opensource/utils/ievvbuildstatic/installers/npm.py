@@ -19,6 +19,11 @@ class NpmInstaller(AbstractNpmInstaller):
     name = 'npminstall'
     optionprefix = 'npm'
 
+    def _run_npm(self, args):
+        self.run_shell_command('npm',
+                               args=args,
+                               _cwd=self.app.get_source_path())
+
     def __init__(self, *args, **kwargs):
         super(NpmInstaller, self).__init__(*args, **kwargs)
         self.queued_packages = OrderedDict()
@@ -62,3 +67,22 @@ class NpmInstaller(AbstractNpmInstaller):
         self.run_shell_command('npm',
                                args=['run', script] + args,
                                _cwd=self.app.get_source_path())
+
+    def link_package(self, packagename):
+        self._run_npm(args=['link', packagename])
+
+    def unlink_package(self, packagename):
+        self._run_npm(args=['unlink', packagename])
+
+    def install(self):
+        self.get_logger().command_start(
+            'Installing npm packages for {}'.format(self.app.get_source_path()))
+        if self.get_option('clean_node_modules', False):
+            self.remove_node_modules_directory()
+        if not self.packagejson_exists():
+            self.create_packagejson()
+        self.install_packages_from_packagejson()
+        self.install_queued_packages()
+        self.handle_linked_packages()
+        self.get_logger().command_success('Install npm packages succeeded :)')
+        self.add_deferred_success('Install npm packages succeeded :)')

@@ -109,3 +109,16 @@ class YarnInstaller(AbstractNpmInstaller):
 
     def unlink_package(self, packagename):
         self._run_yarn(args=['unlink', packagename])
+
+    def install(self):
+        self.get_logger().command_start(
+            'Installing npm packages for {}'.format(self.app.get_source_path()))
+        if self.get_option('clean_node_modules', False):
+            self.remove_node_modules_directory()
+        self.handle_linked_packages()
+        if not self.packagejson_exists():
+            self.create_packagejson()
+        self.install_packages_from_packagejson()
+        self.install_queued_packages()
+        self.get_logger().command_success('Install npm packages succeeded :)')
+        self.add_deferred_success('Install npm packages succeeded :)')
