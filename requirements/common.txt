@@ -60,7 +60,7 @@ djangorestframework==3.9.2
 -r common.gitpackages.txt
 
 # django cradmin
-django_cradmin==6.0.2
+#django_cradmin==6.0.2
 
 # RQ
 rq==0.10.0
