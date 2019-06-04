@@ -8,7 +8,7 @@ What is new?
 ************
 - Django 1.10b1 support.
     - Minumum Django version is still 1.8.
-- Minimum version of cradmin-legacy updated to 1.1.1.
+- Minimum version of django-cradmin updated to 1.1.1.
 
 
 

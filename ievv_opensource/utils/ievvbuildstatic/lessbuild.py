@@ -24,7 +24,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                 )
             )
 
-        A more complex example that builds a cradmin-legacy theme
+        A more complex example that builds a django-cradmin theme
         where sources are split in multiple directories, and
         the bower install directory is on the less path
         (the example also uses :class:`ievv_opensource.utils.ievvbuildstatic.bowerinstall.Plugin`)::

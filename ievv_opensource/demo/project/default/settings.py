@@ -38,10 +38,8 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
-    'cradmin_legacy',
-    'cradmin_legacy.apps.cradmin_authenticate',
-    'cradmin_legacy.apps.cradmin_temporaryfileuploadstore',
-    'cradmin_legacy.apps.cradmin_email',
+    'django_cradmin.apps.cradmin_authenticate',
+    'django_cradmin.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
@@ -52,8 +50,6 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_developemail',
-    'ievv_opensource.ievv_elasticsearch',
-    'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
     'ievv_opensource.ievv_sms',
 ]
 
@@ -84,13 +80,13 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                'cradmin_legacy.context_processors.cradmin',
+                'django_cradmin.context_processors.cradmin',
             ],
         },
     },
 ]
 
-ROOT_URLCONF = 'cradmin_legacy.demo.project.demo.urls'
+ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
@@ -149,11 +145,6 @@ LOGGING = {
         'django.db': {
             'handlers': ['stderr'],
             'level': 'INFO',  # Do not set to debug - logs all queries
-            'propagate': False
-        },
-        'elasticsearch': {
-            'handlers': ['stderr'],
-            'level': 'WARNING',
             'propagate': False
         },
         'urllib3': {

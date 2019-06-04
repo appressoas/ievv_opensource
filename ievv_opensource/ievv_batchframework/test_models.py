@@ -1,7 +1,7 @@
 from django import test
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from cradmin_legacy import datetimeutils
+from django_cradmin import datetimeutils
 from model_mommy import mommy
 
 from ievv_opensource.ievv_batchframework.models import BatchOperation

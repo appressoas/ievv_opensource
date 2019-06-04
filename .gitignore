@@ -42,8 +42,6 @@ ievv_buildstatic.appconfig.json
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_build_directory
 
-/elasticsearch_develop/
-/elasticsearch_unittest/
 /dump.rdb
 /.idea/
 

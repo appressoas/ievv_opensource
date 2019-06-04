@@ -122,7 +122,6 @@ Overview
    base.ShellCommandRunnableThread
    django_runserver.RunnableThread
    dbdev_runserver.RunnableThread
-   elasticsearch.RunnableThread
    redis_server.RunnableThread
 
 
@@ -137,9 +136,6 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvdevrun.runnables.dbdev_runserver
 .. automodule:: ievv_opensource.utils.ievvdevrun.runnables.dbdev_runserver
-
-.. currentmodule:: ievv_opensource.utils.ievvdevrun.runnables.elasticsearch
-.. automodule:: ievv_opensource.utils.ievvdevrun.runnables.elasticsearch
 
 .. currentmodule:: ievv_opensource.utils.ievvdevrun.runnables.redis_server
 .. automodule:: ievv_opensource.utils.ievvdevrun.runnables.redis_server
