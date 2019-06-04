@@ -30,7 +30,6 @@ Apps
 
    ievv_tagframework
    ievv_batchframework
-   ievv_elasticsearch
    ievv_customsql
    ievv_jsbase
    ievv_developemail

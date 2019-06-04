@@ -134,7 +134,7 @@ class BatchOperation(models.Model):
     #: Optional, but it is good metadata to add for debugging.
     started_by = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
-        null=True, blank=True)
+        null=True, blank=True, on_delete=models.CASCADE)
 
     #: The datetime when this batch operation was created.
     #: Defaults to ``timezone.now()``.

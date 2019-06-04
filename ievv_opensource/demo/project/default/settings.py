@@ -34,12 +34,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_rq',
+    'django_cradmin.apps.cradmin_generic_token_with_metadata',
     'sorl.thumbnail',
     'django_dbdev',
     'crispy_forms',
-    'django_cradmin',
     'django_cradmin.apps.cradmin_authenticate',
-    'django_cradmin.apps.cradmin_temporaryfileuploadstore',
     'django_cradmin.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
@@ -51,8 +50,6 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_developemail',
-    'ievv_opensource.ievv_elasticsearch',
-    'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
     'ievv_opensource.ievv_sms',
 ]
 
@@ -148,11 +145,6 @@ LOGGING = {
         'django.db': {
             'handlers': ['stderr'],
             'level': 'INFO',  # Do not set to debug - logs all queries
-            'propagate': False
-        },
-        'elasticsearch': {
-            'handlers': ['stderr'],
-            'level': 'WARNING',
             'propagate': False
         },
         'urllib3': {

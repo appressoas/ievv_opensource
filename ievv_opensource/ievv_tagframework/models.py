@@ -84,10 +84,10 @@ class TaggedObject(models.Model):
         verbose_name_plural = _('Tagged objects')
 
     #: The :class:`.Tag`.
-    tag = models.ForeignKey(Tag)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
     #: The ContentType of the tagged object.
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 
     #: The ID of the tagged object.
     object_id = models.PositiveIntegerField()
