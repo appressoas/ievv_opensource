@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import math
 import re
 
 from django.conf import settings
 
 from ievv_opensource.utils.singleton import Singleton
+import gsm0338  # registers the gsm03.38 text encoder used in get_sms_text_length
 
 
 class AbstractSmsBackend(object):
@@ -61,6 +63,21 @@ class AbstractSmsBackend(object):
     with the print backend.
     """
     STRIP_WHITESPACE_PATTERN = re.compile(r'\s+')
+
+    @classmethod
+    def get_max_length(cls):
+        return 153 * 6
+
+    @classmethod
+    def get_sms_text_length(cls, text):
+        return len(text.encode('gsm03.38'))
+
+    @classmethod
+    def get_part_count(cls, text):
+        sms_text_length = cls.get_sms_text_length(text)
+        if sms_text_length <= 160:
+            return 1
+        return int(math.ceil(sms_text_length / 153))
 
     @classmethod
     def get_backend_id(cls):
@@ -296,6 +313,11 @@ class Registry(Singleton):
         backend.send()
         return backend
 
+    def get_backend_class(self, backend_id=None):
+        if not backend_id:
+            backend_id = self.get_default_backend_id()
+        return self._backend_class_map[backend_id]
+
 
 class MockableRegistry(Registry):
     """
@@ -346,3 +368,18 @@ def send_sms(phone_number, message, backend_id=None, **kwargs):
         message=message,
         backend_id=backend_id,
         **kwargs)
+
+
+def get_sms_part_count(message, backend_id=None):
+    backend_class = Registry.get_instance().get_backend_class(backend_id=backend_id)
+    return backend_class.get_part_count(message)
+
+
+def get_sms_text_length(message, backend_id=None):
+    backend_class = Registry.get_instance().get_backend_class(backend_id=backend_id)
+    return backend_class.get_sms_text_length(message)
+
+
+def get_sms_max_length(backend_id=None):
+    backend_class = Registry.get_instance().get_backend_class(backend_id=backend_id)
+    return backend_class.get_max_length()
