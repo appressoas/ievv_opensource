@@ -70,7 +70,7 @@ class AbstractSmsBackend(object):
 
     @classmethod
     def get_sms_text_length(cls, text):
-        return len(text.encode('gsm03.38'))
+        return len(text.encode('gsm03.38', errors='replace'))
 
     @classmethod
     def get_part_count(cls, text):
