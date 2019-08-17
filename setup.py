@@ -19,7 +19,6 @@ setup(
         'sh',
         'Django',
         'django_dbdev>=1.0.0',
-        'django_cradmin>=1.1.1',
         'watchdog',
         'termcolor',
         'psutil',
