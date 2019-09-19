@@ -494,6 +494,31 @@ The default backend ID to use for SMS sending. Example::
     IEVV_SMS_DEFAULT_BACKEND_ID = 'debugprint'
 
 
+*******
+ievv_db
+*******
+
+...setting:: IEVV_DB_POSTGRES_COLLATION
+
+IEVV_DB_POSTGRES_COLLATION
+==========================
+The collation to use for Django order_by that :func:`ievv_opensource.ievv_db.postgres.collate_utils.collate`
+uses as fallback if not passed as a parameter. Example::
+
+Example setting the default collation in settings::
+
+    IEVV_DB_POSTGRES_COLLATION = 'en_US.UTF-8'
+
+
+Example usage in query::
+    from ievv_opensource.ievv_db.postgres.collate_util import collate
+
+    # Ascending order
+    ExampleModel.objects.order_by(collate('some_field'))
+
+    # Descending order
+    ExampleModel.objects.order_by(collate('-some_field'))
+
 
 *****
 utils
