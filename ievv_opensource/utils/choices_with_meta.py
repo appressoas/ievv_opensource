@@ -83,6 +83,30 @@ class Choice(object):
     def __str__(self):
         return self.value
 
+    def get_short_label_translated(self):
+        """
+        Get a short translated label for the choice.
+
+        Defaults to returning :attr:`~.Choice.translated_label`, but you
+        can override this in subclasses.
+        """
+        return self.translated_label
+
+    def get_long_label_translated(self):
+        """
+        Get a long translated label for the choice.
+
+        Generating by joining :attr:`~.Choice.translated_label` and :attr:`~.Choice.translated_description`
+        with ``" - "``.
+        """
+        if self.description:
+            return '{} - {}'.format(self.translated_label, self.translated_description)
+        else:
+            return self.translated_label
+
+    def __str__(self):
+        return self.value
+
     @property
     def translated_label(self):
         from django.utils.translation import ugettext
@@ -343,6 +367,32 @@ class ChoicesWithMeta(object):
         where each item is a ``(value, label)``-tuple.
 
         Uses :meth:`.Choice.get_long_label` to create the ``label``.
+
+        Args:
+            *extra_choices: See :meth:`.iterchoices`.
+        """
+        for choice in self.iterchoices(*extra_choices):
+            yield choice.value, choice.get_long_label()
+
+    def iter_as_django_choices_short_translated(self, *extra_choices):
+        """
+        Iterate over the choices as a Django choices list,
+        where each item is a ``(value, label)``-tuple.
+
+        Uses :meth:`.Choice.get_short_label_translated` to create the ``label``.
+
+        Args:
+            *extra_choices: See :meth:`.iterchoices`.
+        """
+        for choice in self.iterchoices(*extra_choices):
+            yield choice.value, choice.get_short_label()
+
+    def iter_as_django_choices_long_translated(self, *extra_choices):
+        """
+        Iterate over the choices as a Django choices list,
+        where each item is a ``(value, label)``-tuple.
+
+        Uses :meth:`.Choice.get_long_label_translated` to create the ``label``.
 
         Args:
             *extra_choices: See :meth:`.iterchoices`.
