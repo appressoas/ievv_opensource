@@ -17,11 +17,11 @@ class Encoder(json.JSONEncoder):
     - `datetime.date`
         - Serialized as ``{"__type__": "date", "value": "<iso date YYYY-MM-DD>"}``
     - `datetime.time`
-        - Serialized as ``{"__type__": "date", "value": "<str(timeobject)>"}``
+        - Serialized as ``{"__type__": "time", "value": "<str(timeobject)>"}``
     - `decimal.Decimal`
-        - Serialized as ``{"__type__": "date", "value": "<str(decimalvalue)>"}``
+        - Serialized as ``{"__type__": "decimal", "value": "<str(decimalvalue)>"}``
     - Django model objects
-        - Serialized as ``{"__type__": "date", "__model__": "someapp.SomeModel", "value": "<model object PK>"}``
+        - Serialized as ``{"__type__": "djangomodel", "__model__": "someapp.SomeModel", "value": "<model object PK>"}``
     """
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
