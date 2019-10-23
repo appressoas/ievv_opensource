@@ -34,14 +34,17 @@ class DevelopEmail(models.Model):
     def _get_message(self, content_type, allow_not_multipart_fallback=False):
         if self.message.is_multipart():
             for part in self.message.walk():
+                content_charset = part.get_content_charset() or 'utf-8'
+
                 part_content_type = part.get_content_type()
                 part_content_disposition = str(part.get('Content-Disposition'))
 
                 if part_content_type == content_type and 'attachment' not in part_content_disposition:
-                    return part.get_payload(decode=True).decode('utf-8')
+                    return part.get_payload(decode=True).decode(content_charset)
             return None
         elif allow_not_multipart_fallback:
-            return self.message.get_payload(decode=True).decode('utf-8')
+            content_charset = self.message.get_content_charset() or 'utf-8'
+            return self.message.get_payload(decode=True).decode(content_charset)
         return None
 
     @property
