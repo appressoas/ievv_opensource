@@ -12,6 +12,9 @@ class IevvLoggingEventBase(models.Model):
     def __str__(self):
         return self.slug
 
+    class Meta:
+        ordering = ['-id']
+
 
 class IevvLoggingEventItem(models.Model):
     logging_base = models.ForeignKey(IevvLoggingEventBase, on_delete=models.CASCADE)
@@ -24,3 +27,6 @@ class IevvLoggingEventItem(models.Model):
 
     def __str__(self):
         return f'{self.logging_base}'
+
+    class Meta:
+        ordering = ['-id']
