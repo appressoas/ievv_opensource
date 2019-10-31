@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievv_elasticsearch',
     'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
     'ievv_opensource.ievv_sms',
+    'ievv_opensource.ievv_logging',
 ]
 
 MIDDLEWARE = [
