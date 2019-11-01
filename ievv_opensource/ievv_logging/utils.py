@@ -50,6 +50,8 @@ def getDuration(from_dt, to_dt, interval='default'):
             duration_string = duration_string.replace('0 years, ', '')
             if duration_string.startswith('0 days'):
                 duration_string = duration_string.replace('0 days, ', '')
+        if duration_string == '0 hours, 0 minutes and 0 seconds':
+            duration_string = 'Less than a second'
         return duration_string
 
     return {
@@ -69,7 +71,7 @@ class IevvLogging():
 
         from ievv_opensource.ievv_logging.utils import IevvLogging
 
-        ievvlogging = IevvLogging('the_foo_script')
+        ievvlogging = IevvLogging(__name__) # or any custom preferred name like 'the_foo_script'
         ievvlogging.begin()
 
         # the script does its work
