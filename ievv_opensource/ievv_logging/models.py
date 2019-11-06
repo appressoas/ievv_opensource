@@ -19,8 +19,8 @@ class IevvLoggingEventBase(models.Model):
 class IevvLoggingEventItem(models.Model):
     logging_base = models.ForeignKey(IevvLoggingEventBase, on_delete=models.CASCADE)
     time_spent = models.CharField(max_length=255, null=False, blank=True, default='')
-    time_spent_in_seconds = models.IntegerField()
-    data = JSONField()
+    time_spent_in_seconds = models.IntegerField(null=True, blank=True)
+    data = JSONField(null=True, blank=True)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField(null=True, blank=True)
     created_datetime = models.DateTimeField(auto_now_add=True)

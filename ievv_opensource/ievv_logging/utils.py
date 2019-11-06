@@ -92,27 +92,27 @@ class IevvLogging():
 
     def begin(self):
         self.loggingbase = self._get_logging_base_from_slug()
-        self.loggingbase.last_started = timezone.now()
-        self.loggingbase.last_finished = None
+        start = timezone.now()
+        self.loggingbase.last_started = start
         self.loggingbase.save()
+        self.loggingitem = IevvLoggingEventItem(
+            logging_base=self.loggingbase,
+            start_datetime=start
+        )
+        self.loggingitem.save()
 
     def finish(self, **kwargs):
         finish = timezone.now()
-        start = self.loggingbase.last_started
-        duration_string = getDuration(start, finish)
-        duration_seconds = getDuration(start, finish, 'seconds')
+        duration_string = getDuration(self.loggingbase.last_started, finish)
+        duration_seconds = getDuration(self.loggingbase.last_started, finish, 'seconds')
         # update the base model
         self.loggingbase.last_finished = finish
         self.loggingbase.time_spent = duration_string
         self.loggingbase.time_spent_in_seconds = duration_seconds
         self.loggingbase.save()
-        # create item model instance
-        loggingitem = IevvLoggingEventItem(
-            logging_base=self.loggingbase,
-            time_spent=duration_string,
-            time_spent_in_seconds=duration_seconds,
-            data=kwargs,
-            start_datetime=start,
-            end_datetime=finish
-        )
-        loggingitem.save()
+        # update the item model
+        self.loggingitem.time_spent = duration_string
+        self.loggingitem.time_spent_in_seconds = duration_seconds
+        self.loggingitem.data = kwargs
+        self.loggingitem.end_datetime = finish
+        self.loggingitem.save()

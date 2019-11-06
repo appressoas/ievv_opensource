@@ -9,13 +9,13 @@ class TestIevvLogging(test.TestCase):
         ievvlogging = IevvLogging('foo_bar')
         ievvlogging.begin()
         self.assertEqual(1, IevvLoggingEventBase.objects.count())
-        self.assertEqual(0, IevvLoggingEventItem.objects.count())
+        self.assertEqual(1, IevvLoggingEventItem.objects.count())
 
     def test_finish(self):
         ievvlogging = IevvLogging('foo_bar')
         ievvlogging.begin()
         self.assertEqual(1, IevvLoggingEventBase.objects.count())
-        self.assertEqual(0, IevvLoggingEventItem.objects.count())
+        self.assertEqual(1, IevvLoggingEventItem.objects.count())
         ievvlogging.finish()
         self.assertEqual(1, IevvLoggingEventBase.objects.count())
         self.assertEqual(1, IevvLoggingEventItem.objects.count())

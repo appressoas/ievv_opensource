@@ -25,8 +25,14 @@ If for example you are running a management nightly and want to log the running,
         number_of_users_anonymized=4
     )
 
-
 To avoid filling the database with to many log rows, set up *cron* or *scheduled* running of this:
 
     python manage.py ievv_opensource_logging_items_delete_older_than_last_1000
     
+The logs can be (with normal django and ievv setup) found at
+
+    PROJECTDOMAIN/djangoadmin/ievv_logging/
+    
+which will contain a `logging event base` that contains information about the last run for each script, 
+and a `logging event item` that contains information about multiple runs of 
+a given script.  
