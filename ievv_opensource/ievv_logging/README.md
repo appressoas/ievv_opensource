@@ -3,11 +3,15 @@
 An easy to use interface for logging events to the database models in this app. By using this you can easily log and have a useful overview about what
 is going on in e.g. scheduled scripts.
 
+## Install
+
 To use it, add `ievv_opensource.ievv_logging` to `INSTALLED_APPS` and run 
 
     python manage.py migrate
 
-and for example if you are running a management nightly and want to log the running, do:
+## Usage
+
+If for example you are running a management nightly and want to log the running, do:
 
     from ievv_opensource.ievv_logging.utils import IevvLogging
 
