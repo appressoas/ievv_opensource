@@ -27,7 +27,7 @@ If for example you are running a management nightly and want to log the running,
 
 To avoid filling the database with to many log rows, set up *cron* or *scheduled* running of this:
 
-    python manage.py ievv_opensource_logging_items_delete_older_than_last_1000
+    python manage.py ievv_opensource_logging_items_delete_older_than_last_100
     
 The logs can be (with normal django and ievv setup) found at
 
