@@ -1,0 +1,28 @@
+# Ievv Logging 
+
+An easy to use interface for logging events to the database models in this app. By using this you can easily log and have a useful overview about what
+is going on in e.g. scheduled scripts.
+
+To use it, add `ievv_opensource.ievv_logging` to `INSTALLED_APPS` and run 
+
+    python manage.py migrate
+
+and for example if you are running a management nightly and want to log the running, do:
+
+    from ievv_opensource.ievv_logging.utils import IevvLogging
+
+    ievvlogging = IevvLogging(__name__) # or any custom preferred name like 'the_foo_script'
+    ievvlogging.begin()
+
+    # the script does its work
+
+    ievvlogging.finish(
+        number_of_users_updated=12,
+        number_of_users_anonymized=4
+    )
+
+
+To avoid filling the database with to many log rows, set up *cron* or *scheduled* running of this:
+
+    python manage.py ievv_opensource_logging_items_delete_older_than_last_1000
+    
