@@ -1,6 +1,6 @@
 from django import test
 
-from ievv_opensource.ievv_logging.management.commands.ievv_opensource_logging_items_delete_older_than_last_1000 import \
+from ievv_opensource.ievv_logging.management.commands.ievv_opensource_logging_items_delete_older_than_last_100 import \
     delete_older_than_the_last_100
 from ievv_opensource.ievv_logging.models import IevvLoggingEventBase, IevvLoggingEventItem
 from ievv_opensource.ievv_logging.utils import IevvLogging
