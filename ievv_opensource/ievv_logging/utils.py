@@ -1,5 +1,25 @@
 """
 An easy to use interface for logging events to the database models in this app.
+
+
+By using this you can easily log and have a useful overview about what
+is going on in e.g. scheduled scripts.
+
+To use, add ievv_opensource.ievv_logging to INSTALLED_APPS. Run migrate, and for example
+if you are running a management script called "the_foo_script" nightly, do:
+
+    from ievv_opensource.ievv_logging.utils import IevvLogging
+
+    ievvlogging = IevvLogging(__name__) # or any custom preferred name like 'the_foo_script'
+    ievvlogging.begin()
+
+    # the script does its work
+
+    ievvlogging.finish(
+        number_of_users_updated=12,
+        number_of_users_anonymized=4
+    )
+
 """
 from django.utils import timezone
 
@@ -43,9 +63,16 @@ def getDuration(from_dt, to_dt, interval='default'):
         h = hours(d[1])
         m = minutes(h[1])
         s = seconds(m[1])
-        duration_string = "{} years, {} days, {} hours, {} minutes and {} seconds".format(
-            int(y[0]), int(d[0]), int(h[0]), int(m[0]), int(s[0])
-        )
+
+        y_ = y[0]
+        d_ = d[0]
+        h_ = h[0]
+        m_ = m[0]
+        if type(s) == tuple:
+            s_ = s[0]
+        else:
+            s_ = s
+        duration_string = f"{y_} years, {d_} days, {h_} hours, {m_} minutes and {s_} seconds"
         if duration_string.startswith('0 years'):
             duration_string = duration_string.replace('0 years, ', '')
             if duration_string.startswith('0 days'):
@@ -62,25 +89,6 @@ def getDuration(from_dt, to_dt, interval='default'):
 
 
 class IevvLogging():
-    """
-    By using this you can easily log and have a useful overview about what
-    is going on in e.g. scheduled scripts.
-
-    To use, add ievv_opensource.ievv_logging to INSTALLED_APPS. Run migrate, and for example
-    if you are running a management script called "the_foo_script" nightly, do:
-
-        from ievv_opensource.ievv_logging.utils import IevvLogging
-
-        ievvlogging = IevvLogging(__name__) # or any custom preferred name like 'the_foo_script'
-        ievvlogging.begin()
-
-        # the script does its work
-
-        ievvlogging.finish(
-            number_of_users_updated=12,
-            number_of_users_anonymized=4
-        )
-    """
 
     def __init__(self, slug):
         self.slug = slug
