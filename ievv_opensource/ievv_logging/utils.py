@@ -50,12 +50,15 @@ def getDuration(from_dt, to_dt, interval='default'):
         return divmod(seconds or duration_in_s, 3600) # Seconds in an hour = 3600
 
     def minutes(seconds = None):
+        if not seconds:
+            return (0, 0)
         return divmod(seconds or duration_in_s, 60) # Seconds in a minute = 60
 
     def seconds(seconds = None):
         if seconds:
             return divmod(seconds, 1)
-        return duration_in_s
+        # return (duration_in_s, 0)
+        return (0, 0)
 
     def totalDuration():
         y = years()
@@ -64,15 +67,13 @@ def getDuration(from_dt, to_dt, interval='default'):
         m = minutes(h[1])
         s = seconds(m[1])
 
-        y_ = y[0]
-        d_ = d[0]
-        h_ = h[0]
-        m_ = m[0]
-        if type(s) == tuple:
-            s_ = s[0]
-        else:
-            s_ = s
+        y_ = int(y[0])
+        d_ = int(d[0])
+        h_ = int(h[0])
+        m_ = int(m[0])
+        s_ = int(s[0])
         duration_string = f"{y_} years, {d_} days, {h_} hours, {m_} minutes and {s_} seconds"
+
         if duration_string.startswith('0 years'):
             duration_string = duration_string.replace('0 years, ', '')
             if duration_string.startswith('0 days'):
@@ -83,7 +84,7 @@ def getDuration(from_dt, to_dt, interval='default'):
 
     return {
         'minutes': int(minutes()[0]),
-        'seconds': int(seconds()),
+        'seconds': int(seconds()[0]),
         'default': totalDuration()
     }[interval]
 
