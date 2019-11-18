@@ -61,13 +61,17 @@ class TestIevvLogging(test.TestCase):
         to_time = datetime.now()
         from_time = to_time - timedelta(seconds=33)
         duration = getDuration(from_dt=from_time, to_dt=to_time)
+        duration_seconds = getDuration(from_dt=from_time, to_dt=to_time, interval='seconds')
         self.assertEqual('0 hours, 0 minutes and 33 seconds', duration)
+        self.assertEqual(33, duration_seconds)
 
     def test_duration_some_minutes(self):
         to_time = datetime.now()
         from_time = to_time - timedelta(minutes=45)
         duration = getDuration(from_dt=from_time, to_dt=to_time)
+        duration_seconds = getDuration(from_dt=from_time, to_dt=to_time, interval='seconds')
         self.assertEqual('0 hours, 45 minutes and 0 seconds', duration)
+        self.assertEqual(45*60, duration_seconds)
 
     def test_duration_some_minutes_and_seconds(self):
         to_time = datetime.now()
@@ -80,7 +84,9 @@ class TestIevvLogging(test.TestCase):
         to_time = datetime.now()
         from_time = to_time - timedelta(hours=5)
         duration = getDuration(from_dt=from_time, to_dt=to_time)
+        duration_seconds = getDuration(from_dt=from_time, to_dt=to_time, interval='seconds')
         self.assertEqual('5 hours, 0 minutes and 0 seconds', duration)
+        self.assertEqual(5*60*60, duration_seconds)
 
     def test_duration_some_hours_minutes_and_seconds(self):
         to_time = datetime.now()

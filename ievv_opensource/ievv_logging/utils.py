@@ -55,9 +55,10 @@ def getDuration(from_dt, to_dt, interval='default'):
         return divmod(seconds or duration_in_s, 60) # Seconds in a minute = 60
 
     def seconds(seconds = None):
+        if interval == 'seconds':
+            return (duration_in_s, 0)
         if seconds:
             return divmod(seconds, 1)
-        # return (duration_in_s, 0)
         return (0, 0)
 
     def totalDuration():
