@@ -25,8 +25,14 @@ If for example you are running a management nightly and want to log the running,
         number_of_users_anonymized=4
     )
     
-    # To handle errors that happens, and get info logged about them, you can do the following: 
     
+If you also want to handle errors that happens, and get info logged about them, you can do the following: 
+
+    import traceback    
+    from ievv_opensource.ievv_logging.utils import IevvLogging
+
+    ievvlogging = IevvLogging(__name__) # or any custom preferred name like 'the_foo_script'
+    ievvlogging.begin()
     try:
         # the script does its work
     except Exception:
