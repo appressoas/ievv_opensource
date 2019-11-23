@@ -51,6 +51,19 @@ class TestIevvLogging(test.TestCase):
         self.assertTrue('a' in IevvLoggingEventItem.objects.first().data)
         self.assertEqual(3, len(IevvLoggingEventItem.objects.first().data))
 
+    def test_error_occured_is_NOT_set(self):
+        ievvlogging = IevvLogging('foo')
+        ievvlogging.begin()
+        ievvlogging.finish()
+        self.assertFalse(IevvLoggingEventItem.objects.first().error_occured)
+        self.assertIsNotNone(IevvLoggingEventItem.objects.first().error_occured)
+
+    def test_error_occured_is_set(self):
+        ievvlogging = IevvLogging('foo')
+        ievvlogging.begin()
+        ievvlogging.finish(error_occured=True)
+        self.assertTrue(IevvLoggingEventItem.objects.first().error_occured)
+
     def test_duration_less_than_a_second(self):
         to_time = datetime.now()
         from_time = to_time - timedelta(milliseconds=100)

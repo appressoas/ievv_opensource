@@ -111,7 +111,7 @@ class IevvLogging():
         )
         self.loggingitem.save()
 
-    def finish(self, **kwargs):
+    def finish(self, error_occured=False, **kwargs):
         finish = timezone.now()
         duration_string = getDuration(self.loggingbase.last_started, finish)
         duration_seconds = getDuration(self.loggingbase.last_started, finish, 'seconds')
@@ -119,10 +119,12 @@ class IevvLogging():
         self.loggingbase.last_finished = finish
         self.loggingbase.time_spent = duration_string
         self.loggingbase.time_spent_in_seconds = duration_seconds
+        self.loggingbase.error_occured = error_occured
         self.loggingbase.save()
         # update the item model
         self.loggingitem.time_spent = duration_string
         self.loggingitem.time_spent_in_seconds = duration_seconds
         self.loggingitem.data = kwargs
         self.loggingitem.end_datetime = finish
+        self.loggingitem.error_occured = error_occured
         self.loggingitem.save()
