@@ -17,6 +17,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         'last_started',
+        'error_occured',
     ]
     readonly_fields = [
         'slug',
