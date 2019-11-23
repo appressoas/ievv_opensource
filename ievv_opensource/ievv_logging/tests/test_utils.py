@@ -1,3 +1,5 @@
+import sys
+import traceback
 from datetime import datetime, timedelta
 
 from django import test
@@ -63,6 +65,40 @@ class TestIevvLogging(test.TestCase):
         ievvlogging.begin()
         ievvlogging.finish(error_occured=True)
         self.assertTrue(IevvLoggingEventItem.objects.first().error_occured)
+
+    def test_error_occured_is_set_and_exception_msg_is_saved_in_data(self):
+        ievvlogging = IevvLogging('foo')
+        ievvlogging.begin()
+        try:
+            {'foo': 11}['bar']
+        except Exception:
+            ievvlogging.finish(
+                error_occured=True,
+                error=traceback.format_exc()
+            )
+        else:
+            ievvlogging.finish()
+        loggingitem = IevvLoggingEventItem.objects.first()
+        self.assertTrue(loggingitem.error_occured)
+        self.assertTrue('error' in loggingitem.data)
+        self.assertTrue('KeyError' in loggingitem.data['error'])
+
+    def test_NO_error_occured_is_set_and_exception_msg_is_saved_in_data(self):
+        # same test as above, but with no error
+        ievvlogging = IevvLogging('foo')
+        ievvlogging.begin()
+        try:
+            {'foo': 11}['foo']
+        except Exception:
+            ievvlogging.finish(
+                error_occured=True,
+                error=traceback.format_exc()
+            )
+        else:
+            ievvlogging.finish()
+        loggingitem = IevvLoggingEventItem.objects.first()
+        self.assertFalse(loggingitem.error_occured)
+        self.assertFalse('error' in loggingitem.data)
 
     def test_duration_less_than_a_second(self):
         to_time = datetime.now()

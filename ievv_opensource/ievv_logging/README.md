@@ -24,6 +24,20 @@ If for example you are running a management nightly and want to log the running,
         number_of_users_updated=12,
         number_of_users_anonymized=4
     )
+    
+    # To handle errors that happens, and get info logged about them, you can do the following: 
+    
+    try:
+        # the script does its work
+    except Exception:
+        ievvlogging.finish(
+            error_occured=True,
+            error=traceback.format_exc()
+        )
+    else:
+        ievvlogging.finish()
+
+    
 
 To avoid filling the database with to many log rows, set up *cron* or *scheduled* running of this:
 

@@ -100,6 +100,12 @@ class IevvLogging():
             return IevvLoggingEventBase.objects.get(slug=self.slug)
         return IevvLoggingEventBase(slug=self.slug)
 
+    def exception_as_dict(self, exception_instance):
+        return {
+            'repr': repr(exception_instance),
+            'args': exception_instance.args,
+        }
+
     def begin(self):
         self.loggingbase = self._get_logging_base_from_slug()
         start = timezone.now()

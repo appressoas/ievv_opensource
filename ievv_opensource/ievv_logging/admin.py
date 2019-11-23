@@ -17,7 +17,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         'last_started',
-        'error_occured',g
+        'error_occured',
     ]
     readonly_fields = [
         'slug',
@@ -25,6 +25,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
         'last_finished',
         'time_spent_in_seconds',
         'time_spent',
+        'error_occured',
     ]
 
 
@@ -41,6 +42,7 @@ class IevvLoggingEventItemAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         'logging_base',
+        'error_occured',
         'created_datetime',
     ]
     readonly_fields = [
@@ -51,6 +53,7 @@ class IevvLoggingEventItemAdmin(admin.ModelAdmin):
         'end_datetime',
         'time_spent',
         'time_spent_in_seconds',
+        'error_occured',
     ]
     exclude = [
         'data',
