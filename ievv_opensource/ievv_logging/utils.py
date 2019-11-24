@@ -125,12 +125,12 @@ class IevvLogging():
         self.loggingbase.last_finished = finish
         self.loggingbase.time_spent = duration_string
         self.loggingbase.time_spent_in_seconds = duration_seconds
-        self.loggingbase.error_occured = error_occured
+        self.loggingbase.success_run = not error_occured
         self.loggingbase.save()
         # update the item model
         self.loggingitem.time_spent = duration_string
         self.loggingitem.time_spent_in_seconds = duration_seconds
         self.loggingitem.data = kwargs
         self.loggingitem.end_datetime = finish
-        self.loggingitem.error_occured = error_occured
+        self.loggingitem.success_run = not error_occured
         self.loggingitem.save()

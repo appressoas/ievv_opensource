@@ -1,4 +1,6 @@
 import sys
+import traceback
+
 from django.core.management.base import BaseCommand
 
 from ievv_opensource.ievv_logging.utils import IevvLogging
@@ -23,5 +25,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ievvlogging = IevvLogging(__name__)
         ievvlogging.begin()
-        logmessages = delete_older_than_the_last_100()
-        ievvlogging.finish(logmessages=logmessages)
+        try:
+            logmessages = delete_older_than_the_last_100()
+        except Exception:
+            ievvlogging.finish(
+                error_occured=True,
+                error=traceback.format_exc()
+            )
+        else:
+            ievvlogging.finish(logmessages=logmessages)

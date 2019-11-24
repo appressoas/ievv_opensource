@@ -52,20 +52,20 @@ class TestIevvLogging(test.TestCase):
         self.assertTrue('a' in IevvLoggingEventItem.objects.first().data)
         self.assertEqual(3, len(IevvLoggingEventItem.objects.first().data))
 
-    def test_error_occured_is_NOT_set(self):
+    def test_success_run_is_NOT_set(self):
         ievvlogging = IevvLogging('foo')
         ievvlogging.begin()
         ievvlogging.finish()
-        self.assertFalse(IevvLoggingEventItem.objects.first().error_occured)
-        self.assertIsNotNone(IevvLoggingEventItem.objects.first().error_occured)
+        self.assertTrue(IevvLoggingEventItem.objects.first().success_run)
+        self.assertIsNotNone(IevvLoggingEventItem.objects.first().success_run)
 
-    def test_error_occured_is_set(self):
+    def test_success_run_is_false(self):
         ievvlogging = IevvLogging('foo')
         ievvlogging.begin()
         ievvlogging.finish(error_occured=True)
-        self.assertTrue(IevvLoggingEventItem.objects.first().error_occured)
+        self.assertFalse(IevvLoggingEventItem.objects.first().success_run)
 
-    def test_error_occured_is_set_and_exception_msg_is_saved_in_data(self):
+    def test_success_is_false_and_exception_msg_is_saved_in_data(self):
         ievvlogging = IevvLogging('foo')
         ievvlogging.begin()
         try:
@@ -78,7 +78,7 @@ class TestIevvLogging(test.TestCase):
         else:
             ievvlogging.finish()
         loggingitem = IevvLoggingEventItem.objects.first()
-        self.assertTrue(loggingitem.error_occured)
+        self.assertFalse(loggingitem.success_run)
         self.assertTrue('error' in loggingitem.data)
         self.assertTrue('KeyError' in loggingitem.data['error'])
 
@@ -96,7 +96,7 @@ class TestIevvLogging(test.TestCase):
         else:
             ievvlogging.finish()
         loggingitem = IevvLoggingEventItem.objects.first()
-        self.assertFalse(loggingitem.error_occured)
+        self.assertTrue(loggingitem.success_run)
         self.assertFalse('error' in loggingitem.data)
 
     def test_duration_less_than_a_second(self):

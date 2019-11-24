@@ -9,7 +9,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
     list_display = [
         'slug',
         'last_started',
-        'last_finished',
+        'success_run',
         'time_spent_in_seconds',
     ]
     search_fields = [
@@ -17,7 +17,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         'last_started',
-        'error_occured',
+        'success_run',
     ]
     readonly_fields = [
         'slug',
@@ -25,7 +25,7 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
         'last_finished',
         'time_spent_in_seconds',
         'time_spent',
-        'error_occured',
+        'success_run',
     ]
 
 
@@ -33,16 +33,16 @@ class IevvLoggingEventBaseAdmin(admin.ModelAdmin):
 class IevvLoggingEventItemAdmin(admin.ModelAdmin):
     list_display = [
         'logging_base',
+        'success_run',
         'created_datetime',
         'time_spent_in_seconds',
-        'time_spent',
     ]
     search_fields = [
         'logging_base'
     ]
     list_filter = [
         'logging_base',
-        'error_occured',
+        'success_run',
         'created_datetime',
     ]
     readonly_fields = [
@@ -53,7 +53,7 @@ class IevvLoggingEventItemAdmin(admin.ModelAdmin):
         'end_datetime',
         'time_spent',
         'time_spent_in_seconds',
-        'error_occured',
+        'success_run',
     ]
     exclude = [
         'data',
