@@ -28,6 +28,21 @@ class Command(BaseCommand):
                             required=False, action='store_false', default=True,
                             help='Do not abort if we have uncommitted changes. Mostly only useful when '
                                  'developing this management command.')
+        parser.add_argument('--patch', dest='patch',
+                            required=False, action='store_true', default=False,
+                            help='Patch version, use patch ONLY IF the release contains bug fixes.')
+        parser.add_argument('--minor', dest='minor',
+                            required=False, action='store_true', default=False,
+                            help='Minor version, use minor when the release contains no breaking changes, '
+                                 'new features and multiple bugfixes.')
+        parser.add_argument('--major', dest='major',
+                            required=False, action='store_true', default=False,
+                            help='Major version, use major version if the release contains '
+                                 'breaking changes and or major new features.')
+        parser.add_argument('--no-confirm', dest='no_confirm',
+                            required=False, action='store_true', default=False,
+                            help='Release will pass all confirmation prompts. '
+                                 'Only provide --no-confirm if you are not a humanoid such as a cat.')
 
     def __log_shell_command_stdout(self, line):
         """
@@ -63,6 +78,20 @@ class Command(BaseCommand):
                 _err=self.__log_shell_command_stderr,
                 **kwargs)
 
+    def __validate_version_option(self, options):
+        self.patch = options['patch']
+        self.minor = options['minor']
+        self.major = options['major']
+
+        if ((self.patch and self.minor)
+                or (self.minor and self.major)
+                or (self.major and self.patch)
+                or (self.patch and self.major and self.minor))\
+                or (not self.patch and not self.major and not self.minor):
+            raise CommandError(
+                'Please provide only one semver option --patch, --minor or --major'
+            )
+
     def get_version_json_file_path(self):
         try:
             return getattr(settings, 'IEVV_PROJECT_VERSIONJSON_PATH')
@@ -87,30 +116,59 @@ class Command(BaseCommand):
                     app.get_appfolder(),
                     'static',
                     app.appname,
-                    self.get_release_major_version())
+                    self.release_version)
                 if os.path.exists(static_directory):
                     static_directories.append(static_directory)
         return static_directories
 
-    def get_release_major_version(self):
-        if self.current_version.endswith('alpha'):
-            return self.current_version.replace('alpha', '').split('.')[0]
-        else:
-            raise CommandError(
-                'Detecting versions for production releases only work '
-                'if the version stored in {} ends with "alpha".'.format(
-                    self.get_version_json_file_path()))
+    def get_old_release_version(self):
+        if self.current_version.endswith('-dev'):
+            return self.current_version.replace('-dev', '')
+        raise CommandError(
+            'Detecting versions for production releases only work '
+            'if the version stored in {} is formatted "[major].[minor].[patch]-dev".'.format(
+                self.get_version_json_file_path()))
 
-    def get_release_version(self):
-        major_version = self.get_release_major_version()
-        return '{}.0.0'.format(major_version)
+    def get_splitted_version(self):
+        if self.current_version.endswith('-dev'):
+            splitted_version = self.current_version.replace('-dev', '').split('.')
+            return [int(splitted_version[0]), int(splitted_version[1]), int(splitted_version[2])]
+        raise CommandError(
+            'Detecting versions for production releases only work '
+            'if the version stored in {} is formatted "[major].[minor].[patch]-dev".'.format(
+                self.get_version_json_file_path()))
+
+    def make_release_version(self):
+        [major, minor, patch] = self.get_splitted_version()
+        version = ''
+
+        if self.patch:
+            version = '{}.{}.{}'.format(major, minor, patch + 1)
+            self.confirm('Are you sure you want to release patch version ({} -> {})?'
+                         '\nYou should only release a patch version if the release contains ONLY bug fixes\n'
+                         .format(self.get_old_release_version(), version),
+                         'release patch')
+        if self.minor:
+            version = '{}.{}.0'.format(major, minor + 1)
+            self.confirm('Are you sure you want to release minor version ({} -> {})?'
+                         .format(self.get_old_release_version(), version), 'yes')
+        if self.major:
+            version = '{}.0.0'.format(major + 1)
+            self.confirm('Are you sure you want to release major version ({} -> {})?\n'
+                         .format(self.get_old_release_version(), version),
+                         'bump major version to {}'.format(version))
+        return version
+
+
+    # def get_release_version(self):
+    #     major_version = self.get_release_major_version()
+    #     return '{}.0.0'.format(major_version)
 
     def get_new_version_after_release(self):
-        major_version = int(self.get_release_major_version())
-        return '{}.0.0alpha'.format(major_version + 1)
+        return '{}-dev'.format(self.release_version)
 
     def set_release_version(self):
-        self.write_version_json(version=self.get_release_version())
+        self.write_version_json(version=self.release_version)
 
     @property
     def ievv_buildstatic_args(self):
@@ -136,12 +194,12 @@ class Command(BaseCommand):
 
     def commit_release(self):
         self.__run_shell_command('git', args=[
-            'commit', '-m', 'Release version: {}'.format(self.get_release_version())
+            'commit', '-m', 'Release version: {}'.format(self.release_version)
         ])
 
     def tag_release(self):
         self.__run_shell_command('git', args=[
-            'tag', 'v{}'.format(self.get_release_version())
+            'tag', 'v{}'.format(self.release_version)
         ])
 
     def build_and_commit(self):
@@ -169,10 +227,10 @@ class Command(BaseCommand):
             ])
         action_list.extend([
             'Change {} to {!r}'.format(self.get_version_json_file_path(),
-                                       self.get_release_version()),
+                                       self.release_version),
             self.ievv_buildstatic_command_string,
             'Git commit the files built by buildstatic and tag the commit with v{}'.format(
-                self.get_release_version()),
+                self.release_version),
             'python setup.py sdist'
             'Change {} to: {!r}'.format(self.get_version_json_file_path(),
                                         self.get_new_version_after_release()),
@@ -190,18 +248,30 @@ class Command(BaseCommand):
         else:  # pragma: no cover
             return input
 
-    def confirm(self):
+    def confirm(self, message, confirm_text):
+        cli_input = self.__get_cli_input()
+        if self.no_confirm:
+            return
+        try:
+            try:
+                if cli_input('{} [type "{}" to confirm or hit enter to abort] '.format(message, confirm_text)) != confirm_text:
+                    raise CommandError('Confirmation failed, abort!')
+                return
+            except KeyboardInterrupt:
+                self.stderr.write('\n')
+                raise CommandError('Confirmation failed, abort!')
+
+        except KeyboardInterrupt:
+            self.stdout.write('\n')
+            return
+
+    def confirm_procedure(self):
         self.stdout.write('Summary of actions to be performed:')
         self.print_preview()
         self.stdout.write('\n')
         self.stdout.write('Are you sure you want to to build a source dist?')
         confirm_text = 'yes'
-        cli_input = self.__get_cli_input()
-        try:
-            return cli_input('[type "{}" to confirm or hit enter to abort] '.format(confirm_text)) == confirm_text
-        except KeyboardInterrupt:
-            self.stdout.write('\n')
-            return False
+        self.confirm('', confirm_text)
 
     def has_git_changes(self):
         return sh.Command('git')('diff-index', 'HEAD').strip() != ''
@@ -217,7 +287,7 @@ class Command(BaseCommand):
         not exist, we assume all old build folder should be deleted.
         """
         build_version_folder_regex = getattr(
-            settings, 'IEVVTASKS_MAKE_SOURCE_DIST_PRODUCTION_BUILD_VERSION_FOLDER_REGEX', r'^\d+(a|alpha)?$')
+            settings, 'IEVVTASKS_MAKE_SOURCE_DIST_PRODUCTION_BUILD_VERSION_FOLDER_REGEX', r'^\d+-dev?$')
         if build_version_folder_regex:
             return re.match(build_version_folder_regex, dir_name)
         return False
@@ -261,6 +331,8 @@ class Command(BaseCommand):
         check_for_uncommitted_changes = options['check_for_uncommitted_changes']
         self.keep_old_static = options['keep_old_static']
         self.dirty_node_modules = options['dirty_node_modules']
+        self.no_confirm = options['no_confirm']
+        self.__validate_version_option(options)
         self.current_version = None
         self.should_make_source_dist = True
 
@@ -268,9 +340,8 @@ class Command(BaseCommand):
         if check_for_uncommitted_changes and self.has_git_changes():
             raise CommandError('You have uncommitted changes. Aborting.')
 
-        if not self.confirm():
-            self.stderr.write('Aborted')
-            return
+        self.release_version = self.make_release_version()
+        self.confirm_procedure()
 
         if not self.keep_old_static:
             self.remove_old_static_builds()
