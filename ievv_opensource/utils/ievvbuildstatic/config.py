@@ -5,6 +5,7 @@ import shutil
 import time
 from collections import OrderedDict
 
+from django.conf import settings
 from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
@@ -106,7 +107,8 @@ class App(LogMixin):
             'sourcefolder': self.get_source_path(),
             'destinationfolder': self.get_destination_path(),
             'keep_temporary_files': self.keep_temporary_files,
-            'is_in_production_mode': self.apps.is_in_production_mode()
+            'is_in_production_mode': self.apps.is_in_production_mode(),
+            'static_url': self.get_static_url()
         }
 
     def _get_json_appconfig_path(self):
@@ -169,6 +171,20 @@ class App(LogMixin):
                 return os.path.join(relative_path_root, *pathlist)
             else:
                 return relative_path_root
+
+    def get_static_url(self):
+        """
+        Returns the static-url for the output-directory.
+        This url is needed for webpack when using code-splitting during javascript-build, as it will be used by the
+        frontend to load the chunks when/if needed.
+
+        This will typically be something like:
+
+            `/static/myapp/42/`
+
+        where `/static/` is `settings.STATIC_URL`, `myapp` is the appname, and `42` is the version.
+        """
+        return f'{settings.STATIC_URL}{self.appname}/{self.version}/'
 
     def get_source_path(self, *path):
         """
