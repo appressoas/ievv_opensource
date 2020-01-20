@@ -4,3 +4,5 @@
 #
 #
 -r common.txt
+
+twine==1.13.0

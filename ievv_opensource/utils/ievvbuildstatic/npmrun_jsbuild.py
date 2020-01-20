@@ -86,9 +86,11 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
 
     def __init__(self,
                  extra_import_paths=None,
+                 extra_import_aliases=None,
                  **kwargs):
         super(Plugin, self).__init__(**kwargs)
         self.extra_import_paths = extra_import_paths or []
+        self.extra_import_aliases = extra_import_aliases or {}
 
     @property
     def destinationfolder(self):
@@ -108,11 +110,20 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
             import_paths.append(path)
         return import_paths
 
+    def _get_extra_import_aliases(self):
+        import_aliases = {}
+        for alias, path in self.extra_import_aliases.items():
+            if isinstance(path, AbstractDjangoAppPath):
+                path = path.abspath
+            import_aliases[alias] = path
+        return import_aliases
+
     def install(self):
         self.app.add_pluginconfig_to_json_config(
             plugin_name=self.name,
             config_dict={
-                'import_paths': self._get_import_paths_as_strlist()
+                'import_paths': self._get_import_paths_as_strlist(),
+                'extra_import_aliases': self._get_extra_import_aliases()
             }
         )
 

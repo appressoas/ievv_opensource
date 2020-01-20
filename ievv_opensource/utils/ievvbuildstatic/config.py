@@ -5,6 +5,7 @@ import shutil
 import time
 from collections import OrderedDict
 
+from django.conf import settings
 from django.apps import apps
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
@@ -25,7 +26,8 @@ class App(LogMixin):
                  installers_config=None,
                  docbuilder_classes=None,
                  default_skipgroups=None,
-                 default_includegroups=None):
+                 default_includegroups=None,
+                 appspecific_fields=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -34,6 +36,9 @@ class App(LogMixin):
             sourcefolder: The folder relative to the app root folder where
                 static sources (I.E.: less, coffescript, ... sources) are located.
                 Defaults to ``staticsources``.
+            appspecific_fields: If your build-scenario requires more variables, add them in a dictionary here, and they
+                will be included in the config.
+                Defaults to ``{}``.
         """
         self.apps = None
         self.version = version
@@ -46,6 +51,7 @@ class App(LogMixin):
         self.keep_temporary_files = keep_temporary_files
         self.default_skipgroups = default_skipgroups or []
         self.default_includegroups = default_includegroups or []
+        self.appspecific_fields = appspecific_fields or {}
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
         for plugin in plugins:
@@ -106,7 +112,9 @@ class App(LogMixin):
             'sourcefolder': self.get_source_path(),
             'destinationfolder': self.get_destination_path(),
             'keep_temporary_files': self.keep_temporary_files,
-            'is_in_production_mode': self.apps.is_in_production_mode()
+            'is_in_production_mode': self.apps.is_in_production_mode(),
+            'static_url': self.get_static_url(),
+            'appspecific_fields': self.appspecific_fields
         }
 
     def _get_json_appconfig_path(self):
@@ -169,6 +177,20 @@ class App(LogMixin):
                 return os.path.join(relative_path_root, *pathlist)
             else:
                 return relative_path_root
+
+    def get_static_url(self):
+        """
+        Returns the static-url for the output-directory.
+        This url is needed for webpack when using code-splitting during javascript-build, as it will be used by the
+        frontend to load the chunks when/if needed.
+
+        This will typically be something like:
+
+            `/static/myapp/42/`
+
+        where `/static/` is `settings.STATIC_URL`, `myapp` is the appname, and `42` is the version.
+        """
+        return f'{settings.STATIC_URL}{self.appname}/{self.version}/'
 
     def get_source_path(self, *path):
         """

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_developemail',
     'ievv_opensource.ievv_sms',
+    'ievv_opensource.ievv_logging',
 ]
 
 MIDDLEWARE = [

@@ -20,6 +20,7 @@ from . import autosetup_jsdoc  #noqa
 from . import autosetup_esdoc  #noqa
 from . import npmrun_jsbuild  # noqa
 from . import npmrun  # noqa
+from . import single_media_copy
 
 __all__ = [
     'utils',
@@ -42,4 +43,5 @@ __all__ = [
     'run_jstests',
     'autosetup_jsdoc',
     'autosetup_esdoc',
+    'single_media_copy',
 ]

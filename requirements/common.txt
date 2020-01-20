@@ -62,4 +62,10 @@ rq==0.10.0
 django-rq==1.0.1
 redis==2.10.5
 
+# For counting the length of SMSes
+gsm0338==1.0.0
+
+# Used for interactive terminal
+PyInquirer==1.0.3
+
 -e .

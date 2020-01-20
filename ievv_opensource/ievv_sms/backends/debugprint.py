@@ -17,9 +17,6 @@ class Backend(sms_registry.AbstractSmsBackend):
         return 'debugprint'
 
     def send(self):
-        print('**************')
-        print('opensource: ', self.send_as)
-        print('**************')
         print(
             '{border}\n'
             'DEBUG PRINT SMS:\n'

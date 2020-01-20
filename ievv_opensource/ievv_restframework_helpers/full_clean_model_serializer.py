@@ -1,9 +1,12 @@
 import traceback
+from django.contrib.postgres.fields import DateTimeRangeField
 
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
+
+from ievv_opensource.ievv_restframework_helpers.serializer_fields import DateTimeRangeSerializerField
 from ievv_opensource.utils.validation_error_util import ValidationErrorUtil
 
 
@@ -105,3 +108,11 @@ class FullCleanModelSerializer(serializers.ModelSerializer):
         self.clean_model_instance(instance)
         instance.save()
         return instance
+
+
+class IevvModelSerializer(FullCleanModelSerializer):
+    def build_field(self, field_name, info, model_class, nested_depth):
+        result = super().build_field(field_name, info, model_class, nested_depth)
+        if isinstance(model_class._meta.get_field(field_name), DateTimeRangeField):
+            return DateTimeRangeSerializerField, result[1]
+        return result
