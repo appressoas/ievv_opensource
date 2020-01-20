@@ -26,7 +26,8 @@ class App(LogMixin):
                  installers_config=None,
                  docbuilder_classes=None,
                  default_skipgroups=None,
-                 default_includegroups=None):
+                 default_includegroups=None,
+                 appspecific_fields=None):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -35,6 +36,9 @@ class App(LogMixin):
             sourcefolder: The folder relative to the app root folder where
                 static sources (I.E.: less, coffescript, ... sources) are located.
                 Defaults to ``staticsources``.
+            appspecific_fields: If your build-scenario requires more variables, add them in a dictionary here, and they
+                will be included in the config.
+                Defaults to ``{}``.
         """
         self.apps = None
         self.version = version
@@ -47,6 +51,7 @@ class App(LogMixin):
         self.keep_temporary_files = keep_temporary_files
         self.default_skipgroups = default_skipgroups or []
         self.default_includegroups = default_includegroups or []
+        self.appspecific_fields = appspecific_fields or {}
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
         for plugin in plugins:
@@ -108,7 +113,8 @@ class App(LogMixin):
             'destinationfolder': self.get_destination_path(),
             'keep_temporary_files': self.keep_temporary_files,
             'is_in_production_mode': self.apps.is_in_production_mode(),
-            'static_url': self.get_static_url()
+            'static_url': self.get_static_url(),
+            'appspecific_fields': self.appspecific_fields
         }
 
     def _get_json_appconfig_path(self):
