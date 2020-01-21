@@ -11,6 +11,8 @@ To use it, add `ievv_opensource.ievv_logging` to `INSTALLED_APPS` and run
 
 ## Usage
 
+### Without caring about errors that occur
+
 If for example you are running a management nightly and want to log the running, do:
 
     from ievv_opensource.ievv_logging.utils import IevvLogging
@@ -25,7 +27,7 @@ If for example you are running a management nightly and want to log the running,
         number_of_users_anonymized=4
     )
     
-    
+### With saving information about errors that occur    
 If you also want to handle errors that happens, and get info logged about them, you can do the following: 
 
     import traceback    
