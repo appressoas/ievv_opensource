@@ -73,7 +73,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
         self.gzip_compresslevel = gzip_compresslevel
 
     def gzip_compression_enabled(self):
-        return self.gzip
+        return self.gzip and self.app.apps.is_in_production_mode()
 
     def gzip_compresslevel(self):
         return self.gzip_compresslevel
