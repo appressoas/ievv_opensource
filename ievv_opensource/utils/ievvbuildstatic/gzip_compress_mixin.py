@@ -19,7 +19,8 @@ class GzipCompressMixin:
         sourcecode = open(sourcepath, 'rb').read()
         gzipped_data = gzip.compress(sourcecode, compresslevel=self.gzip_gzip_compresslevel())
         open(gzip_outfilepath, 'wb').write(gzipped_data)
-        
+        self.add_deferred_success(f'GZIP compressed {sourcepath} -> {gzip_outfilepath}.')
+
     def gzip_compress_files(self):
         if not self.gzip_compression_enabled():
             return
