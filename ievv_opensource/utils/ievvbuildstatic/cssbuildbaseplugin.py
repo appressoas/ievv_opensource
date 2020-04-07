@@ -120,6 +120,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             args.extend([
                 '--use', 'cssnano',
                 '--cssnano.browsers', self.browserslist,
+                '--no-map'
             ])
         self.get_logger().command_start('Running postcss with [{args}] on {destination}'.format(
             args=' '.join(args),
