@@ -49,8 +49,9 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
                 and cssnano commands.
             gzip (bool): Make a .css.gz version of the file in --production mode. This is added in
                 addition to the .css file (same filename, just with .gz at the end).
-            gzip_compresslevel (int): A number between 0 and 9. Higher is better compression,
-                but slower to compress.
+            gzip_compresslevel (int, optional): Gzip compression level.
+                A number between 0 and 9. Higher is better compression,
+                but slower to compress. Defaults to 9.
             **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
         super(AbstractPlugin, self).__init__(**kwargs)

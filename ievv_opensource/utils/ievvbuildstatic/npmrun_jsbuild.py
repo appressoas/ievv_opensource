@@ -1,11 +1,17 @@
+import os
+from glob import glob
+
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.filepath import AbstractDjangoAppPath
+from ievv_opensource.utils.ievvbuildstatic.filepath import \
+    AbstractDjangoAppPath
 from ievv_opensource.utils.ievvbuildstatic.watcher import ProcessWatchConfig
-from ievv_opensource.utils.shellcommandmixin import ShellCommandError
-from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin
+from ievv_opensource.utils.shellcommandmixin import (ShellCommandError,
+                                                     ShellCommandMixin)
+
+from .gzip_compress_mixin import GzipCompressMixin
 
 
-class Plugin(pluginbase.Plugin, ShellCommandMixin):
+class Plugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
     """
     Webpack builder plugin.
 
@@ -87,14 +93,37 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
     def __init__(self,
                  extra_import_paths=None,
                  extra_import_aliases=None,
+                 gzip=False, gzip_compresslevel=9,
                  **kwargs):
+        """
+        
+        Args:
+            extra_import_paths (list, optional): List of extra javascript import paths. Defaults to None.
+            extra_import_aliases (list, optional): Mapping of extra import aliases. Defaults to None.
+            gzip (bool, optional): Make a .js.gz version of the file in --production mode. This is added in
+                addition to the .js files (same filename, just with .gz at the end).
+            gzip_compresslevel (int, optional): Gzip compression level.
+                A number between 0 and 9. Higher is better compression,
+                but slower to compress. Defaults to 9.
+        """
         super(Plugin, self).__init__(**kwargs)
         self.extra_import_paths = extra_import_paths or []
         self.extra_import_aliases = extra_import_aliases or {}
+        self.gzip = gzip
+        self.gzip_compresslevel = gzip_compresslevel
 
-    @property
-    def destinationfolder(self):
-        return self.app.get_destination_path('scripts')
+    # @property
+    # def destinationfolder(self):
+    #     return self.app.get_destination_path('scripts')
+
+    def gzip_compression_enabled(self):
+        return self.gzip and self.app.apps.is_in_production_mode()
+
+    def gzip_compresslevel(self):
+        return self.gzip_compresslevel
+
+    def get_filepaths_to_gzip(self):
+        return glob(os.path.join(self.app.get_destination_path(), '**/*.js'), recursive=True)
 
     def get_default_import_paths(self):
         return []
@@ -151,6 +180,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
         except ShellCommandError:
             self.get_logger().command_error('{} FAILED!'.format(about))
         else:
+            self.gzip_compress_files()
             self.get_logger().command_success('{} succeeded :)'.format(about))
 
     def __str__(self):
