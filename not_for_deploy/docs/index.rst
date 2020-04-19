@@ -37,6 +37,7 @@ Apps
    ievv_model_mommy_extras
    ievv_restframework_helpers
    ievv_sms
+   ievv_18n_url
 
 
 ********
