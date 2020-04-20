@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
-from . import ievv_i18n_url_utils
+from . import i18n_url_utils
 
 
 class LocaleMiddleware(MiddlewareMixin):
@@ -10,37 +10,16 @@ class LocaleMiddleware(MiddlewareMixin):
     """
     response_redirect_class = HttpResponseRedirect
 
-    def is_supported_language_code(self, request, language_code):
-        """
-        Check if the language code is supported by the domain.
-        """
-        if request.ievv_pageframework_domain.supported_languagecodes:
-            if language_code in request.ievv_pageframework_domain.supported_languagecodes:
-                return True
-        return False
-
     def process_request(self, request):
         """
-        Simply checks if there is a language code added as prefix to ``request.path``
-        and sets this as the language for translation if it's supported by the domain.
+        Initializes the ievv_i18n_url handler from the request,
+        and calls :meth:`ievv_opensource.ievv_i18n_url.handlers.abstract_handler.activate_detected_languagecode`.
 
         Args:
             request: The request-object.
         """
-        handler = ievv_i18n_url_utils.get_handler(request)
-        default_languagecode = handler.find_default_languagecode()
-        if handler.is_translatable_urlpath(request.path):
-            current_languagecode = handler.find_current_languagecode()
-            if not current_languagecode or not handler.is_supported_languagecode(current_languagecode):
-                current_languagecode = default_languagecode
-        else:
-            current_languagecode = default_languagecode
-
-        translation.activate(current_languagecode)
-        translation_language = translation.get_language()
-        request.LANGUAGE_CODE = translation_language
-        request.IEVV_I18N_URL_DEFAULT_LANGUAGE_CODE = default_languagecode
-        request.session['LANGUAGE_CODE'] = translation_language
+        handler = i18n_url_utils.get_handler(request)
+        handler.activate_detected_languagecode()
         return request
 
     def process_response(self, request, response):

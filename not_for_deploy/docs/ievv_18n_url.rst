@@ -19,6 +19,12 @@ Hosting a page in different languages can only be achived in a finite number of 
 - A library that provides a superset of the functionality of what the template tags provide.
 - Middleware that uses the handler to handle whatever you write a handler for.
 
+Things this handle that the built-in locale URL support in Django does not handle:
+
+- Different default/fallback language per domain (actually per request, but that is normally not a good idea).
+- Support for domains to define the languagecode.
+- Locale aware URL reversing (e.g.: link to a page in a specific language).
+
 
 *****
 Setup
@@ -29,6 +35,12 @@ Add it to ``INSTALLED_APPS`` setting::
     INSTALLED_APPS = [
         # ...
         'ievv_opensource.ievv_i18n_url',
+    ]
+
+    MIDDLEWARE = [
+       # ...
+       # Instead of django.middleware.locale.LocaleMiddleware, or any other LocaleMiddleware,
+       'ievv_opensource.ievv_i18n_url.middleware.LocaleMiddleware'
     ]
 
 
@@ -63,3 +75,46 @@ that changes the session language from a HTTP GET request.
 
 Our recommendation is to NOT use session based translations, and instead use a URL path
 or domain based translation handler.
+
+
+**************
+i18n_url_utils
+**************
+
+.. currentmodule:: ievv_opensource.ievv_i18n_url.i18n_url_utils
+.. automodule:: ievv_opensource.ievv_i18n_url.i18n_url_utils
+   :members:
+   :imported-members:
+
+
+*************
+Template tags
+*************
+.. currentmodule:: ievv_opensource.ievv_i18n_url.templatetags.ievv_i18n_url_tags
+.. automodule:: ievv_opensource.ievv_i18n_url.templatetags.ievv_i18n_url_tags
+   :members:
+
+
+********
+handlers
+********
+
+DjangoSessionHandler
+====================
+.. currentmodule:: ievv_opensource.ievv_i18n_url.handlers.django_session_handler
+.. autoclass:: DjangoSessionHandler
+  :no-members:
+
+AbstractHandler
+===============
+.. currentmodule:: ievv_opensource.ievv_i18n_url.handlers.abstract_handler
+.. autoclass:: AbstractHandler
+   :members:
+
+
+**********
+Middleware
+**********
+.. currentmodule:: ievv_opensource.ievv_i18n_url.middleware
+.. automodule:: ievv_opensource.ievv_i18n_url.middleware
+   :members:

@@ -1,6 +1,6 @@
 from django.template import Library, defaulttags
 
-from ievv_opensource.ievv_i18n_url import ievv_i18n_url_utils
+from ievv_opensource.ievv_i18n_url import i18n_url_utils
 
 register = Library()
 
@@ -26,14 +26,14 @@ register = Library()
 #     """
 #     request = context['request']
 #     defaulttags.url()
-#     return ievv_i18n_url_utils.i18n_url(request, *args, **kwargs)
+#     return i18n_url_utils.i18n_url(request, *args, **kwargs)
 
 
 @register.simple_tag(takes_context=True)
 def transform_url_to_languagecode(context, *args, **kwargs):
     """Template tag for the ievv_i18n_utils.transform_url_to_languagecode function.
 
-    See :func:`~ievv_opensource.ievv_i18n_url.ievv_i18n_url_utils.transform_url_to_languagecode` for
+    See :func:`~ievv_opensource.ievv_i18n_url.i18n_url_utils.transform_url_to_languagecode` for
     the available arguments, but do not provide the ``request`` argument - we get that
     from ``context["request"]``.
 
@@ -41,4 +41,4 @@ def transform_url_to_languagecode(context, *args, **kwargs):
         str: An url.
     """
     request = context['request']
-    return ievv_i18n_url_utils.transform_url_to_languagecode(request, *args, **kwargs)
+    return i18n_url_utils.transform_url_to_languagecode(request, *args, **kwargs)
