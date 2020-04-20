@@ -1,6 +1,5 @@
 from threading import local
 from django.utils import translation
-
 from django.conf import settings
 
 
@@ -73,7 +72,7 @@ def set_active_languagecode(active_languagecode):
 
 def get_active_language_urlpath_prefix():
     """
-    Get the default language code activated within the current thread.
+    Get the active URL path prefix within the current thread.
 
     I.e.: This returns the language url path prefix that the
     :class:`ievv_opensource.ievv_i18n_url.middleware.LocaleMiddleware`
@@ -102,7 +101,39 @@ def set_active_language_urlpath_prefix(urlpath_prefix):
     _active.active_language_urlpath_prefix = urlpath_prefix
 
 
-def activate(active_languagecode, default_languagecode, active_language_urlpath_prefix):
+def get_active_base_url():
+    """
+    Get the default language code activated within the current thread.
+
+    I.e.: This returns the language url path prefix that the
+    :class:`ievv_opensource.ievv_i18n_url.middleware.LocaleMiddleware`
+    sets as active.
+
+    If this is called without using the middleware, or in management scripts
+    etc. where the middleware is not applied, we fall back on empty string.
+
+    Returns:
+        str: The URL path prefix for active language in the current thread.
+    """
+    active_base_url = getattr(_active, 'active_base_url', None)
+    return active_base_url or ''
+
+
+def set_active_base_url(active_base_url):
+    """
+    Used by :class:`ievv_opensource.ievv_i18n_url.middleware.LocaleMiddleware`
+    to set the active language url prefix in the current thread.
+
+    .. warning::
+
+        You will normally not want to use this, but it may be useful in management
+        scripts along with calling :func:`.activate`.
+    """
+    base_url = active_base_url
+    _active.active_base_url = base_url
+
+
+def activate(active_languagecode, default_languagecode, active_base_url=None, active_language_urlpath_prefix=None):
     """Activate a translation.
 
     This works much like ``django.utils.translation.activate()`` (and it calls that function),
@@ -111,9 +142,13 @@ def activate(active_languagecode, default_languagecode, active_language_urlpath_
     Args:
         active_languagecode (str): Language code to set as the active translation in the current thread.
         default_languagecode (str): Default language code for the current thread.
+        active_base_url (urllib.parse.ParseResult): The active base URL (E.g.: https://example.com/).
+            Defaults to settings.IEVV_I18N_URL_FALLBACK_BASE_URL. Can be provided as a urllib.parse.ParseResult
+            or as a string.
         active_language_urlpath_prefix (str): URL path prefix for the active language.
     """
     translation.activate(active_languagecode)
-    set_active_languagecode(default_languagecode)
+    set_active_languagecode(active_languagecode)
     set_default_languagecode(default_languagecode)
+    set_active_base_url(active_base_url)
     set_active_language_urlpath_prefix(active_language_urlpath_prefix)

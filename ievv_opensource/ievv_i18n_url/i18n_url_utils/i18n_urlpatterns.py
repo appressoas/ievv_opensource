@@ -1,10 +1,11 @@
 import re
 
 from django import urls
+from django.conf.urls import url
 from django.conf import settings
-from django.utils.translation import get_language
 
-from . import active_translation
+from ievv_opensource.ievv_i18n_url import active_i18n_url_translation
+from ievv_opensource.ievv_i18n_url.views import RedirectToLanguagecodeView
 
 #
 # Note: Basically copy and tuning from https://github.com/django/django/blob/1.11.29/django/conf/urls/i18n.py
@@ -13,7 +14,7 @@ from . import active_translation
 #
 
 
-def i18n_patterns(*urls):
+def i18n_patterns(*urls, include_redirect_view=True):
     """
     Adds the language code prefix to every URL pattern within this
     function. This may only be used in the root URLconf, not in an included
@@ -22,8 +23,10 @@ def i18n_patterns(*urls):
     if not settings.USE_I18N:
         return list(urls)
     return [
-        I18nRegexURLResolver(
-            list(urls))
+        url(r'^_ievv-i18n-redirect-to/(?P<languagecode>[a-zA-Z-]+)/(?P<path>.*)$',
+            RedirectToLanguagecodeView.as_view(),
+            name='ievv_i18n_url_redirect_to_languagecode'),
+        I18nRegexURLResolver(list(urls)),
     ]
 
 
@@ -43,12 +46,10 @@ class I18nRegexURLResolver(urls.RegexURLResolver):
 
     @property
     def regex(self):
-        # default_languagecode = get_default_languagecode()
-        language_code = active_translation.get_active_languagecode()
-        # language_code = get_language() or default_languagecode
+        language_code = active_i18n_url_translation.get_active_languagecode()
 
         if language_code not in self._regex_dict:
-            urlpath_prefix = active_translation.get_active_language_urlpath_prefix()
+            urlpath_prefix = active_i18n_url_translation.get_active_language_urlpath_prefix()
             if urlpath_prefix:
                 regex_string = '^%s/' % urlpath_prefix
             else:

@@ -3,7 +3,7 @@ from django.urls import reverse
 from .get_handler import get_handler
 
 
-def i18n_reverse(request, viewname, urlconf=None, args=None, kwargs=None, current_app=None, languagecode=None):
+def i18n_reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, languagecode=None):
     """
     Serves kind of the same use case as the ``django.urls.reverse`` function, but with i18n URL support, AND
     this function returns an absolute URL.
@@ -15,8 +15,6 @@ def i18n_reverse(request, viewname, urlconf=None, args=None, kwargs=None, curren
     See the *A warning about session based translations* in the docs for more details.
 
     Args:
-        request (django.http.HttpRequest): Django http request object, or a
-            :class:`ievv_opensource.ievv_i18n_url.i18n_url_utils.FakeHttpRequest` object.
         viewname: See the docs for ``django.urls.reverse``.
         urlconf: See the docs for ``django.urls.reverse``. Defaults to None.
         args: See the docs for ``django.urls.reverse``. Defaults to None.
@@ -29,10 +27,10 @@ def i18n_reverse(request, viewname, urlconf=None, args=None, kwargs=None, curren
         str: An URL.
     """
     path = reverse(viewname=viewname, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
-    return get_handler(request).build_absolute_url(path=path, languagecode=languagecode)
+    return get_handler().build_absolute_url(path=path, languagecode=languagecode)
 
 
-def transform_url_to_languagecode(request, url, to_languagecode, from_languagecode=None):
+def transform_url_to_languagecode(url, to_languagecode, from_languagecode=None):
     """Takes an URL, and finds the URL to the same content within a different languagecode.
 
     NOTE: Session based `ievv_i18n_url` handlers will ignore the languagecode argument and just return
@@ -40,7 +38,6 @@ def transform_url_to_languagecode(request, url, to_languagecode, from_languageco
     See the *A warning about session based translations* in the docs for more details.
 
     Args:
-        request ([type]): [description]
         url (str): The URL to transform.
         to_languagecode (str): The languagecode to transform the url into.
         from_languagecode (str): The languagecode to transform the url from.
@@ -49,4 +46,4 @@ def transform_url_to_languagecode(request, url, to_languagecode, from_languageco
         str: The transformed URL. If from_languagecode and to_languagecode is the same,
             the provided ``url`` is returned unchanged.
     """
-    return get_handler(request).transform_url_to_languagecode(url=url, to_languagecode=to_languagecode)
+    return get_handler().transform_url_to_languagecode(url=url, to_languagecode=to_languagecode)
