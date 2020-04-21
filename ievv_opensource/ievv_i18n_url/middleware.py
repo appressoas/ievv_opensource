@@ -16,7 +16,7 @@ class LocaleMiddleware(MiddlewareMixin):
     def process_request(self, request):
         """
         Initializes the ievv_i18n_url handler from the request,
-        and calls :meth:`ievv_opensource.ievv_i18n_url.handlers.abstract_handler.activate_languagecode_from_request`.
+        and calls :meth:`ievv_opensource.ievv_i18n_url.handlers.AbstractHandler.activate_languagecode_from_request`.
 
         Args:
             request: The request-object.

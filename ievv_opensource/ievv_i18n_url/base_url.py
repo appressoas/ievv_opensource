@@ -20,6 +20,13 @@ class BaseUrl:
 
     @cached_property
     def parsed_url(self):
+        """Get the parsed URL.
+
+        The returned URL only has scheme+domain+port (e.g.: scheme+netloc).
+
+        Returns:
+            urllib.parse.ParseResult: A parsed URL on the same format as urllib.parse.urlparse returns.
+        """
         if isinstance(self.url_or_urllib_parseresult, urllib.parse.ParseResult):
             parsed_url = self.url_or_urllib_parseresult
         else:
@@ -31,19 +38,58 @@ class BaseUrl:
 
     @property
     def scheme(self):
+        """Shortcut for parsed_url.scheme.
+
+        See :obj:`~.BaseUrl.parsed_url`.
+
+        Returns:
+            str: The url scheme (e.g.: https, http, ...)
+        """
         return self.parsed_url.scheme
 
     @property
     def netloc(self):
+        """Shortcut for parsed_url.netloc.
+
+        See :obj:`~.BaseUrl.parsed_url`.
+
+        Returns:
+            str: The url netloc (e.g.: www.example.com:9090)
+        """
         return self.parsed_url.netloc
 
     @property
     def hostname(self):
+        """Shortcut for parsed_url.hostname.
+
+        See :obj:`~.BaseUrl.parsed_url`.
+
+        Returns:
+            str: The url hostname (e.g.: www.example.com)
+        """
         return self.parsed_url.hostname
 
     @property
     def port(self):
+        """Shortcut for parsed_url.port.
+
+        See :obj:`~.BaseUrl.parsed_url`.
+
+        Returns:
+            str: The url port (e.g.: 8080, 80, ...)
+        """
         return self.parsed_url.port
 
     def build_absolute_url(self, path_or_url):
+        """Build absolute URL from the provided ``path_or_url``.
+
+        If the provided ``path_or_url`` is an URL, it is returned unchanged.
+        If the provided ``path_or_url`` is a URL path, it is appended to the base url.
+
+        Args:
+            path_or_url (str): URL path or an URL.
+
+        Returns:
+            [type]: [description]
+        """
         return urllib.parse.urljoin(self.parsed_url.geturl(), path_or_url)
