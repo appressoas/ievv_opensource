@@ -64,3 +64,14 @@ do this using the ``DJANGOENV`` environent variable::
 .. _PIP: https://pip.pypa.io
 .. _VirtualEnv: https://virtualenv.pypa.io
 .. _pipenv: https://pipenv-fork.readthedocs.io/en/latest/
+
+
+************************
+Adding more dependencies
+************************
+Just add dependencies as normal with pipenv, BUT make sure you run::
+
+    $ pipenv lock -r > requirements.txt
+
+when you merge into master before you push IF you add any non-dev dependencies. This
+is because readthedocs requires ``requirements.txt`` to build.
