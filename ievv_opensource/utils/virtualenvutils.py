@@ -6,7 +6,7 @@ def is_in_virtualenv():
     """
     Returns ``True`` if we are in a virtualenv.
     """
-    return hasattr(sys, 'real_prefix')
+    return hasattr(sys, 'real_prefix') or hasattr(sys, 'base_prefix')
 
 
 def get_virtualenv_directory():
