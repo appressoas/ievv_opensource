@@ -13,6 +13,9 @@ model-mommy = "*"
 django-dbdev = "*"
 django-debug-toolbar = "*"
 twine = "*"
+pytest = "==5.3.5"
+pytest-django = "==3.8.0"
+pytest-env = "==0.6.2"
 
 [packages]
 django = ">1.11,<2"
