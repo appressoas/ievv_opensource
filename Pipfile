@@ -13,6 +13,9 @@ model-mommy = "*"
 django-dbdev = "*"
 django-debug-toolbar = "*"
 twine = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+appresso-sphinx-extensions = "*"
 
 [packages]
 django = ">1.11,<2"
