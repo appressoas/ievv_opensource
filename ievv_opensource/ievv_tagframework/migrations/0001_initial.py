@@ -28,8 +28,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
                 ('object_id', models.PositiveIntegerField()),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
-                ('tag', models.ForeignKey(to='ievv_tagframework.Tag')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.CASCADE)),
+                ('tag', models.ForeignKey(to='ievv_tagframework.Tag', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name_plural': 'Tagged objects',
