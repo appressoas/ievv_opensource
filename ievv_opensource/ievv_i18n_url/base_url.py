@@ -15,7 +15,7 @@ class BaseUrl:
     but all the methods and properties work on a ``urllib.parse.ParseResult`` that
     does not have any of the URL parts after
     """
-    def __init__(self, url_or_urllib_parseresult):
+    def __init__(self, url_or_urllib_parseresult=None):
         self.url_or_urllib_parseresult = url_or_urllib_parseresult or get_fallback_base_url_setting()
 
     @cached_property
@@ -85,6 +85,14 @@ class BaseUrl:
 
         If the provided ``path_or_url`` is an URL, it is returned unchanged.
         If the provided ``path_or_url`` is a URL path, it is appended to the base url.
+
+        Examples.::
+
+            BaseUrl('https://example.com').build_absolute_url('/my/path?a=2')
+            # -> https://example.com/my/path?a=2
+
+            BaseUrl('https://example.com').build_absolute_url('https://other.example.com/a/b')
+            # -> https://other.example.com/a/b
 
         Args:
             path_or_url (str): URL path or an URL.
