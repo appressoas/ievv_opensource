@@ -13,9 +13,6 @@ model-mommy = "*"
 django-dbdev = "*"
 django-debug-toolbar = "*"
 twine = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
-appresso-sphinx-extensions = "*"
 
 [packages]
 django = ">1.11,<2"
@@ -32,6 +29,9 @@ psutil = "*"
 sorl-thumbnail = "*"
 django-crispy-forms = "==1.6.0"
 djangorestframework = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+appresso-sphinx-extensions = "*"
 
 [requires]
 python_version = "3.7"
