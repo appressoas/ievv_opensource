@@ -17,9 +17,10 @@ setup(
     packages=find_packages(exclude=['manage']),
     install_requires=[
         'sh',
-        'Django',
+        'Django<2',
+        'django-rq<2',
         'django_dbdev>=1.0.0',
-        'django_cradmin>=1.1.1',
+        'django_cradmin>=5.0.0,<7',
         'watchdog',
         'termcolor',
         'psutil',
