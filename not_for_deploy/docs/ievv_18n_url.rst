@@ -44,7 +44,7 @@ Add it to settings::
    ]
 
    # Fallback base URL - used everywhere that we can not determine the "current" domain (management scripts that does not specify a base url etc).
-   IEVV_I18N_URL_FALLBACK_BASE_URL = os.environ.get('IEVV_I18N_URL_FALLBACK_BASE_URL', 'https://mydomain.com/')
+   IEVV_I18N_URL_FALLBACK_BASE_URL = https://mydomain.com/
 
    # The handler class - see further down for the available handler classes
    IEVV_I18N_URL_HANDLER = 'ievv_opensource.ievv_i18n_url.handlers.UrlpathPrefixHandler'
