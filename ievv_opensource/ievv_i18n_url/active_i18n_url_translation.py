@@ -133,7 +133,7 @@ def set_active_base_url(active_base_url):
     _active.active_base_url = base_url
 
 
-def activate(active_languagecode, default_languagecode, active_translation_languagecode=None,
+def activate(active_languagecode=None, default_languagecode=None, active_translation_languagecode=None,
              active_base_url=None, active_language_urlpath_prefix=None):
     """Activate a translation.
 
@@ -141,8 +141,11 @@ def activate(active_languagecode, default_languagecode, active_translation_langu
     but it stores all of the stuff `ievv_i18n_url` needs to function in the current thread context.
 
     Args:
-        active_languagecode (str): Language code to set as the active languagecode in the current thread.
-        default_languagecode (str): Default language code for the current thread.
+        active_languagecode (str): Language code to set as the active languagecode in the current thread. Defaults
+            to settings.LANGUAGE_CODE. The only reason to call this without the active_languagecode argument is
+            to reset the active language to the defaults. E.g.: Call ``activate()`` to reset to defaults from
+            settings.
+        default_languagecode (str): Default language code for the current thread. Defaults to ``active_languagecode``.
         active_translation_languagecode (str): Language code to set as the active translation in the current thread.
             I.e.: The languagecode we send to ``django.utils.translation.activate()``.
             Defaults to ``active_languagecode``.
@@ -151,8 +154,8 @@ def activate(active_languagecode, default_languagecode, active_translation_langu
             or as a string.
         active_language_urlpath_prefix (str): URL path prefix for the active language.
     """
-    translation.activate(active_translation_languagecode or active_languagecode)
+    translation.activate(active_translation_languagecode or active_languagecode or settings.LANGUAGE_CODE)
     set_active_languagecode(active_languagecode)
-    set_default_languagecode(default_languagecode)
+    set_default_languagecode(default_languagecode or active_languagecode)
     set_active_base_url(active_base_url)
     set_active_language_urlpath_prefix(active_language_urlpath_prefix)
