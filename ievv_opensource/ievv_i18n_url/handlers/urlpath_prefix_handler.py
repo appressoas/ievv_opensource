@@ -26,9 +26,13 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
             return f'{cls.LANGUAGECODE_URLPATH_PREFIX}/{languagecode}'
         return languagecode
 
+    @classmethod
+    def _get_full_urlpath_prefix(cls):
+        return f'/{cls.LANGUAGECODE_URLPATH_PREFIX}/'
+
     def strip_languagecode_from_urlpath(self, path):
-        if self.__class__.LANGUAGECODE_URLPATH_PREFIX:
-            full_prefix = f'/{self.__class__.LANGUAGECODE_URLPATH_PREFIX}/'
+        if self.LANGUAGECODE_URLPATH_PREFIX:
+            full_prefix = self.__class__._get_full_urlpath_prefix()
             if not path.startswith(full_prefix):
                 return path
             path_without_prefix = path[len(full_prefix):]
@@ -45,7 +49,7 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
     @classmethod
     def _detect_languagecode_from_urlpath(cls, path):
         if cls.LANGUAGECODE_URLPATH_PREFIX:
-            full_prefix = f'/{cls.LANGUAGECODE_URLPATH_PREFIX}/'
+            full_prefix = cls._get_full_urlpath_prefix()
             if not path.startswith(full_prefix):
                 return None
             path_without_prefix = path[len(full_prefix):]
@@ -54,7 +58,10 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
         splitpath = path_without_prefix.split(posixpath.sep, 1)
         if not splitpath:
             return None
-        return splitpath[0]
+        languagecode = splitpath[0]
+        if cls.is_supported_languagecode(languagecode):
+            return languagecode
+        return None
 
     def get_languagecode_from_url(self, url):
         parsed_url = urllib.parse.urlparse(url)
@@ -64,6 +71,7 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
     def detect_current_languagecode(cls, base_url, request):
         return cls._detect_languagecode_from_urlpath(request.path)
 
+    # TODO: These two should take a base_url as optional argument!?
     def build_urlpath(self, path, languagecode=None):
         real_languagecode = languagecode or self.active_languagecode
         prefix = self.__class__.get_urlpath_prefix_for_languagecode(
