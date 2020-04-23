@@ -1,7 +1,8 @@
 from threading import local
-from django.utils import translation
-from django.conf import settings
 
+from django.conf import settings
+from django.utils import translation
+from ievv_opensource.ievv_i18n_url.base_url import BaseUrl
 
 _active = local()
 
@@ -103,20 +104,22 @@ def set_active_language_urlpath_prefix(urlpath_prefix):
 
 def get_active_base_url():
     """
-    Get the default language code activated within the current thread.
+    Get the BaseUrl activated within the current thread.
 
-    I.e.: This returns the language url path prefix that the
+    I.e.: This returns BaseUrl that the
     :class:`ievv_opensource.ievv_i18n_url.middleware.LocaleMiddleware`
     sets as active.
 
     If this is called without using the middleware, or in management scripts
-    etc. where the middleware is not applied, we fall back on empty string.
+    etc. where the middleware is not applied, we fall back on ``BaseUrl()``.
 
     Returns:
-        str: The URL path prefix for active language in the current thread.
+        ievv_opensource.ievv_i18n_url.base_url.BaseUrl: The active BaseUrl.
     """
     active_base_url = getattr(_active, 'active_base_url', None)
-    return active_base_url or ''
+    if active_base_url:
+        return active_base_url
+    return BaseUrl()
 
 
 def set_active_base_url(active_base_url):
@@ -149,7 +152,7 @@ def activate(active_languagecode=None, default_languagecode=None, active_transla
         active_translation_languagecode (str): Language code to set as the active translation in the current thread.
             I.e.: The languagecode we send to ``django.utils.translation.activate()``.
             Defaults to ``active_languagecode``.
-        active_base_url (urllib.parse.ParseResult): The active base URL (E.g.: https://example.com/).
+        active_base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl): The active base URL (E.g.: https://example.com/).
             Defaults to settings.IEVV_I18N_URL_FALLBACK_BASE_URL. Can be provided as a urllib.parse.ParseResult
             or as a string.
         active_language_urlpath_prefix (str): URL path prefix for the active language.
