@@ -336,6 +336,14 @@ class AbstractHandler:
         """
         return {l[0] for l in settings.LANGUAGES}
 
+    def has_multiple_supported_languages(self):
+        """Do we support multiple languages?
+
+        Returns:
+            bool: True if we support multiple languages.
+        """
+        return len(self.__class__.get_supported_languagecodes()) > 1
+
     def strip_languagecode_from_urlpath(self, path):
         raise NotImplementedError()
 
