@@ -17,14 +17,17 @@ class DjangoSessionHandler(abstract_handler.AbstractHandler):
     def detect_current_languagecode(cls, base_url, request):
         return translation.get_language_from_request(request)
 
-    def strip_languagecode_from_urlpath(self, path):
-        return path
+    # @classmethod
+    # def strip_languagecode_from_urlpath(cls, base_url, languagecode, path):
+    #     return path
 
     def get_languagecode_from_url(self, url):
         return self.active_languagecode
 
-    def build_absolute_url(self, path, languagecode=None):
-        return self.active_base_url.build_absolute_url(path)
+    def build_absolute_url(self, path, languagecode=None, base_url=None):
+        base_url = base_url or self.active_base_url
+        return base_url.build_absolute_url(path)
 
-    def transform_url_to_languagecode(self, url, languagecode):
+    @classmethod
+    def transform_url_to_languagecode(cls, url, languagecode):
         return url

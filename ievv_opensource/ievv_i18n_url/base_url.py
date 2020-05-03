@@ -101,3 +101,6 @@ class BaseUrl:
             [type]: [description]
         """
         return urllib.parse.urljoin(self.parsed_url.geturl(), path_or_url)
+
+    def __str__(self):
+        return self.parsed_url.geturl()

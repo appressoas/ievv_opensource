@@ -246,7 +246,7 @@ class AbstractHandler:
         """
         return None
 
-    def build_absolute_url(self, path, languagecode=None):
+    def build_absolute_url(self, path, languagecode=None, base_url=None):
         """Build absolute uri for the provided path within the provided languagecode.
 
         MUST be implemented in subclasses.
@@ -262,6 +262,10 @@ class AbstractHandler:
                 returns - e.g: ``"/my/path?option1&option2"``)
             languagecode (str, optional): The languagecode to build the URI for. Defaults to None, which
                 means we build the URI within the current languagecode.
+            base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+                The base URL to reverse the path+languagecode in - see
+                :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+                If this is ``None``, we use :obj:`~.AbstractHandler.active_base_url`.
         """
         raise NotImplementedError()
 
@@ -288,12 +292,14 @@ class AbstractHandler:
             languagecode (str, optional): The languagecode to build the path for. Defaults to None, which
                 means we build the URI within the current languagecode.
             base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
-                The base URL to reverse the path+languagecode in - see :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+                The base URL to reverse the path+languagecode in - see
+                :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
                 If this is ``None``, we use :obj:`~.AbstractHandler.active_base_url`.
         """
         raise NotImplementedError()
 
-    def transform_url_to_languagecode(self, url, languagecode):
+    @classmethod
+    def transform_url_to_languagecode(cls, url, languagecode):
         """Transform the provided url into the "same" url, but in the provided languagecode.
 
         MUST be implemented in subclasses.
@@ -392,11 +398,21 @@ class AbstractHandler:
         """
         return self.__class__.has_multiple_supported_languages(base_url=self.active_base_url)
 
-    def strip_languagecode_from_urlpath(self, path):
-        raise NotImplementedError()
+    # @classmethod
+    # def strip_languagecode_from_urlpath(cls, base_url, languagecode, path):
+    #     """Strip the languagecode from the URL path.
 
-    def get_languagecode_from_url(self, url):
-        raise NotImplementedError()
+    #     Must be overridden in subclasses.
+
+    #     Args:
+    #         base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+    #             The base URL - see :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+    #         languagecode (str): The languagecode to strip out of ``path``.
+    #         path (str): An URL path (e.g: ``/my/path``, ``/my/path?a=1&b=2``, etc.)
+    #     Returns:
+    #         str: The path without any languagecode prefix.
+    #     """
+    #     raise NotImplementedError()
 
     @classmethod
     def is_translatable_urlpath(self, base_url, path):
@@ -448,17 +464,31 @@ class AbstractHandler:
         return None
 
     @classmethod
+    def get_languagecode_from_url(cls, url):
+        """Get the languagecode from the provided ``url``.
+
+        MUST be overridden in subclasses.
+
+        Args:
+            url (str): The URL to find the languagecode from.
+        """
+        raise NotImplementedError()
+
+    @classmethod
     def detect_current_languagecode(cls, base_url, request):
         """Detect the current languagecode from the provided request and/or base_url.
 
         Used by the middleware provided by `ievv_i18n_url` find the current language code
         and set it on the current request.
 
-        DO NOT USE THIS - it is for the middleware. Use :obj:`~.AbstractHandler.current_languagecode`.
+        DO NOT USE THIS - it is for the middleware. Use :obj:`~.AbstractHandler.current_languagecode`
+        or :meth:`~.AbstractHandler.get_languagecode_from_url`.
 
-        MUST be overridden in subclasses.
+        You normally do not need to override this method in subclasses - it defaults to
+        using :meth:`~.AbstractHandler.get_languagecode_from_url` with the full URL
+        in the ``request`` as the url argument.
 
-        If this returns None, it means that we should use the default languagecode. I.e.: Do not handle
+        If this returns None, it means that we should use the default languagecode. I.e.: Do you do not need to handle
         fallback to default languagecode when implementing this method in subclasses - just return None.
 
         Args:
@@ -469,7 +499,7 @@ class AbstractHandler:
         Returns:
             str: The current languagecode or None (None means default languagecode is detected).
         """
-        raise NotImplementedError()
+        return cls.get_languagecode_from_url(request.build_absolute_uri())
 
     @classmethod
     def detect_default_languagecode(cls, base_url):
@@ -491,7 +521,7 @@ class AbstractHandler:
     @classmethod
     def get_urlpath_prefix_for_languagecode(cls, base_url, languagecode):
         """
-        Get the URL path prefix for the provided languagecode within the current base_url.
+        Get the URL path prefix for the provided languagecode within the provided base_url.
 
         Args:
             base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):

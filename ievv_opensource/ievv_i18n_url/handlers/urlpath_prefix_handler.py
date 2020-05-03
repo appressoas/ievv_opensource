@@ -1,6 +1,9 @@
 import posixpath
 import urllib.parse
 
+from django.conf import settings
+from ievv_opensource.ievv_i18n_url.base_url import BaseUrl
+
 from . import abstract_handler
 
 
@@ -30,9 +33,14 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
     def _get_full_urlpath_prefix(cls):
         return f'/{cls.LANGUAGECODE_URLPATH_PREFIX}/'
 
-    def strip_languagecode_from_urlpath(self, path):
-        if self.LANGUAGECODE_URLPATH_PREFIX:
-            full_prefix = self.__class__._get_full_urlpath_prefix()
+    @classmethod
+    def _strip_languagecode_from_urlpath(cls, base_url, languagecode, path):
+        if not cls.is_supported_languagecode(languagecode):
+            return path
+        if languagecode == cls.detect_default_languagecode(base_url):
+            return path
+        if cls.LANGUAGECODE_URLPATH_PREFIX:
+            full_prefix = cls._get_full_urlpath_prefix()
             if not path.startswith(full_prefix):
                 return path
             path_without_prefix = path[len(full_prefix):]
@@ -41,8 +49,8 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
         splitpath = path_without_prefix.split(posixpath.sep, 1)
         if not splitpath:
             return path
-        languagecode = splitpath[0]
-        if not self.is_supported_languagecode(languagecode):
+        languagecode_in_path = splitpath[0]
+        if languagecode_in_path != languagecode:
             return path
         return f'/{splitpath[1]}'
 
@@ -63,25 +71,40 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
             return languagecode
         return None
 
-    def get_languagecode_from_url(self, url):
-        parsed_url = urllib.parse.urlparse(url)
-        return self.__class__._detect_languagecode_from_urlpath(parsed_url.path)
+    @classmethod
+    def get_languagecode_from_url(cls, url):
+        urlpath = urllib.parse.urlparse(url).path
+        return cls._detect_languagecode_from_urlpath(urlpath) or settings.LANGUAGE_CODE
 
     @classmethod
-    def detect_current_languagecode(cls, base_url, request):
-        return cls._detect_languagecode_from_urlpath(request.path)
-
-    # TODO: These two should take a base_url as optional argument!?
-    def build_urlpath(self, path, languagecode=None, base_url=None):
-        real_languagecode = languagecode or self.active_languagecode
-        prefix = self.__class__.get_urlpath_prefix_for_languagecode(
-            base_url=base_url or self.active_base_url, languagecode=real_languagecode)
+    def _build_urlpath(cls, path, languagecode, base_url):
+        prefix = cls.get_urlpath_prefix_for_languagecode(
+            base_url=base_url, languagecode=languagecode)
         if prefix:
             full_path = f'/{prefix}{path}'
         else:
             full_path = path
         return full_path
 
-    def build_absolute_url(self, path, languagecode=None):
-        return self.active_base_url.build_absolute_url(
-            self.build_urlpath(path=path, languagecode=languagecode))
+    def build_urlpath(self, path, languagecode=None, base_url=None):
+        real_languagecode = languagecode or self.active_languagecode
+        return self.__class__._build_urlpath(
+            path=path,
+            languagecode=real_languagecode,
+            base_url=base_url or self.active_base_url)
+
+    def build_absolute_url(self, path, languagecode=None, base_url=None):
+        base_url = base_url or self.active_base_url
+        return base_url.build_absolute_url(
+            self.build_urlpath(path=path, languagecode=languagecode, base_url=base_url))
+
+    @classmethod
+    def transform_url_to_languagecode(cls, url, languagecode):
+        from_languagecode = cls.get_languagecode_from_url(url)
+        base_url = BaseUrl(url)
+        path_without_languagecode = cls._strip_languagecode_from_urlpath(
+            base_url=base_url,
+            languagecode=from_languagecode,
+            path=urllib.parse.urlparse(url).path)
+        return base_url.build_absolute_url(
+            cls._build_urlpath(path=path_without_languagecode, languagecode=languagecode, base_url=base_url))
