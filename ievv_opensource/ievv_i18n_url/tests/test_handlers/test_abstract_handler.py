@@ -40,7 +40,7 @@ class TestAbstractHandler(test.TestCase):
         self.assertEqual(AbstractHandler().active_base_url, 'https://active.example.com')
 
     def test_get_supported_languagecodes(self):
-        self.assertEqual(AbstractHandler.get_supported_languagecodes(), {'en', 'nb', 'de'})
+        self.assertEqual(AbstractHandler.get_all_supported_languagecodes(), {'en', 'nb', 'de'})
 
     def test_is_supported_languagecode(self):
         self.assertTrue(AbstractHandler.is_supported_languagecode('de'))

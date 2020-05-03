@@ -76,7 +76,7 @@ class AbstractHandler:
         Returns:
             bool: True if the provided languagecode is supported.
         """
-        return languagecode in cls.get_supported_languagecodes()
+        return languagecode in cls.get_all_supported_languagecodes()
 
     def get_translated_label_for_languagecode(self, languagecode):
         """Get the translated label for the languagecode (the name of the language)
@@ -326,8 +326,10 @@ class AbstractHandler:
         return languagecode
 
     @classmethod
-    def get_supported_languagecodes(cls):
-        """Get supported language codes.
+    def get_all_supported_languagecodes(cls):
+        """Get ALL the supported language codes.
+
+        I.e.: All supported languagecodes, not filtered by domain or anything.
 
         Defaults to the language codes in ``settings.LANGUAGES``.
 
@@ -336,13 +338,56 @@ class AbstractHandler:
         """
         return {l[0] for l in settings.LANGUAGES}
 
-    def has_multiple_supported_languages(self):
-        """Do we support multiple languages?
+    @classmethod
+    def get_supported_languagecodes(cls, base_url):
+        """Get the supported language codes within the provided ``base_url``.
+
+        Defaults to :meth:`.get_all_supported_languagecodes`, but will typically be
+        overridden in handlers that deal with binding languagecodes to domains.
+
+        Args:
+            base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+                The base URL - see :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+        Returns:
+            set: A set of the supported language codes within the ``base_url``.
+        """
+        return cls.get_all_supported_languagecodes()
+
+    @classmethod
+    def has_multiple_supported_languages(cls, base_url):
+        """Does the provided ``base_url`` support multiple languages?
+
+        Defaults to checking if the length of :meth:`.get_supported_languagecodes` is more than 1.
+
+        Args:
+            base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+                The base URL - see :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+        Returns:
+            bool: True if we support multiple languages within the provided ``base_url``.
+        """
+        return len(cls.get_supported_languagecodes(base_url)) > 1
+
+    def get_supported_languagecodes_in_active_base_url(self):
+        """Get the supported language codes within the :obj:`~.AbstractHandler.active_base_url`.
+
+        Defaults to calling :meth:`~.AbstractHandler.get_supported_languagecodes`, and you will
+        normally NOT want to override this (override :meth:`~.AbstractHandler.get_supported_languagecodes` instead).
 
         Returns:
-            bool: True if we support multiple languages.
+            set: A set of the supported language codes within the active base url.
         """
-        return len(self.__class__.get_supported_languagecodes()) > 1
+        return self.__class__.get_supported_languagecodes(base_url=self.active_base_url)
+
+    def has_multiple_supported_languages_in_active_base_url(self):
+        """Does the :obj:`~.AbstractHandler.active_base_url` support multiple languages?
+
+        Defaults to calling :meth:`~.AbstractHandler.has_multiple_supported_languages`, and you will
+        normally NOT want to override this (override :meth:`~.AbstractHandler.has_multiple_supported_languages` instead).
+
+        Returns:
+            bool: True if we support multiple languages within the active base url.
+        """
+        return self.__class__.has_multiple_supported_languages(base_url=self.active_base_url)
 
     def strip_languagecode_from_urlpath(self, path):
         raise NotImplementedError()
