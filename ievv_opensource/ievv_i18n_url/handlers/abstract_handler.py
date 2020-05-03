@@ -265,7 +265,7 @@ class AbstractHandler:
         """
         raise NotImplementedError()
 
-    def build_urlpath(self, path, languagecode=None):
+    def build_urlpath(self, path, languagecode=None, base_url=None):
         """Build URL path for the provided path within the provided languagecode.
 
         This is a compatibility layer to make it possible to work with older code
@@ -287,6 +287,9 @@ class AbstractHandler:
                 returns - e.g: ``"/my/path?option1&option2"``)
             languagecode (str, optional): The languagecode to build the path for. Defaults to None, which
                 means we build the URI within the current languagecode.
+            base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+                The base URL to reverse the path+languagecode in - see :class:`ievv_opensource.ievv_i18n_url.base_url.BaseUrl` for more info.
+                If this is ``None``, we use :obj:`~.AbstractHandler.active_base_url`.
         """
         raise NotImplementedError()
 

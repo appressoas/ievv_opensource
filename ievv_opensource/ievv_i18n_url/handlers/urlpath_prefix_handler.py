@@ -72,10 +72,10 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
         return cls._detect_languagecode_from_urlpath(request.path)
 
     # TODO: These two should take a base_url as optional argument!?
-    def build_urlpath(self, path, languagecode=None):
+    def build_urlpath(self, path, languagecode=None, base_url=None):
         real_languagecode = languagecode or self.active_languagecode
         prefix = self.__class__.get_urlpath_prefix_for_languagecode(
-            base_url=self.active_base_url, languagecode=real_languagecode)
+            base_url=base_url or self.active_base_url, languagecode=real_languagecode)
         if prefix:
             full_path = f'/{prefix}{path}'
         else:
