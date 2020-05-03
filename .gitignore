@@ -52,3 +52,4 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 /ievv_opensource/ievv_jsbase/staticsources/ievv_jsbase/built_docs/
 
 .vscode/
+.vscode-atest-temp/
