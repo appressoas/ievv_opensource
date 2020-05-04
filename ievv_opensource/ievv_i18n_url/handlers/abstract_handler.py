@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils import translation
 from django.utils.translation import get_language_info
 from ievv_opensource.ievv_i18n_url import active_i18n_url_translation
@@ -337,6 +337,8 @@ class AbstractHandler:
             new_path = reverse(url_parts.view_name, args=url_parts.args, kwargs=url_parts.kwargs)
         except Resolver404 as resolver_404_error:
             raise UrlTransformError(str(resolver_404_error))
+        except NoReverseMatch as no_reverse_match_error:
+            raise UrlTransformError(str(no_reverse_match_error))
         finally:
             translation.activate(current_language)
         return str(new_path)

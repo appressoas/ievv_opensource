@@ -175,4 +175,8 @@ class TestAbstractHandler(test.TestCase):
         self.assertEqual(
             UrlpathPrefixHandler.transform_url_to_languagecode(
                 'https://example.com/ievv_i18n_url_testapp/my/named/translated_example', 'nb'),
-            'https://example.com/nb/ievv_i18n_url_testapp/mitt/navngitte/oversatte_eksempel')
+            'https://example.com/nb/ievv_i18n_url_testapp/mitt/navngitte/oversatte-eksempel')
+        self.assertEqual(
+            UrlpathPrefixHandler.transform_url_to_languagecode(
+                'https://example.com/nb/ievv_i18n_url_testapp/mitt/navngitte/oversatte-eksempel', 'de'),
+            'https://example.com/de/ievv_i18n_url_testapp/mein/benanntes/ubersetztes-beispiel')
