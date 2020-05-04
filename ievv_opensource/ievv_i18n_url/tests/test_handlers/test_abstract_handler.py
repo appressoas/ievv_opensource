@@ -125,10 +125,10 @@ class TestAbstractHandler(test.TestCase):
     #             to_languagecode='nb'),
     #         '/ievv_i18n_url_testapp/mitt/ikke-navngitte/oversatte_eksempel')
 
-    # def test_transform_urlpath_to_languagecode_invalid_path(self):
-    #     with self.assertRaises(UrlTransformError):
-    #         AbstractHandler.transform_urlpath_to_languagecode(
-    #             base_url=BaseUrl('https://example.com'),
-    #             path='/some/random/invalid/path',
-    #             from_languagecode='en',
-    #             to_languagecode='nb')
+    def test_transform_urlpath_to_languagecode_invalid_path(self):
+        with self.assertRaises(UrlTransformError):
+            AbstractHandler.transform_urlpath_to_languagecode(
+                base_url=BaseUrl('https://example.com'),
+                path='/some/random/invalid/path',
+                from_languagecode='en',
+                to_languagecode='nb')
