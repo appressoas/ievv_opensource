@@ -29,5 +29,5 @@ class DjangoSessionHandler(abstract_handler.AbstractHandler):
         return base_url.build_absolute_url(path)
 
     @classmethod
-    def transform_url_to_languagecode(cls, url, languagecode):
+    def transform_url_to_languagecode(cls, url, languagecode, translate_path=True):
         return url

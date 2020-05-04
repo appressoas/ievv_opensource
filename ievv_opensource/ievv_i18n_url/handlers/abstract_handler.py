@@ -1,8 +1,17 @@
 from django.conf import settings
+from django.urls import Resolver404, resolve, reverse
+from django.utils import translation
 from django.utils.translation import get_language_info
-
 from ievv_opensource.ievv_i18n_url import active_i18n_url_translation
 from ievv_opensource.ievv_i18n_url.base_url import BaseUrl
+
+
+class UrlTransformError(Exception):
+    """
+    Raised when :meth:`.AbstractHandler.transform_url_to_languagecode`
+    or :meth:`.AbstractHandler.transform_urlpath_to_languagecode` fails
+    to transform the URL.
+    """
 
 
 class AbstractHandler:
@@ -299,7 +308,41 @@ class AbstractHandler:
         raise NotImplementedError()
 
     @classmethod
-    def transform_url_to_languagecode(cls, url, languagecode):
+    def transform_urlpath_to_languagecode(self, base_url, path, from_languagecode, to_languagecode):
+        """
+        Transform the provided ``path`` (url path) into the provided languagecode.
+
+        This is a utility method that is normally used by :meth:`~.AbstractHandler.transform_url_to_languagecode`
+        to handle the ``translate_path=True`` argument. It SHOULD NOT be used directly.
+
+        Raises:
+            UrlTransformError: If the URL path can not be translated.
+        Args:
+            base_url (ievv_opensource.ievv_i18n_url.base_url.BaseUrl):
+                The base URL of the provided ``path``. The result may be ment to
+                live in a different ``base_url``, but that is not the responsibility of this
+                method - that is the responsibility of :meth:`~.AbstractHandler.transform_url_to_languagecode`.
+            path (str): The URL path to translate.
+            from_languagecode (str): The languagecode to translate from.
+            to_languagecode (str): The languagecode to translate to.
+        Returns:
+            str: The translated URL path.
+        """
+        current_language = translation.get_language()
+        try:
+            translation.activate(from_languagecode)
+            url_parts = resolve(path)
+            new_path = path
+            translation.activate(to_languagecode)
+            new_path = reverse(url_parts.view_name, args=url_parts.args, kwargs=url_parts.kwargs)
+        except Resolver404 as resolver_404_error:
+            raise UrlTransformError(str(resolver_404_error))
+        finally:
+            translation.activate(current_language)
+        return str(new_path)
+
+    @classmethod
+    def transform_url_to_languagecode(cls, url, languagecode, translate_path=True):
         """Transform the provided url into the "same" url, but in the provided languagecode.
 
         MUST be implemented in subclasses.
@@ -314,6 +357,10 @@ class AbstractHandler:
         Args:
             url (str): The URL to transform.
             languagecode (str): The languagecode to transform the URL into.
+            translate_path (bool): Translate the path? This means that the handler tries
+                to convert the path to the translated path. E.g.: The path may be ``/about/contact-us``
+                in english, but ``/om/kontakt-oss`` in norwegian, and with this argument set to ``True``,
+                the handler will try its best to make that happen.
         """
         raise NotImplementedError()
 

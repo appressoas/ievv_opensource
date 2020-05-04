@@ -1,8 +1,11 @@
 from unittest import mock
+
 from django import test
 from ievv_opensource.ievv_i18n_url import active_i18n_url_translation
-from ievv_opensource.ievv_i18n_url.handlers import AbstractHandler
 from ievv_opensource.ievv_i18n_url.base_url import BaseUrl
+from ievv_opensource.ievv_i18n_url.handlers import AbstractHandler
+from ievv_opensource.ievv_i18n_url.handlers.abstract_handler import \
+    UrlTransformError
 
 
 @test.override_settings(
@@ -85,3 +88,47 @@ class TestAbstractHandler(test.TestCase):
 
     def test_get_urlpath_prefix_for_languagecode(self):
         self.assertEqual(AbstractHandler().get_urlpath_prefix_for_languagecode(BaseUrl(), 'en'), '')
+
+    def test_transform_urlpath_to_languagecode_named_url_no_translation(self):
+        self.assertEqual(
+            AbstractHandler.transform_urlpath_to_languagecode(
+                base_url=BaseUrl('https://example.com'),
+                path='/ievv_i18n_url_testapp/my/named/untranslated_example',
+                from_languagecode='en',
+                to_languagecode='nb'),
+            '/ievv_i18n_url_testapp/my/named/untranslated_example')
+
+    def test_transform_urlpath_to_languagecode_named_url_translation(self):
+        self.assertEqual(
+            AbstractHandler.transform_urlpath_to_languagecode(
+                base_url=BaseUrl('https://example.com'),
+                path='/ievv_i18n_url_testapp/my/named/translated_example',
+                from_languagecode='en',
+                to_languagecode='nb'),
+            '/ievv_i18n_url_testapp/mitt/navngitte/oversatte_eksempel')
+
+    # def test_transform_urlpath_to_languagecode_unnamed_url_no_translation(self):
+    #     self.assertEqual(
+    #         AbstractHandler.transform_urlpath_to_languagecode(
+    #             base_url=BaseUrl('https://example.com'),
+    #             path='/ievv_i18n_url_testapp/my/unnamed/untranslated_example',
+    #             from_languagecode='en',
+    #             to_languagecode='nb'),
+    #         '/ievv_i18n_url_testapp/my/unnamed/untranslated_example')
+
+    # def test_transform_urlpath_to_languagecode_unnamed_url_translation(self):
+    #     self.assertEqual(
+    #         AbstractHandler.transform_urlpath_to_languagecode(
+    #             base_url=BaseUrl('https://example.com'),
+    #             path='/ievv_i18n_url_testapp/my/unnamed/translated_example',
+    #             from_languagecode='en',
+    #             to_languagecode='nb'),
+    #         '/ievv_i18n_url_testapp/mitt/ikke-navngitte/oversatte_eksempel')
+
+    # def test_transform_urlpath_to_languagecode_invalid_path(self):
+    #     with self.assertRaises(UrlTransformError):
+    #         AbstractHandler.transform_urlpath_to_languagecode(
+    #             base_url=BaseUrl('https://example.com'),
+    #             path='/some/random/invalid/path',
+    #             from_languagecode='en',
+    #             to_languagecode='nb')

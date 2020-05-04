@@ -145,7 +145,7 @@ class TestAbstractHandler(test.TestCase):
             UrlpathPrefixHandler().build_absolute_url('/my/view', languagecode='en'),
             'https://example.com/my/view')
 
-    def test_transform_url_to_languagecode(self):
+    def test_transform_url_to_languagecode_simple(self):
         # active_i18n_url_translation.activate(active_languagecode='nb')
         self.assertEqual(
             UrlpathPrefixHandler.transform_url_to_languagecode('https://example.com/my/view', 'nb'),
@@ -166,3 +166,13 @@ class TestAbstractHandler(test.TestCase):
         self.assertEqual(
             UrlpathPrefixExtraPrefixHandler.transform_url_to_languagecode('https://example.com/my/view', 'nb'),
             'https://example.com/l/s/nb/my/view')
+
+    def test_transform_url_to_languagecode_translate_path(self):
+        self.assertEqual(
+            UrlpathPrefixHandler.transform_url_to_languagecode(
+                'https://example.com/ievv_i18n_url_testapp/my/named/untranslated_example', 'nb'),
+            'https://example.com/nb/ievv_i18n_url_testapp/my/named/untranslated_example')
+        self.assertEqual(
+            UrlpathPrefixHandler.transform_url_to_languagecode(
+                'https://example.com/ievv_i18n_url_testapp/my/named/translated_example', 'nb'),
+            'https://example.com/nb/ievv_i18n_url_testapp/mitt/navngitte/oversatte_eksempel')

@@ -3,6 +3,8 @@ import urllib.parse
 
 from django.conf import settings
 from ievv_opensource.ievv_i18n_url.base_url import BaseUrl
+from ievv_opensource.ievv_i18n_url.handlers.abstract_handler import \
+    UrlTransformError
 
 from . import abstract_handler
 
@@ -99,12 +101,21 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
             self.build_urlpath(path=path, languagecode=languagecode, base_url=base_url))
 
     @classmethod
-    def transform_url_to_languagecode(cls, url, languagecode):
+    def transform_url_to_languagecode(cls, url, languagecode, translate_path=True):
         from_languagecode = cls.get_languagecode_from_url(url)
         base_url = BaseUrl(url)
         path_without_languagecode = cls._strip_languagecode_from_urlpath(
             base_url=base_url,
             languagecode=from_languagecode,
             path=urllib.parse.urlparse(url).path)
+        if translate_path:
+            try:
+                path_without_languagecode = cls.transform_urlpath_to_languagecode(
+                    base_url=base_url,
+                    path=path_without_languagecode,
+                    from_languagecode=from_languagecode,
+                    to_languagecode=languagecode)
+            except UrlTransformError:
+                pass
         return base_url.build_absolute_url(
             cls._build_urlpath(path=path_without_languagecode, languagecode=languagecode, base_url=base_url))
