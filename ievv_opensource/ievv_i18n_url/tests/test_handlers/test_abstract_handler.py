@@ -105,7 +105,7 @@ class TestAbstractHandler(test.TestCase):
                 path='/ievv_i18n_url_testapp/my/named/translated_example',
                 from_languagecode='en',
                 to_languagecode='nb'),
-            '/ievv_i18n_url_testapp/mitt/navngitte/oversatte_eksempel')
+            '/ievv_i18n_url_testapp/mitt/navngitte/oversatte-eksempel')
 
     # def test_transform_urlpath_to_languagecode_unnamed_url_no_translation(self):
     #     self.assertEqual(

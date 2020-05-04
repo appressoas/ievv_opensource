@@ -1,3 +1,4 @@
+import logging
 import posixpath
 import urllib.parse
 
@@ -7,6 +8,9 @@ from ievv_opensource.ievv_i18n_url.handlers.abstract_handler import \
     UrlTransformError
 
 from . import abstract_handler
+
+
+logger = logging.getLogger(__name__)
 
 
 class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
@@ -115,7 +119,7 @@ class UrlpathPrefixHandler(abstract_handler.AbstractHandler):
                     path=path_without_languagecode,
                     from_languagecode=from_languagecode,
                     to_languagecode=languagecode)
-            except UrlTransformError:
-                pass
+            except UrlTransformError as e:
+                logger.warning('Failed to translate %s. Error: %s', path_without_languagecode, e)
         return base_url.build_absolute_url(
             cls._build_urlpath(path=path_without_languagecode, languagecode=languagecode, base_url=base_url))
