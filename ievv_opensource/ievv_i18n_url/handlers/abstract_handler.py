@@ -308,7 +308,7 @@ class AbstractHandler:
         raise NotImplementedError()
 
     @classmethod
-    def transform_urlpath_to_languagecode(self, base_url, path, from_languagecode, to_languagecode):
+    def transform_urlpath_to_languagecode(cls, base_url, path, from_languagecode, to_languagecode):
         """
         Transform the provided ``path`` (url path) into the provided languagecode.
 
