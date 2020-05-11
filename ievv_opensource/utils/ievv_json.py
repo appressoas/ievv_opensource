@@ -4,6 +4,7 @@ import json
 
 import arrow
 from django.db import models
+from ievv_opensource.utils.ievvbuildstatic.filepath import FilePathInterface
 
 
 class Encoder(json.JSONEncoder):
@@ -50,6 +51,8 @@ class Encoder(json.JSONEncoder):
                 '__model__': f'{obj._meta.label}',
                 'value': obj.pk
             }
+        elif isinstance(obj, FilePathInterface):
+            return obj.abspath
         return super().default(obj)
 
 

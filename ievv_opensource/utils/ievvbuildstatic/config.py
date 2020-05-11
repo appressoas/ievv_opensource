@@ -5,12 +5,13 @@ import shutil
 import time
 from collections import OrderedDict
 
-from django.conf import settings
 from django.apps import apps
+from django.conf import settings
+from ievv_opensource.utils import ievv_json
 from ievv_opensource.utils.ievvbuildstatic import filepath
 from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
-from ievv_opensource.utils.logmixin import LogMixin, Logger
+from ievv_opensource.utils.logmixin import Logger, LogMixin
 
 from . import docbuilders
 
@@ -124,11 +125,11 @@ class App(LogMixin):
         config_path = self._get_json_appconfig_path()
         self.get_logger().debug('Creating {config_path}'.format(config_path=config_path))
         open(config_path, 'w').write(
-            json.dumps(appconfig_dict, indent=2, sort_keys=True)
+            ievv_json.dumps(appconfig_dict, indent=2, sort_keys=True)
         )
 
     def add_pluginconfig_to_json_config(self, plugin_name, config_dict):
-        appconfig_dict = json.loads(open(self._get_json_appconfig_path(), 'r').read())
+        appconfig_dict = ievv_json.loads(open(self._get_json_appconfig_path(), 'r').read())
         appconfig_dict[plugin_name] = config_dict
         self._save_json_appconfig(appconfig_dict=appconfig_dict)
 
