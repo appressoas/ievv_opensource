@@ -6,7 +6,6 @@ import os
 import re
 from collections import OrderedDict
 
-import htmls
 from django import template
 from django.db import connection
 from ievv_opensource.utils.singleton import Singleton
