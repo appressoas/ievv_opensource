@@ -349,6 +349,17 @@ class Registry(Singleton):
         for customsql_class in self._customsql_classes_by_appname_map[appname]:
             yield customsql_class(appname)
 
+    def iter_customsql_exclude_apps(self, appnames):
+        """
+        Iterate over all :class:`.AbstractCustomSql` subclasses registered
+        except for the list of given appnames. The yielded values are objects of the
+        classes initialized with no arguments.
+        """
+        for registered_appname in self.iter_appnames():
+            if registered_appname not in appnames:
+                for customsql_class in self._customsql_classes_by_appname_map[registered_appname]:
+                    yield customsql_class(registered_appname)
+
     def run_all_in_app(self, appname):
         """
         Loops through all the :class:`.AbstractCustomSql` classes registered in the registry
