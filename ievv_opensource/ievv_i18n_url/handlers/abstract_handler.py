@@ -178,7 +178,8 @@ class AbstractHandler:
             base_url=active_base_url,
             languagecode=current_languagecode)
         return {
-            'active_translation_languagecode': cls.get_translation_to_activate_for_languagecode(current_languagecode),
+            'active_translation_languagecode': cls.get_translation_to_activate_for_languagecode(
+                current_languagecode, base_url=active_base_url, path=request.path),
             'active_languagecode': current_languagecode,
             'default_languagecode': default_languagecode,
             'active_language_urlpath_prefix': active_language_urlpath_prefix,
@@ -367,7 +368,7 @@ class AbstractHandler:
         raise NotImplementedError()
 
     @classmethod
-    def get_translation_to_activate_for_languagecode(cls, languagecode):
+    def get_translation_to_activate_for_languagecode(cls, languagecode, base_url=None, path=None):
         """Get the languagecode to actually activate for the provided languagecode.
 
         Used by the middleware provided by `ievv_i18n_url` to activate the translation for the
