@@ -17,3 +17,7 @@ The first releasenote created for ievv_opensource (for minor-version 5.23).
 
 ### 5.23.2
 - Add optional base-url instance and path arguments to `get_translation_to_activate_for_languagecode` for i18n URL-handler.
+
+5.24.0
+======
+Minor updates to phone_number_handler. Add handling og `-` in phone numbers.
