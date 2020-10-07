@@ -5,7 +5,7 @@ from django.utils.module_loading import import_string
 
 
 class BasePhoneNumberHandler:
-    STRIP_WHITESPACE_PATTERN = re.compile(r'\s+')
+    STRIP_WHITESPACE_PATTERN = re.compile(r'(\s|-)+')
 
     def __init__(self, phone_number, country_calling_code=None):
         self.raw_phone_number = phone_number or ''
@@ -41,7 +41,7 @@ class BasePhoneNumberHandler:
             return None
         return f'+{country_code}{phone_number}'
 
-    def _strip_whitespace(self, string):
+    def _strip_ignorable_characters(self, string):
         return self.STRIP_WHITESPACE_PATTERN.sub('', string)
 
     def get_normalized_phone_number(self):
@@ -51,18 +51,17 @@ class BasePhoneNumberHandler:
         cleaned_phone_number = self.get_cleaned_phone_number()
         if cleaned_phone_number:
             return cleaned_phone_number
-        return self._strip_whitespace(self.raw_phone_number)
+        return self._strip_ignorable_characters(self.raw_phone_number)
 
 
 class NorwegianPhoneNumberHandler(BasePhoneNumberHandler):
     """
     Simple handler that works if you only have norwegian users.
     """
-    STRIP_WHITESPACE_PATTERN = re.compile(r'\s+')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._clean_raw_phone_number = self._strip_whitespace(self.raw_phone_number)
+        self._clean_raw_phone_number = self._strip_ignorable_characters(self.raw_phone_number)
 
     def get_country_calling_code(self):
         if self._country_calling_code:

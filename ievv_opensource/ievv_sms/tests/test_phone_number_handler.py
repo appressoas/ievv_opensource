@@ -112,6 +112,8 @@ class TestNorwegianPhoneNumberHandler(test.TestCase):
                          '+4712345678')
         self.assertEqual(NorwegianPhoneNumberHandler('12 34 56 78').get_normalized_phone_number(),
                          '+4712345678')
+        self.assertEqual(NorwegianPhoneNumberHandler('123-45-678').get_normalized_phone_number(),
+                         '+4712345678')
 
         self.assertEqual(NorwegianPhoneNumberHandler('004812345678').get_normalized_phone_number(), '004812345678')
         self.assertEqual(NorwegianPhoneNumberHandler('+4882345678').get_normalized_phone_number(), '+4882345678')
@@ -123,3 +125,5 @@ class TestNorwegianPhoneNumberHandler(test.TestCase):
         self.assertEqual(NorwegianPhoneNumberHandler('00471 2  345  6789').get_normalized_phone_number(),
                          '0047123456789')
         self.assertEqual(NorwegianPhoneNumberHandler('004  712 34567').get_normalized_phone_number(), '00471234567')
+        self.assertEqual(NorwegianPhoneNumberHandler('+47-123-45-678').get_normalized_phone_number(),
+                         '+4712345678')
