@@ -21,3 +21,8 @@ The first releasenote created for ievv_opensource (for minor-version 5.23).
 5.24.0
 ======
 Minor updates to phone_number_handler. Add handling og `-` in phone numbers.
+
+
+5.25.0
+======
+Python 3.8 compatibility for ``ievv buildstatic --watch``.
