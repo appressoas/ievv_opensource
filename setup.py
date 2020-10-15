@@ -19,12 +19,9 @@ setup(
         'sh',
         'Django<2',
         'django-rq<2.2.0',  # django-rq 2.2 removes django 1.x support
-        'django_dbdev>=1.0.0',
-        'django_cradmin>=5.0.0,<7',
         'watchdog',
         'termcolor',
         'psutil',
-        'future',
         'arrow',
     ],
     entry_points={

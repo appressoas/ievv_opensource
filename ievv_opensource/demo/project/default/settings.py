@@ -22,7 +22,7 @@ DATABASES = {
 }
 DATABASES['default']['PORT'] = 23653
 
-LOGIN_URL = '/cradmin_authenticate/login'
+# LOGIN_URL = '/cradmin_authenticate/login'
 
 # Application definition
 
@@ -36,10 +36,10 @@ INSTALLED_APPS = [
     'django_rq',
     'sorl.thumbnail',
     'django_dbdev',
-    'crispy_forms',
-    'django_cradmin',
-    'django_cradmin.apps.cradmin_authenticate',
-    'django_cradmin.apps.cradmin_email',
+    # 'crispy_forms',
+    # 'django_cradmin',
+    # 'django_cradmin.apps.cradmin_authenticate',
+    # 'django_cradmin.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
@@ -81,13 +81,13 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                'django_cradmin.context_processors.cradmin',
+                # 'django_cradmin.context_processors.cradmin',
             ],
         },
     },
 ]
 
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
+# ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
 
 # Sorl-thumbnail settings
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
@@ -177,7 +177,7 @@ USE_L10N = True
 USE_TZ = True
 
 # Use bootstrap3 template pack to django-crispy-forms.
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
+# CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES = [
