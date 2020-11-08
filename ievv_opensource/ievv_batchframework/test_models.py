@@ -1,11 +1,11 @@
 from django import test
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django_cradmin import datetimeutils
 from model_mommy import mommy
 
 from ievv_opensource.ievv_batchframework.models import BatchOperation
 from ievv_opensource.python2_compatibility import mock
+from ievv_opensource.utils import datetimeutils
 
 
 class TestBatchOperationModel(test.TestCase):

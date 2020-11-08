@@ -76,13 +76,10 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                # 'django_cradmin.context_processors.cradmin',
             ],
         },
     },
 ]
-
-# ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
