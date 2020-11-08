@@ -16,13 +16,7 @@ setup(
     license='BSD',
     packages=find_packages(exclude=['manage']),
     install_requires=[
-        'sh',
-        'Django<2',
-        'django-rq<2.2.0',  # django-rq 2.2 removes django 1.x support
-        'watchdog',
-        'termcolor',
-        'psutil',
-        'arrow',
+        'Django>=3.1.0,<4.0.0'
     ],
     entry_points={
         'console_scripts': [
