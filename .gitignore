@@ -17,8 +17,6 @@ Session.vim
 .#*
 dbdev_tempdata/
 
-/media/sorlcache/
-
 .ipynb_checkpoints/
 *.ipynb
 

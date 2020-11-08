@@ -34,12 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_rq',
-    'sorl.thumbnail',
     'django_dbdev',
-    # 'crispy_forms',
-    # 'django_cradmin',
-    # 'django_cradmin.apps.cradmin_authenticate',
-    # 'django_cradmin.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
@@ -88,13 +83,6 @@ TEMPLATES = [
 ]
 
 # ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
-
-# Sorl-thumbnail settings
-THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
-THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'
-THUMBNAIL_PREFIX = 'sorlcache/'
-THUMBNAIL_DEBUG = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
