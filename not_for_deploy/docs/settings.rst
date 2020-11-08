@@ -29,10 +29,6 @@ Use this setting to add models and apps to exclude from the dumped json. We excl
 - auth.Permission
 - sessions.Session
 
-By default, and we exclude ``thumbnail.KVStore`` by default if ``sorl.thumbnail`` is
-in installed apps, and the ``THUMBNAIL_KVSTORE`` setting is configured to use the
-database (``sorl.thumbnail.kvstores.cached_db_kvstore.KVStore``).
-
 Example::
 
     IEVVTASKS_DUMPDATA_ADD_EXCLUDES = [
