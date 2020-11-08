@@ -44,6 +44,7 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 
 /dump.rdb
 /.idea/
+/build/
 
 /ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
 /ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
