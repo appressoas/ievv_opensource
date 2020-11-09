@@ -1,6 +1,9 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 from django_dbdev.backends.postgres import DBSETTINGS
+
+from ievv_opensource.ievv_i18n_url.tests import ievv_i18n_url_testapp
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -169,9 +172,14 @@ IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES = [
     'en',
     'nb',
 ]
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale'),
-)
+# LOCALE_PATHS = (
+#     os.path.join(BASE_DIR, 'locale'),
+# )
+IEVVTASKS_MAKEMESSAGES_DIRECTORIES = [
+    {'directory': os.path.dirname(ievv_i18n_url_testapp.__file__),
+     'python': True},
+]
+
 
 IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
     ('example-tagtype1', 'Example tagtype 1'),

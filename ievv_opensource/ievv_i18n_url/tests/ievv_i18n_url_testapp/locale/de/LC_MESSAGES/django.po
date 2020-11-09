@@ -19,9 +19,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: urls.py:9
-msgid "^my/unnamed/translated_example$"
-msgstr "^mein/unbenanntes/ubersetztes-beispiel$"
+msgid "my/unnamed/translated_example"
+msgstr "mein/unbenanntes/ubersetztes-beispiel"
 
 #: urls.py:14
-msgid "^my/named/translated_example$"
-msgstr "^mein/benanntes/ubersetztes-beispiel$"
+msgid "my/named/translated_example"
+msgstr "mein/benanntes/ubersetztes-beispiel"

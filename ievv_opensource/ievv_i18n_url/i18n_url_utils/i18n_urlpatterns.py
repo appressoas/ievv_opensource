@@ -1,7 +1,6 @@
 import re
 
-from django import urls
-from django.conf.urls import url
+from django.urls import path, URLResolver
 from django.conf import settings
 
 from ievv_opensource.ievv_i18n_url import active_i18n_url_translation
@@ -22,37 +21,51 @@ def i18n_patterns(*urls, include_redirect_view=True):
     """
     if not settings.USE_I18N:
         return list(urls)
-    return [
-        url(r'^_ievv-i18n-redirect-to/(?P<languagecode>[a-zA-Z-]+)/(?P<path>.*)$',
-            RedirectToLanguagecodeView.as_view(),
-            name='ievv_i18n_url_redirect_to_languagecode'),
-        I18nRegexURLResolver(list(urls)),
-    ]
+    new_urls = []
+    if include_redirect_view:
+        new_urls.append(
+            path('_ievv-i18n-redirect-to/<str:languagecode>/<path:path>',
+                 RedirectToLanguagecodeView.as_view(),
+                 name='ievv_i18n_url_redirect_to_languagecode'),
+        )
+    new_urls.append(
+        URLResolver(
+            I18nLocalePrefixPattern(),
+            list(urls)
+        )
+    )
+    return new_urls
 
 
-class I18nRegexURLResolver(urls.RegexURLResolver):
-    """
-    A URL resolver that always matches the active language code as URL prefix.
-
-    Rather than taking a regex argument, we just override the ``regex``
-    function to always return the active language-code as regex.
-    """
-    def __init__(
-        self, urlconf_name, default_kwargs=None, app_name=None, namespace=None,
-        prefix_default_language=False
-    ):
-        super().__init__(None, urlconf_name, default_kwargs, app_name, namespace)
+class I18nLocalePrefixPattern:
+    def __init__(self, prefix_default_language=True):
         self.prefix_default_language = prefix_default_language
+        self.converters = {}
 
     @property
     def regex(self):
-        language_code = active_i18n_url_translation.get_active_languagecode()
+        # This is only used by reverse() and cached in _reverse_dict.
+        return re.compile(self.language_prefix)
 
-        if language_code not in self._regex_dict:
-            urlpath_prefix = active_i18n_url_translation.get_active_language_urlpath_prefix()
-            if urlpath_prefix:
-                regex_string = '^%s/' % urlpath_prefix
-            else:
-                regex_string = ''
-            self._regex_dict[language_code] = re.compile(regex_string, re.UNICODE)
-        return self._regex_dict[language_code]
+    @property
+    def language_prefix(self):
+        urlpath_prefix = active_i18n_url_translation.get_active_language_urlpath_prefix()
+        if urlpath_prefix:
+            return f'{urlpath_prefix}/'
+        else:
+            return ''
+
+    def match(self, path):
+        language_prefix = self.language_prefix
+        if path.startswith(language_prefix):
+            return path[len(language_prefix):], (), {}
+        return None
+
+    def check(self):
+        return []
+
+    def describe(self):
+        return "'{}'".format(self)
+
+    def __str__(self):
+        return self.language_prefix

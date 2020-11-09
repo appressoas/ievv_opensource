@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 20:29+0200\n"
+"POT-Creation-Date: 2020-11-09 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,9 +19,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: urls.py:9
-msgid "^my/unnamed/translated_example$"
-msgstr "^mitt/ikke-navngitte/oversatte-eksempel$"
+msgid "my/unnamed/translated_example"
+msgstr "mitt/ikke-navngitte/oversatte-eksempel"
 
 #: urls.py:14
-msgid "^my/named/translated_example$"
-msgstr "^mitt/navngitte/oversatte-eksempel$"
+msgid "my/named/translated_example"
+msgstr "mitt/navngitte/oversatte-eksempel"
