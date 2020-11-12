@@ -51,6 +51,11 @@ Create a development database
 
     $ ievv recreate_devdb
 
+This creates a superuser with::
+
+    username: grandma
+    password: test
+
 
 *************
 Running tests
