@@ -23,3 +23,12 @@ If you are migrating from ievv-opensource 5.x, you should just need to:
 Version 6.x of ievv-opensource was an experimental Django2 release. There is many changes
 in 5.x and 7.x that is not in 6.x. You SHOULD be able to just update to ievv-opensource 7.0.x,
 but you may have some issues. If you do, check out the releasenotes for 5.x.
+
+
+## 7.0 patch releases
+
+### 7.0.1
+- More django3 fixes.
+- Include more dependencies in setup.py.
+- Fix and migrate deprecated JSONField.
+- Change NullBooleanField to BooleanField(null=True).
