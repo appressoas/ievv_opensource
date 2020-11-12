@@ -64,7 +64,6 @@ guide will assume you put it at this location.
 
 Put the following code in ``myproject/celery.py``::
 
-    from __future__ import absolute_import
     import os
     from celery import Celery
 
@@ -90,8 +89,6 @@ Put the following code in ``myproject/celery.py``::
 
 
 And put the following code in ``myproject/__init__.py``::
-
-    from __future__ import absolute_import
 
     # This will make sure the Celery app is always imported when
     # Django starts so that @shared_task will use this app.

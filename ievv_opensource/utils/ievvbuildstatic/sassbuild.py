@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import cssbuildbaseplugin

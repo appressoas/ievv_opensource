@@ -7,7 +7,7 @@ from django.core.management import CommandError
 from django.test import TestCase
 
 from ievv_opensource.utils import virtualenvutils
-from ievv_opensource.python2_compatibility import mock
+from unittest import mock
 
 
 @unittest.skip('This is both slow and hard to ensure works in different environments')

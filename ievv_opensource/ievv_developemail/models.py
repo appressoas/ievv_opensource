@@ -1,8 +1,4 @@
-try:
-    from email import message_from_bytes
-except ImportError:
-    # For python 2.x compatibility
-    from future.backports.email import message_from_bytes
+from email import message_from_bytes
 
 from collections import OrderedDict
 

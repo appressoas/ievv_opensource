@@ -1,14 +1,11 @@
 import os
 import shutil
 
-from future.utils import python_2_unicode_compatible
-
 from ievv_opensource.utils.ievvbuildstatic.options_mixin import OptionsMixin
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchdogWatchConfig
 from ievv_opensource.utils.logmixin import LogMixin
 
 
-@python_2_unicode_compatible
 class Plugin(LogMixin, OptionsMixin):
     """
     Base class for all plugins in ``ievvbuildstatic``.

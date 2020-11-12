@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from django.core.management.base import BaseCommand, CommandError
 
 from ievv_opensource.ievv_customsql import customsql_registry

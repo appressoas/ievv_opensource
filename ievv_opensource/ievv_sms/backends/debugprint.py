@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from ievv_opensource.ievv_sms import sms_registry
 
 
