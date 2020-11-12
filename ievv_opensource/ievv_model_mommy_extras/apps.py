@@ -7,4 +7,4 @@ class ModelMommyExtrasAppConfig(AppConfig):
     verbose_name = "IEVV model mommy extras"
 
     def ready(self):
-        postgres_field_generators.add_to_mommy()
+        postgres_field_generators.add_to_model_bakery()

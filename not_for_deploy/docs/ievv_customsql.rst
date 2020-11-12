@@ -139,9 +139,9 @@ Example of using option (1) to create a TestCase::
     class TestPersonCustomSql(test.TestCase):
         def test_add_person_and_search(self):
             PersonCustomSql().initialize()
-            jack = mommy.make('myapp.Person', name='Jack The Man', description='Also called john by some.')
-            mommy.make('myapp.Person', name='NoMatch Man')
-            john = mommy.make('myapp.Person', name='John Peterson', description='Hello world')
+            jack = baker.make('myapp.Person', name='Jack The Man', description='Also called john by some.')
+            baker.make('myapp.Person', name='NoMatch Man')
+            john = baker.make('myapp.Person', name='John Peterson', description='Hello world')
 
             tsquery = 'john'
             queryset = Person.objects.extra(

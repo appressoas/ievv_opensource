@@ -9,7 +9,6 @@ htmls = "*"
 flake8 = "*"
 tox = "*"
 coverage = "*"
-model-mommy = "*"
 django-dbdev = "*"
 # django-debug-toolbar = "*"
 twine = "*"
@@ -17,6 +16,7 @@ pytest = "==5.3.5"
 pytest-django = "==3.8.0"
 pytest-env = "==0.6.2"
 ievv-opensource = {editable = true, path = "."}
+model-bakery = "*"
 
 [packages]
 # django = ">=3.1.0,<4"
