@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import django_rq
 
 from ievv_opensource.ievv_batchframework.models import BatchOperation
