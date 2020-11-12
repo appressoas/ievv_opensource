@@ -1,2 +1,2 @@
-def ugettext(message):
+def gettext(message):
     return message

@@ -193,11 +193,11 @@ class SerializableChoicesWithMeta(choices_with_meta.ChoicesWithMeta):
         raise NotImplementedError()
 
     def clean_model_object(self, model_object):
-        from django.utils.translation import ugettext
+        from django.utils.translation import gettext
         value = getattr(model_object, self.get_model_attribute_name())
         if value not in self:
             raise ValidationError({
-                self.get_model_attribute_name(): ugettext('"%(value)s" is not one of the available choices') % {
+                self.get_model_attribute_name(): gettext('"%(value)s" is not one of the available choices') % {
                     'value': value
                 }
             })
@@ -250,11 +250,11 @@ class SerializableMultiChoicesWithMeta(SerializableChoicesWithMeta):
         choice._choices_with_meta = self
 
     def clean_model_object(self, model_object):
-        from django.utils.translation import ugettext
+        from django.utils.translation import gettext
         for value in getattr(model_object, self.get_model_attribute_name()):
             if value not in self:
                 raise ValidationError({
-                    self.get_model_attribute_name(): ugettext('"%(value)s" is not one of the available choices') % {
+                    self.get_model_attribute_name(): gettext('"%(value)s" is not one of the available choices') % {
                         'value': value
                     }
                 })
