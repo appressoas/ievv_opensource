@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.staticfiles.templatetags import staticfiles
+from django.templatetags.static import static as django_static
 
 
 def get_setting():
@@ -25,8 +25,8 @@ def static_path(path, autogzip_context):
 def static(path, autogzip_context):
     """
     Just like ``django.contrib.staticfiles.templatetags.static()``,
-    but if the ``autogzip_context`` is set to True in the 
+    but if the ``autogzip_context`` is set to True in the
     django setting IEVV_STATICFILES_AUTOGZIP (a dict), the provided
     path is suffixed with ``.gz``.
     """
-    return staticfiles.static(static_path(path, autogzip_context))
+    return django_static(static_path(path, autogzip_context))
