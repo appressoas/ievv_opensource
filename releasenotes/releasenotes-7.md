@@ -40,3 +40,6 @@ but you may have some issues. If you do, check out the releasenotes for 5.x.
 - Remove dependency on the future library.
 - Use model_bakery instead of model_mommy for the tests.
 - Update ievv_model_mommy_extras to use model_bakery instead of model_mommy.
+
+### 7.0.3
+- Remove pyproject.toml. It causes an issue with strict PEP 517 checking in pip.
