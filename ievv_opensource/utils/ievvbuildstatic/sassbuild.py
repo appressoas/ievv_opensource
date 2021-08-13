@@ -119,8 +119,9 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
         return sass_include_paths
 
     def format_sass_include_paths(self, temporary_directory):
-        if self.sass_include_paths:
-            return ':'.join(self.get_sass_include_paths(temporary_directory))
+        include_paths = self.get_sass_include_paths(temporary_directory)
+        if include_paths:
+            return ':'.join(include_paths)
         else:
             return ''
 
