@@ -43,3 +43,6 @@ but you may have some issues. If you do, check out the releasenotes for 5.x.
 
 ### 7.0.3
 - Remove pyproject.toml. It causes an issue with strict PEP 517 checking in pip.
+
+### 7.0.4
+- buildstatic...sassbuild: Fix bug with automatic include path.
