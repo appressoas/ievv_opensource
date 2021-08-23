@@ -25,6 +25,8 @@ DATABASES = {
 }
 DATABASES['default']['PORT'] = 23653
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # LOGIN_URL = '/cradmin_authenticate/login'
 
 # Application definition
