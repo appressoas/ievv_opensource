@@ -19,7 +19,7 @@ ievv-opensource = {editable = true, path = "."}
 model-bakery = "*"
 
 [packages]
-# django = ">=3.1.0,<4"
+django = ">=3.2.0,<4"
 arrow = "*"
 rq = "*"
 django-rq = "*"
