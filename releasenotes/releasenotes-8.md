@@ -1,9 +1,9 @@
-IEVV Opensource 8 beta releasenotes
-===================================
+IEVV Opensource 8 releasenotes
+==============================
 
 
-8.0.0b1
-=======
+8.0.0
+=====
 
 ## What is new
 
