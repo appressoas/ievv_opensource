@@ -120,6 +120,7 @@ class WatchConfigPool(LogMixin):
         return watchdog_foldermap, process_runnables
 
     def watch(self):
+        multiprocessing.set_start_method('fork')
         watchdog_foldermap, process_runnables = self.__build_foldermap()
         observers = []
         for folderpath, folderkwargs in watchdog_foldermap.items():

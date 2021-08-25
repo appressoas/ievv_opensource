@@ -1,0 +1,57 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.134.0/containers/python-3
+{
+	"name": "ievv_opensource dockerdev",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		// General extensions
+		"eamodio.gitlens",
+		"reduckted.vscode-gitweblinks",
+		"palidino.gitlab-workflow-pali-fork",
+		"VisualStudioExptTeam.vscodeintellicode",
+
+		// Python extensions
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"brainfit.vscode-importmagic",
+		"batisteo.vscode-django",
+		"appresso.atest"
+	],
+	
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"python.pythonPath": "/home/codemonkey/pipenv-virtualenv/bin/python",
+		"python.languageServer": "Pylance",
+		"python.linting.enabled": true,
+		"python.linting.flake8Path": "/home/codemonkey/pipenv-virtualenv/bin/flake8",
+		"python.linting.flake8Enabled": true,
+		"atest.runners": {
+			"pytest": true
+		},
+		"importMagic.maxColumns": 120,
+		"gitlens.codeLens.enabled": false
+	},
+
+	"mounts": [
+		"source=${localEnv:HOME}${localEnv:USERPROFILE},target=/host_userhome/,type=bind,consistency=cached",
+		
+		// Mount a persistent directory for yarn, pip and pipenv caches + dbdev_tempdata.
+		// Speeds up builds, and speeds up the postgres database.
+		"source=ievv_opensource_dockerdev_persistent,destination=/home/codemonkey/persistent/"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [9005],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "pipenv install --dev && ln -s $(pipenv --venv) ~/pipenv-virtualenv",
+
+	// Comment out to connect as root instead.
+	"remoteUser": "codemonkey"
+}

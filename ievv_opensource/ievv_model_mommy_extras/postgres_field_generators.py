@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from model_mommy.timezone import now
+from model_bakery.timezone import now
 from psycopg2.extras import DateTimeTZRange, DateRange
 
 
@@ -18,11 +18,11 @@ def generate_date_range():
     )
 
 
-def add_to_mommy():
-    from model_mommy import mommy
-    mommy.generators.add(
+def add_to_model_bakery():
+    from model_bakery import baker
+    baker.generators.add(
         'django.contrib.postgres.fields.ranges.DateTimeRangeField',
         generate_datetime_range)
-    mommy.generators.add(
+    baker.generators.add(
         'django.contrib.postgres.fields.ranges.DateRangeField',
         generate_date_range)

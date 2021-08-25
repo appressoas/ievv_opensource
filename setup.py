@@ -16,14 +16,11 @@ setup(
     license='BSD',
     packages=find_packages(exclude=['manage']),
     install_requires=[
-        'sh',
-        'Django',
-        'django_dbdev>=1.0.0',
-        'django_cradmin>=1.1.1',
-        'watchdog',
+        'Django>=3.1.0,<4.0.0',
         'termcolor',
         'psutil',
-        'future',
+        'watchdog',
+        'sh',
         'arrow',
     ],
     entry_points={

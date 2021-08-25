@@ -1,0 +1,36 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+htmls = "*"
+flake8 = "*"
+tox = "*"
+coverage = "*"
+django-dbdev = "*"
+# django-debug-toolbar = "*"
+twine = "*"
+pytest = "==5.3.5"
+pytest-django = "==3.8.0"
+pytest-env = "==0.6.2"
+ievv-opensource = {editable = true, path = "."}
+model-bakery = "*"
+
+[packages]
+# django = ">=3.1.0,<4"
+arrow = "*"
+rq = "*"
+django-rq = "*"
+redis = "*"
+gsm0338 = "*"
+psycopg2 = "*"
+sh = "*"
+watchdog = "*"
+termcolor = "*"
+psutil = "*"
+djangorestframework = "*"
+
+[requires]
+python_version = "3.8"

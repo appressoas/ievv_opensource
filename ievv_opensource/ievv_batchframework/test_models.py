@@ -1,16 +1,16 @@
 from django import test
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django_cradmin import datetimeutils
-from model_mommy import mommy
+from model_bakery import baker
 
 from ievv_opensource.ievv_batchframework.models import BatchOperation
-from ievv_opensource.python2_compatibility import mock
+from unittest import mock
+from ievv_opensource.utils import datetimeutils
 
 
 class TestBatchOperationModel(test.TestCase):
     def test_clean_status_finished_result_not_available(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_FINISHED,
                                        result=BatchOperation.RESULT_NOT_AVAILABLE)
         with self.assertRaisesMessage(ValidationError,
@@ -18,7 +18,7 @@ class TestBatchOperationModel(test.TestCase):
             batchoperation.clean()
 
     def test_clean_status_running_no_started_running_datetime(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_RUNNING,
                                        started_running_datetime=None)
         with self.assertRaisesMessage(ValidationError,
@@ -26,7 +26,7 @@ class TestBatchOperationModel(test.TestCase):
             batchoperation.clean()
 
     def test_clean_status_finished_no_started_running_datetime(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_FINISHED,
                                        result=BatchOperation.RESULT_SUCCESSFUL,
                                        started_running_datetime=None)
@@ -35,56 +35,56 @@ class TestBatchOperationModel(test.TestCase):
             batchoperation.clean()
 
     def test_input_data_setter(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation')
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation')
         batchoperation.input_data = {'hello': 'world'}
         self.assertEqual(
             '{"hello": "world"}',
             batchoperation.input_data_json)
 
     def test_input_data_getter_emptystring(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        input_data_json='')
         self.assertEqual(
             None,
             batchoperation.input_data)
 
     def test_input_data_getter_nonemptystring(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        input_data_json='{"hello": "world"}')
         self.assertEqual(
             {'hello': 'world'},
             batchoperation.input_data)
 
     def test_output_data_setter(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation')
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation')
         batchoperation.output_data = {'hello': 'world'}
         self.assertEqual(
             '{"hello": "world"}',
             batchoperation.output_data_json)
 
     def test_output_data_getter_emptystring(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        output_data_json='')
         self.assertEqual(
             None,
             batchoperation.output_data)
 
     def test_output_data_getter_nonemptystring(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        output_data_json='{"hello": "world"}')
         self.assertEqual(
             {'hello': 'world'},
             batchoperation.output_data)
 
     def test_finish_successful(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_RUNNING,
                                        started_running_datetime=timezone.now())
         batchoperation.finish()
         self.assertEqual(BatchOperation.RESULT_SUCCESSFUL, batchoperation.result)
 
     def test_finish_failed(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_RUNNING,
                                        started_running_datetime=timezone.now())
         mocknow = datetimeutils.default_timezone_datetime(2016, 1, 1)
@@ -95,7 +95,7 @@ class TestBatchOperationModel(test.TestCase):
         self.assertEqual(batchoperation.finished_datetime, mocknow)
 
     def test_finish_with_output_data(self):
-        batchoperation = mommy.make('ievv_batchframework.BatchOperation',
+        batchoperation = baker.make('ievv_batchframework.BatchOperation',
                                     status=BatchOperation.STATUS_RUNNING,
                                     started_running_datetime=timezone.now())
         batchoperation.finish(output_data={'hello': 'world'})
@@ -105,7 +105,7 @@ class TestBatchOperationModel(test.TestCase):
             batchoperation.output_data_json)
 
     def test_mark_as_running(self):
-        batchoperation = mommy.prepare('ievv_batchframework.BatchOperation',
+        batchoperation = baker.prepare('ievv_batchframework.BatchOperation',
                                        status=BatchOperation.STATUS_UNPROCESSED,
                                        started_running_datetime=None)
         mocknow = datetimeutils.default_timezone_datetime(2016, 1, 1)

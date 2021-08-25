@@ -11,29 +11,29 @@ Install the following:
 #. Python
 #. PIP_
 #. VirtualEnv_
-#. virtualenvwrapper_
+#. pipenv_
 
 
-***********************
-Install in a virtualenv
-***********************
-Create a virtualenv using Python 3 (an isolated Python environment)::
-
-    $ mkvirtualenv -p /usr/local/bin/python3 ievv_opensource
+********************************
+Install development requirements
+********************************
 
 Install the development requirements::
 
-    $ pip install -r requirements.txt
+    $ pipenv install --dev
 
 
 .. _enable-virtualenv:
 
 .. note::
 
-    Whenever you start a new shell where you need to use the virtualenv we created
-    with ``mkvirtualenv`` above, you have to run::
+    The commands below assume you are in the virtualenv. You activate the virtualenv with::
 
-        $ workon ievv_opensource
+        $ pipenv shell
+
+    You can also run all the commands with::
+
+        $ pipenv run <command>
 
 
 **************
@@ -51,6 +51,11 @@ Create a development database
 
     $ ievv recreate_devdb
 
+This creates a superuser with::
+
+    username: grandma
+    password: test
+
 
 *************
 Running tests
@@ -63,4 +68,15 @@ do this using the ``DJANGOENV`` environent variable::
 
 .. _PIP: https://pip.pypa.io
 .. _VirtualEnv: https://virtualenv.pypa.io
-.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/
+.. _pipenv: https://pipenv-fork.readthedocs.io/en/latest/
+
+
+************************
+Adding more dependencies
+************************
+Just add dependencies as normal with pipenv, BUT make sure you run::
+
+    $ pipenv lock -r > requirements.txt
+
+when you merge into master before you push IF you add any non-dev dependencies. This
+is because readthedocs requires ``requirements.txt`` to build.

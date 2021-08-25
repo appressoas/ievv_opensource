@@ -14,7 +14,6 @@ class Command(BaseIevvTasksCommand):
            'ievvtasks_dump_devdb_as_sql.'
 
     def handle(self, *args, **options):
-        management.call_command('ievvtasks_remove_sorl_cache_media')
         management.call_command('dbdev_reinit')
         dumpdatafile = get_dumpdata_filepath()
         if os.path.exists(dumpdatafile):

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from django.core.management.base import BaseCommand, CommandError
 
 from ievv_opensource.ievv_customsql import customsql_registry
@@ -13,6 +12,9 @@ class Command(BaseCommand):
                             required=False, default=None,
                             help='Only run for a specified Django app.'
                                  'If this is not specified, we run for all apps.')
+        parser.add_argument('--exclude-apps', dest='exclude_appnames',
+                            required=False, nargs='+', type=str,
+                            help='Exclude the one or more Django apps.')
         parser.add_argument('-i', '--initialize', dest='initialize',
                             required=False, action='store_true',
                             help='Initialize/setup.')
@@ -26,15 +28,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         verbose = options['verbosity'] >= 1
         appname = options['appname']
+        exclude_appnames = options['exclude_appnames']
         clear = options['clear']
         initialize = options['initialize']
         recreate_data = options['recreate_data']
+
         if not initialize and not recreate_data and not clear:
             raise CommandError('--clear, -i or -r is required, and you can specify all.')
 
+        if appname and exclude_appnames:
+            raise CommandError('--app and --exclude-app cannot be specified together.')
+
         registry = customsql_registry.Registry.get_instance()
+
         if appname:
             customsql_iterator = registry.iter_customsql_in_app(appname=appname)
+        elif exclude_appnames:
+            customsql_iterator = registry.iter_customsql_exclude_apps(appnames=exclude_appnames)
         else:
             customsql_iterator = iter(registry)
 

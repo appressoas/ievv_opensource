@@ -1,0 +1,39 @@
+version: '3'
+services:
+  django:
+    build:
+      context: ../../
+      dockerfile: docker/develop/Dockerfile.django
+    image: ievv_opensource_django
+    container_name: ievv_opensource_django
+    environment:
+      USING_DOCKER: "true"
+      DJANGO_SETTINGS_MODULE: "ievv_opensource.project.settingsproxy"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+    volumes:
+      - "../../:/usr/src/app:delegated"
+      - "~/:/hosthome/:delegated"
+      - "~/.ssh:/root/.ssh:delegated" # ssh credential access (such as git)
+      - "~/.netrc:/root/.netrc:delegated" # Heroku auth credentials
+      - "~/.gitconfig:/root/.gitconfig:delegated" # Git config
+  db:
+    image: postgres:12
+    container_name: ievv_opensource_db
+    environment:
+      POSTGRES_PASSWORD: dbdev
+      POSTGRES_USER: dbdev
+      POSTGRES_DB: dbdev
+    ports:
+      - "27300:5432"
+    volumes:
+      - "../../ievv_opensource/project/develop/dumps/default.sql:/docker-entrypoint-initdb.d/default.sql"
+  redis:
+    image: redis:5-alpine
+    container_name: ievv_opensource_redis
+    ports:
+      - 27601:6379

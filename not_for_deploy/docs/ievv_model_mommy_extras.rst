@@ -1,9 +1,11 @@
-##############################################################################
-`ievv_model_mommy_extras` --- Add support for more fields types to model-mommy
-##############################################################################
+###############################################################################
+`ievv_model_mommy_extras` --- Add support for more fields types to model-bakery
+###############################################################################
 
-Model-mommy does not support all the fields in Django. To remidy this,
+Model-bakery does not support all the fields in Django. To remidy this,
 we provide the ``ievv_opensource.ievv_model_mommy_extras``.
+
+It is named ievv_model_mommy_extras for historical reasons - model_mommy was renamed to model_bakery at some point.
 
 For now it only adds support for::
 

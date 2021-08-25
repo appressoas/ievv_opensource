@@ -17,8 +17,6 @@ Session.vim
 .#*
 dbdev_tempdata/
 
-/media/sorlcache/
-
 .ipynb_checkpoints/
 *.ipynb
 
@@ -42,13 +40,15 @@ ievv_buildstatic.appconfig.json
 
 ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_build_directory
 
-/elasticsearch_develop/
-/elasticsearch_unittest/
 /dump.rdb
 /.idea/
+/build/
 
 /ievv_opensource/demo/demoapp/staticsources/demoapp/tsconfig.json
 /ievv_opensource/demo/demoapp2/staticsources/demoapp2/bower.json
 /ievv_opensource/demo/demoapp/static/
 /ievv_opensource/demo/demoapp2/static/
 /ievv_opensource/ievv_jsbase/staticsources/ievv_jsbase/built_docs/
+
+.vscode/
+.vscode-atest-temp/

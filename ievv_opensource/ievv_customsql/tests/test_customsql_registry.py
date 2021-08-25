@@ -125,6 +125,45 @@ class TestRegistry(test.TestCase):
         self.assertTrue(isinstance(iter_list[0], MockCustomSql1))
         self.assertTrue(isinstance(iter_list[1], MockCustomSql2))
 
+    def test_iter_customsql_exclude_apps_single_appname(self):
+        class MockCustomSql1(customsql_registry.AbstractCustomSql):
+            pass
+
+        class MockCustomSql2(customsql_registry.AbstractCustomSql):
+            pass
+
+        class MockCustomSql3(customsql_registry.AbstractCustomSql):
+            pass
+
+        mockregistry = customsql_registry.MockableRegistry()
+        mockregistry.add('my_first_app', MockCustomSql1)
+        mockregistry.add('my_second_app', MockCustomSql2)
+        mockregistry.add('my_third_app', MockCustomSql3)
+
+        iter_list = list(mockregistry.iter_customsql_exclude_apps(['my_first_app']))
+        self.assertEqual(2, len(iter_list))
+        self.assertTrue(isinstance(iter_list[0], MockCustomSql2))
+        self.assertTrue(isinstance(iter_list[1], MockCustomSql3))
+
+    def test_iter_customsql_exclude_apps_multiple_appnames(self):
+        class MockCustomSql1(customsql_registry.AbstractCustomSql):
+            pass
+
+        class MockCustomSql2(customsql_registry.AbstractCustomSql):
+            pass
+
+        class MockCustomSql3(customsql_registry.AbstractCustomSql):
+            pass
+
+        mockregistry = customsql_registry.MockableRegistry()
+        mockregistry.add('my_first_app', MockCustomSql1)
+        mockregistry.add('my_second_app', MockCustomSql2)
+        mockregistry.add('my_third_app', MockCustomSql3)
+
+        iter_list = list(mockregistry.iter_customsql_exclude_apps(['my_first_app', 'my_second_app']))
+        self.assertEqual(1, len(iter_list))
+        self.assertTrue(isinstance(iter_list[0], MockCustomSql3))
+
 
 class TestAbstractCustomSqlCreateDropStatementsFromSqlCode(test.TestCase):
     def test_drop_trigger_drop_statements_from_sql_code(self):

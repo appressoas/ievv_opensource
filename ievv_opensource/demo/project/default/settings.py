@@ -1,6 +1,9 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 from django_dbdev.backends.postgres import DBSETTINGS
+
+from ievv_opensource.ievv_i18n_url.tests import ievv_i18n_url_testapp
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -22,7 +25,7 @@ DATABASES = {
 }
 DATABASES['default']['PORT'] = 23653
 
-LOGIN_URL = '/cradmin_authenticate/login'
+# LOGIN_URL = '/cradmin_authenticate/login'
 
 # Application definition
 
@@ -34,13 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_rq',
-    'sorl.thumbnail',
     'django_dbdev',
-    'crispy_forms',
-    'django_cradmin',
-    'django_cradmin.apps.cradmin_authenticate',
-    'django_cradmin.apps.cradmin_temporaryfileuploadstore',
-    'django_cradmin.apps.cradmin_email',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',
@@ -51,8 +48,6 @@ INSTALLED_APPS = [
     'ievv_opensource.ievvtasks_development',
     'ievv_opensource.ievvtasks_production',
     'ievv_opensource.ievv_developemail',
-    'ievv_opensource.ievv_elasticsearch',
-    'ievv_opensource.ievv_elasticsearch2.apps.IevvElasticSearch2AppConfig',
     'ievv_opensource.ievv_sms',
     'ievv_opensource.ievv_logging',
 ]
@@ -84,20 +79,10 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                'django_cradmin.context_processors.cradmin',
             ],
         },
     },
 ]
-
-ROOT_URLCONF = 'django_cradmin.demo.project.demo.urls'
-
-# Sorl-thumbnail settings
-THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.pil_engine.Engine'
-THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'
-THUMBNAIL_PREFIX = 'sorlcache/'
-THUMBNAIL_DEBUG = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
@@ -151,11 +136,6 @@ LOGGING = {
             'level': 'INFO',  # Do not set to debug - logs all queries
             'propagate': False
         },
-        'elasticsearch': {
-            'handlers': ['stderr'],
-            'level': 'WARNING',
-            'propagate': False
-        },
         'urllib3': {
             'handlers': ['stderr'],
             'level': 'WARNING',
@@ -185,16 +165,21 @@ USE_L10N = True
 USE_TZ = True
 
 # Use bootstrap3 template pack to django-crispy-forms.
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
+# CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 IEVVTASKS_MAKEMESSAGES_LANGUAGE_CODES = [
     'en',
     'nb',
 ]
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale'),
-)
+# LOCALE_PATHS = (
+#     os.path.join(BASE_DIR, 'locale'),
+# )
+IEVVTASKS_MAKEMESSAGES_DIRECTORIES = [
+    {'directory': os.path.dirname(ievv_i18n_url_testapp.__file__),
+     'python': True},
+]
+
 
 IEVV_TAGFRAMEWORK_TAGTYPE_CHOICES = [
     ('example-tagtype1', 'Example tagtype 1'),

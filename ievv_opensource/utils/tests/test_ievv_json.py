@@ -4,7 +4,7 @@ import decimal
 import arrow
 from django import test
 from django.conf import settings
-from model_mommy import mommy
+from model_bakery import baker
 
 from ievv_opensource.utils import ievv_json
 
@@ -39,7 +39,7 @@ class TestIevvJSON(test.TestCase):
         self.assertDictEqual(decoded, data)
 
     def test_djangomodel(self):
-        user = mommy.make(settings.AUTH_USER_MODEL)
+        user = baker.make(settings.AUTH_USER_MODEL)
         data = {'someuser': user}
         encoded = ievv_json.dumps(data, sort_keys=True)
         self.assertEquals(

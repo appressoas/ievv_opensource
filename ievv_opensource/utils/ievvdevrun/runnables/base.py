@@ -1,5 +1,6 @@
 import threading
 import time
+import os
 
 import psutil
 
@@ -162,9 +163,15 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         commandconfig = self.get_command_config()
         kwargs = commandconfig.get('kwargs', {}).copy()
         kwargs.update({'_bg': True})
+        environment = commandconfig.get('environment')
+        _env = None
+        if environment:
+            _env = os.environ.copy()
+            _env.update(environment)
         self.command = self.run_shell_command(commandconfig['executable'],
                                               args=commandconfig.get('args', []),
-                                              kwargs=kwargs)
+                                              kwargs=kwargs,
+                                              _env=_env)
 
     def get_command_config(self):
         """

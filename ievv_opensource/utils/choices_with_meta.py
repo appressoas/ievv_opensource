@@ -85,13 +85,13 @@ class Choice(object):
 
     @property
     def translated_label(self):
-        from django.utils.translation import ugettext
-        return ugettext(self.label)
+        from django.utils.translation import gettext
+        return gettext(self.label)
 
     @property
     def translated_description(self):
-        from django.utils.translation import ugettext
-        return ugettext(self.description)
+        from django.utils.translation import gettext
+        return gettext(self.description)
 
     def as_serializable_data(self):
         return {

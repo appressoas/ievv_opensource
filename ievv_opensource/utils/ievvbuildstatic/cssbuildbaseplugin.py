@@ -2,8 +2,10 @@ import json
 import os
 
 from ievv_opensource.utils.ievvbuildstatic import pluginbase
-from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
-from ievv_opensource.utils.shellcommandmixin import ShellCommandMixin, ShellCommandError
+from .gzip_compress_mixin import GzipCompressMixin
+# from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
+from ievv_opensource.utils.shellcommandmixin import (ShellCommandError,
+                                                     ShellCommandMixin)
 
 
 class CssBuildException(Exception):
@@ -12,14 +14,14 @@ class CssBuildException(Exception):
     """
 
 
-class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
+class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
     """
     Base class for builders that produce CSS.
     """
     default_group = 'css'
 
     def __init__(self, lint=True, lintrules=None, lintrules_overrides=None, autoprefix=True,
-                 browserslist='> 5%', **kwargs):
+                 browserslist='> 5%', gzip=False, gzip_compresslevel=9, **kwargs):
         """
 
         Args:
@@ -45,6 +47,11 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             browserslist (str): A string with defining supported browsers
                 for https://github.com/ai/browserslist. Used by the autoprefix
                 and cssnano commands.
+            gzip (bool): Make a .css.gz version of the file in --production mode. This is added in
+                addition to the .css file (same filename, just with .gz at the end).
+            gzip_compresslevel (int, optional): Gzip compression level.
+                A number between 0 and 9. Higher is better compression,
+                but slower to compress. Defaults to 9.
             **kwargs: Kwargs for :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin`.
         """
         super(AbstractPlugin, self).__init__(**kwargs)
@@ -63,6 +70,19 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
         }
         if lintrules_overrides:
             self.lintrules.update(lintrules_overrides)
+        self.gzip = gzip
+        self.gzip_compresslevel = gzip_compresslevel
+
+    def gzip_compression_enabled(self):
+        return self.gzip and self.app.apps.is_in_production_mode()
+
+    def gzip_compresslevel(self):
+        return self.gzip_compresslevel
+
+    def get_filepaths_to_gzip(self):
+        return [
+            self.get_destinationfile_path()
+        ]
 
     def get_postcss_cli_version(self):
         return None
@@ -120,6 +140,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             args.extend([
                 '--use', 'cssnano',
                 '--cssnano.browsers', self.browserslist,
+                '--no-map'
             ])
         self.get_logger().command_start('Running postcss with [{args}] on {destination}'.format(
             args=' '.join(args),
@@ -187,3 +208,5 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin):
             self.postprocess_styles(temporary_directory=temporary_directory)
         except CssBuildException:
             pass
+        else:
+            self.gzip_compress_files()
