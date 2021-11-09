@@ -19,3 +19,9 @@ launch (6. April 2024).
   that needs to be addressed (you can migrate directly to Django 3 without going through Django 2 first).
 - Check out the documentation for ievv-opensource 7.x (this is the initial Django 3 release) if you're updating from Django 1 or 2.
 - Update to ievv-opensource 8.x.
+
+
+# 8.1
+
+## What's new?
+- ievv_sms: New debug backend for pswin and set max length and part count to 134 for pswin backend.
