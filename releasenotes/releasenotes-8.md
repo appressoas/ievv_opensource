@@ -25,3 +25,8 @@ launch (6. April 2024).
 
 ## What's new?
 - ievv_sms: New debug backend for pswin and set max length and part count to 134 for pswin backend.
+
+## 8.1 Patch releases
+
+### 8.1.1
+- register new pswin debug sms backend in apps.py
