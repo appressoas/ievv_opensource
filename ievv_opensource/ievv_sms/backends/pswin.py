@@ -1,3 +1,4 @@
+import math
 import requests
 from django.conf import settings
 
@@ -42,6 +43,17 @@ class Backend(sms_registry.AbstractSmsBackend):
         self._pswin_password = pswin_password
         self._pswin_default_country_code = pswin_default_country_code
         super().__init__(phone_number=phone_number, message=message, **kwargs)
+
+    @classmethod
+    def get_max_length(cls):
+        return 134 * 6
+
+    @classmethod
+    def get_part_count(cls, text):
+        sms_text_length = cls.get_sms_text_length(text)
+        if sms_text_length <= 160:
+            return 1
+        return int(math.ceil(sms_text_length / 134))
 
     @property
     def pswin_base_url(self):

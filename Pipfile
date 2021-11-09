@@ -17,6 +17,7 @@ pytest-django = "==3.8.0"
 pytest-env = "==0.6.2"
 ievv-opensource = {editable = true, path = "."}
 model-bakery = "*"
+autopep8 = "*"
 
 [packages]
 django = ">=3.2.0,<4"
