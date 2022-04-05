@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -48,15 +48,15 @@ class DevelopEmailAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(DevelopEmailAdmin, self).get_urls()
         my_urls = [
-            url(r'^(\d+)/as_html/$',
-                self.admin_site.admin_view(self.as_html_view),
-                name='developemail_as_html'),
-            url(r'^(\d+)/as_plain/$',
-                self.admin_site.admin_view(self.as_plain_view),
-                name='developemail_as_plain'),
-            url(r'^(\d+)/as_raw/$',
-                self.admin_site.admin_view(self.as_raw_view),
-                name='developemail_as_raw'),
+            re_path(r'^(\d+)/as_html/$',
+                    self.admin_site.admin_view(self.as_html_view),
+                    name='developemail_as_html'),
+            re_path(r'^(\d+)/as_plain/$',
+                    self.admin_site.admin_view(self.as_plain_view),
+                    name='developemail_as_plain'),
+            re_path(r'^(\d+)/as_raw/$',
+                    self.admin_site.admin_view(self.as_raw_view),
+                    name='developemail_as_raw'),
         ]
         return my_urls + urls
 
