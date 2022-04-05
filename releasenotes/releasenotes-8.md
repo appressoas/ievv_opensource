@@ -30,3 +30,6 @@ launch (6. April 2024).
 
 ### 8.1.1
 - register new pswin debug sms backend in apps.py
+
+### 8.1.2
+- use re_path instead of url in developemail admin model
