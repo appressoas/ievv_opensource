@@ -37,7 +37,7 @@ class DevelopEmailAdmin(admin.ModelAdmin):
     get_edit.short_description = 'Edit'
 
     def get_subject(self, developemail):
-        view_url = reverse('admin:developemail_as_html', args=(developemail.id,))
+        view_url = reverse(f'{self.admin_site.name}:developemail_as_html', args=(developemail.id,))
         return format_html(
             '<a href="{url}">{label}</a>',
             url=view_url,
