@@ -33,3 +33,9 @@ launch (6. April 2024).
 
 ### 8.1.2
 - use re_path instead of url in developemail admin model
+
+
+# 8.2
+
+## What's new?
+- ievv_developemail: Set admin site name correctly in URLs, allowing the ModelAdmin for developemail to be used in multiple admin sites.
