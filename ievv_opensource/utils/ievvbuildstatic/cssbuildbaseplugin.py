@@ -63,10 +63,7 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
             "color-no-invalid-hex": True,
             "comment-empty-line-before": ["always", {
                 "ignore": ["stylelint-commands", "after-comment"],
-            }],
-            "declaration-colon-space-after": "always",
-            "indentation": 4,
-            "max-empty-lines": 2
+            }]
         }
         if lintrules_overrides:
             self.lintrules.update(lintrules_overrides)
@@ -167,12 +164,18 @@ class AbstractPlugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
         You must override this in subclasses.
         """
         raise NotImplementedError()
+    
+    @property
+    def stylelint_custom_syntax(self):
+        return None
 
     def make_lintconfig_file(self, temporary_directory):
         lintconfig_path = os.path.join(temporary_directory, 'stylelint.json')
         lintconfig = {
             'rules': self.lintrules,
         }
+        if self.stylelint_custom_syntax:
+            lintconfig['customSyntax'] = self.stylelint_custom_syntax
         open(lintconfig_path, 'wb').write(json.dumps(lintconfig, indent=2).encode('utf-8'))
         return lintconfig_path
 

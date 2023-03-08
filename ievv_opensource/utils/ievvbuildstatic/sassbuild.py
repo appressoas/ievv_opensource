@@ -222,3 +222,7 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
                 os.path.join(folder, relative_path)
                 for relative_path in regexfilelist.get_files_as_list(folder))
         return source_file_paths
+
+    @property
+    def stylelint_custom_syntax(self):
+        return 'postcss-scss'
