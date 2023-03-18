@@ -32,6 +32,3 @@ watchdog = "*"
 termcolor = "*"
 psutil = "*"
 djangorestframework = "*"
-
-[requires]
-python_version = "3.8"
