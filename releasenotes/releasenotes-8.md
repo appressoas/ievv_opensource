@@ -39,3 +39,10 @@ launch (6. April 2024).
 
 ## What's new?
 - ievv_developemail: Set admin site name correctly in URLs, allowing the ModelAdmin for developemail to be used in multiple admin sites.
+
+## 8.2 Patch releases
+
+### 8.2.1
+- ievvbuildstatic...cssbuild*: Update for changes to postcss/stylelint.
+  - postcss: Set custom syntax for scss.
+  - stylelint: Replace deprecated and removed options with the correct options.
