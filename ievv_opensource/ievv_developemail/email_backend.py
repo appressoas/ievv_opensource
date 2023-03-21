@@ -1,7 +1,7 @@
 import logging
 
 from django.core.mail.backends.base import BaseEmailBackend
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from ievv_opensource.ievv_developemail.models import DevelopEmail
 
@@ -18,7 +18,7 @@ class DevelopEmailBackend(BaseEmailBackend):
             developemail = DevelopEmail(
                 subject=email_message.subject,
                 from_email=email_message.from_email,
-                to_emails=', '.join(map(force_text, email_message.to)),
+                to_emails=', '.join(map(force_str, email_message.to)),
                 raw_message=raw_message
             )
 

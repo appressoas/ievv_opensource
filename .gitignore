@@ -53,3 +53,5 @@ ievv_opensource/demo/demoapp/staticsources/demoapp/ievvbuildstatic_temporary_bui
 .vscode/
 .vscode-atest-temp/
 .python-version
+.nvmrc
+.venv/

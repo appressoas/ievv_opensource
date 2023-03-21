@@ -12,7 +12,7 @@ class TestIsValidUrl(test.TestCase):
     def test_domain_is_not_valid_by_default(self):
         self.assertFalse(validate_redirect_url.is_valid_url('http://example.com/test/ing'))
 
-    @override_settings(IEVV_VALID_REDIRECT_URL_REGEX='^(https://example\.com/|/).*$')
+    @override_settings(IEVV_VALID_REDIRECT_URL_REGEX=r'^(https://example\.com/|/).*$')
     def test_custom_regex(self):
         self.assertTrue(validate_redirect_url.is_valid_url('https://example.com/test/ing'))
         self.assertTrue(validate_redirect_url.is_valid_url('https://example.com/'))
