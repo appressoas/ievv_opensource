@@ -18,3 +18,8 @@ __Python 3.10__
 - Update your own application for Django 4.0.x or Django 4.1.x
 - Update your own application for python 3.10
 - Update to ievv-opensource 9.x.
+
+## 9 Patch releases
+
+### 9.0.1
+- setup.py set install requiers Django>=4.0.0,<5.0.0

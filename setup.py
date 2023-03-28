@@ -16,7 +16,7 @@ setup(
     license='BSD',
     packages=find_packages(exclude=['manage']),
     install_requires=[
-        'Django>=4.0.0,<4.2.0',
+        'Django>=4.0.0,<5.0.0',
         'termcolor',
         'psutil',
         'watchdog',
