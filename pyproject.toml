@@ -69,5 +69,9 @@ path = "ievv_opensource/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/ievv_opensource",
+    "/ievv_opensource"
+]
+exclude = [
+    "/ievv_opensource/demo",
+    "node_modules"
 ]

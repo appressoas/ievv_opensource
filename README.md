@@ -50,9 +50,23 @@ http://ievv-opensource.readthedocs.org/
 
 
 ## How to release ievv_opensource
-1. Update version using TODO
+1. Update version using `hatch version`:
+   ```
+   Major version update:
+   $ hatch version major
+   
+   Minor version update:
+   $ hatch version minor
+   
+   Patch version update:
+   $ hatch version patch
+   ```
 2. Add releasenote to releasenotes folder on root with name `releasenotes-<major-version>.md`.
 3. Commit with ``Release <version>``.
 4. Tag the commit with ``<version>``.
 5. Push (``git push && git push --tags``).
-6. Release to pypi (``python setup.py sdist && twine upload dist/ievv_opensource-<version>.tar.gz``).
+6. Release to pypi:
+   ```
+   $ hatch build -t sdist
+   $ hatch publish
+   ```
