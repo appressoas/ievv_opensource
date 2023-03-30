@@ -1,8 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-from django_dbdev.backends.postgres import DBSETTINGS
-
 from ievv_opensource.ievv_i18n_url.tests import ievv_i18n_url_testapp
 
 BASE_DIR = os.path.dirname(
@@ -21,9 +19,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 DATABASES = {
-    'default': DBSETTINGS
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'PORT': 23653,
+        'NAME': 'dbdev',
+        'USER': 'dbdev',
+        'PASSWORD': 'dbdev',
+        'HOST': '127.0.0.1',
+    }
 }
-DATABASES['default']['PORT'] = 23653
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
@@ -39,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_rq',
-    'django_dbdev',
     'ievv_opensource.ievv_tagframework',
     'ievv_opensource.ievv_batchframework',
     'ievv_opensource.demo.demoapp',

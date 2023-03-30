@@ -77,15 +77,8 @@ IEVVTASKS_BUILDSTATIC_APPS = ievvbuildstatic.config.Apps(
 
 IEVVTASKS_DEVRUN_RUNNABLES = {
     'default': ievvdevrun.config.RunnableThreadList(
-        ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
         ievvdevrun.runnables.django_runserver.RunnableThread(port=9005),
-        ievvdevrun.runnables.redis_server.RunnableThread(port='6731'),
         ievvdevrun.runnables.rq_worker.RunnableThread(),
-    ),
-    'design': ievvdevrun.config.RunnableThreadList(
-        ievvdevrun.runnables.dbdev_runserver.RunnableThread(),
-        ievvdevrun.runnables.django_runserver.RunnableThread(port=9001),
-        ievvdevrun.runnables.ievv_buildstatic.RunnableThread(),
     ),
 }
 
