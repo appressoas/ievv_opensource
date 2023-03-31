@@ -44,8 +44,7 @@ dev = [
     "pytest-django",
     "pytest-env",
     "model-bakery",
-    "autopep8",
-    "hatch"
+    "autopep8"
 ]
 optional = [
     "arrow",
@@ -75,3 +74,8 @@ exclude = [
     "/ievv_opensource/demo",
     "node_modules"
 ]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "9.1.0"
+tag_format = "$version"
