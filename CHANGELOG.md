@@ -5,6 +5,7 @@
 - fix rq task that use python2 style print statement
 
 ## 9.1.0 (2023-03-30)
+Older changelogs from this version backwards are in ``releasenotes/`` and ``not_for_deploy/docs/releasenotes/``.
 
 ## 9.0.1 (2023-03-28)
 
