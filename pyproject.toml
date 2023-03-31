@@ -77,7 +77,7 @@ exclude = [
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "9.1.0"
+version = "9.1.1"
 version_files = [
     "ievv_opensource/__init__.py:__version__"
 ]
