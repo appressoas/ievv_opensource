@@ -87,6 +87,7 @@ http://ievv-opensource.readthedocs.org/
 Release (create changelog, increment version, commit and tag the change) with:
 ```
 $ cz bump
+$ git push && git push --tags
 ```
 
 NOTE:
