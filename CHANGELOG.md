@@ -10,6 +10,10 @@
 - **ievvdevrun**: fix bad bug
 - fancy fix
 
+### Migration guide
+- step 1
+- step 2
+
 ## 9.1.1 (2023-03-31)
 
 ### Fix
