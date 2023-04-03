@@ -29,3 +29,4 @@ class RunnableThread(base.ShellCommandRunnableThread):
             'args': ['manage.py', 'ievvtasks_buildstatic', '--watch']
         }
 
+
