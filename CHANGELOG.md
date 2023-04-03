@@ -1,3 +1,15 @@
+## 10.0.0 (2023-04-03)
+
+### Feat
+
+- **ievvdevrun**: really fancy new breaking change
+- **ievvbuildstatic**: fancy new feature
+
+### Fix
+
+- **ievvdevrun**: fix bad bug
+- fancy fix
+
 ## 9.1.1 (2023-03-31)
 
 ### Fix
