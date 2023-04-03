@@ -62,7 +62,7 @@ $ docker-compose up
 ### Run dev server
 ```
 $ source .venv/bin/activate   # enable virtualenv
-$ ievv devrun -n docker-compose
+$ ievv devrun
 ```
 
 ### Run tests
