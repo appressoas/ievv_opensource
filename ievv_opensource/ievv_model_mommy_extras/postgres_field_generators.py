@@ -1,6 +1,6 @@
 from datetime import timedelta
+from django.utils.timezone import now
 
-from model_bakery.timezone import now
 from psycopg2.extras import DateTimeTZRange, DateRange
 
 
