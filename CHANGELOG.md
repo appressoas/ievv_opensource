@@ -1,3 +1,9 @@
+## 9.1.2 (2023-04-03)
+
+### Fix
+
+- **ievv_model_mommy_extras**: :bug: use now from django utils timezone
+
 ## 9.1.1 (2023-03-31)
 
 ### Fix
