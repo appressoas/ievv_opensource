@@ -66,7 +66,7 @@ ievv = "ievv_opensource.ievvtasks_common.cli:cli"
 [tool.hatch.version]
 path = "ievv_opensource/__init__.py"
 
-[tool.hatch.build.targets.sdist]
+[tool.hatch.build]
 include = [
     "/ievv_opensource"
 ]
