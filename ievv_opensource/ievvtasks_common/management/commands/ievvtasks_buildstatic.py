@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from ievv_opensource.utils.logmixin import Logger
+from ievv_opensource.utils.shellcommandmixin import BaseShellCommandError
 
 
 class Command(BaseCommand):
@@ -96,9 +97,12 @@ class Command(BaseCommand):
         settings.IEVVTASKS_BUILDSTATIC_APPS.install(appnames=appnames,
                                                     skipgroups=skipgroups,
                                                     includegroups=includegroups)
-        settings.IEVVTASKS_BUILDSTATIC_APPS.run(appnames=appnames,
-                                                skipgroups=skipgroups,
-                                                includegroups=includegroups)
+        try:
+            settings.IEVVTASKS_BUILDSTATIC_APPS.run(appnames=appnames,
+                                                    skipgroups=skipgroups,
+                                                    includegroups=includegroups)
+        except BaseShellCommandError as e:
+            raise SystemExit(str(e))
         if options['watch']:
             settings.IEVVTASKS_BUILDSTATIC_APPS.watch(appnames=appnames,
                                                       skipgroups=skipgroups,

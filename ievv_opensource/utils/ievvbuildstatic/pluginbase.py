@@ -18,6 +18,10 @@ class Plugin(LogMixin, OptionsMixin):
     #: The default value for the ``group`` kwarg for :meth:`.__init__``.
     default_group = None
 
+    @property
+    def fatal_shell_command_errors(self):
+        return self.app.fatal_shell_command_errors
+
     def __init__(self, group=None):
         """
 

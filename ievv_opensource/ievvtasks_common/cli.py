@@ -2,10 +2,11 @@ import argparse
 import logging
 import os
 import re
+import shutil
+import subprocess
 import sys
 import textwrap
 
-import sh
 
 try:
     from shlex import quote as cmd_quote
@@ -21,12 +22,17 @@ logging.getLogger('sh.command').setLevel(logging.WARNING)
 
 def _find_management_commands():
     commands = []
+    shellcommand = f"{shutil.which('python')} manage.py --help"
     try:
-        pythoncommand = sh.Command('python')
-    except sh.CommandNotFound:
+        output = subprocess.check_output(
+            shellcommand,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True
+        )
+    except subprocess.CalledProcessError:
         pass
     else:
-        output = pythoncommand('manage.py', '--help')
         for line in output.split():
             line = line.strip()
             if line.startswith('ievvtasks_'):
@@ -114,5 +120,4 @@ def cli():
         #     # args = parser.parse_args(unknown_args)
         # else:
         parsed_unknown_args = UnknownArgsParser(unknown_args)
-        os.system('python manage.py ievvtasks_{} {}'.format(
-            args.command, parsed_unknown_args.resultstring()))
+        os.system(f'{shutil.which("python")} manage.py ievvtasks_{args.command} {parsed_unknown_args.resultstring()}')

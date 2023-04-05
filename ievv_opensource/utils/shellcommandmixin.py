@@ -1,5 +1,5 @@
 import psutil
-import sh
+from ievv_opensource.utils import run_sh_command
 
 
 try:
@@ -8,9 +8,20 @@ except ImportError:
     from pipes import quote as shell_quote
 
 
-class ShellCommandError(Exception):
+class BaseShellCommandError(Exception):
+    pass
+
+
+class ShellCommandError(BaseShellCommandError):
     """
     Raised when :meth:`.LogMixin.run_shell_command` fails.
+    """
+
+
+class ShellCommandFatalError(BaseShellCommandError):
+    """
+    Raised when :meth:`.LogMixin.run_shell_command` fails if
+    `ShellCommandMixin.fatal_shell_command_errors` is ``True``.
     """
 
 
@@ -20,6 +31,8 @@ class ShellCommandMixin(object):
 
     Requires :class:`~ievv_opensource.utils.logmixin.LogMixin`.
     """
+    fatal_shell_command_errors = False
+
     def log_shell_command_stdout(self, line):
         """
         Called by :meth:`.run_shell_command` each time the shell
@@ -60,7 +73,7 @@ class ShellCommandMixin(object):
         return ' '.join(output)
 
     def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None,
-                          _out=None, _err=None, _env=None):
+                          _out=None, _err=None, _env=None, _failure_output_checker=None):
         """
         Run a shell command.
 
@@ -74,26 +87,25 @@ class ShellCommandMixin(object):
         """
         self.get_logger().debug('Execute: {}'.format(self.prettyformat_shell_command(
             executable=executable, args=args, kwargs=kwargs, _cwd=_cwd)))
-        command = sh.Command(executable)
-        args = args or []
-        kwargs = kwargs or {}
-        if _cwd:
-            kwargs['_cwd'] = _cwd
-        if _env:
-            kwargs['_env'] = _env
 
         _out = _out or self.log_shell_command_stdout
-        _err = _err or self.log_shell_command_stderr
 
         try:
-            return command(*args,
-                           _out=_out,
-                           _err=_err,
-                           **kwargs)
-        except sh.ErrorReturnCode:
+            return run_sh_command.run_executable(
+                executable=executable,
+                args=args,
+                kwargs=kwargs,
+                cwd=_cwd,
+                env=_env,
+                output_handler=_out,
+                failure_output_checker=_failure_output_checker)
+        except run_sh_command.RunExecutableError as e:
             # We do not need to show any more errors here - they
             # have already been printed by the _out and _err handlers.
-            raise ShellCommandError()
+            if self.fatal_shell_command_errors:
+                raise ShellCommandFatalError(str(e))
+            else:
+                raise ShellCommandError(str(e))
 
     def kill_process(self, pid):
         """
