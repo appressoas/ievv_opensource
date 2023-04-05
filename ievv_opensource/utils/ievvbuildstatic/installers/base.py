@@ -21,6 +21,10 @@ class AbstractInstaller(LogMixin, ShellCommandMixin, OptionsMixin):
     #: The name of the installer.
     name = None
 
+    @property
+    def fatal_shell_command_errors(self):
+        return self.app.fatal_shell_command_errors
+
     def __init__(self, app):
         """
         Parameters:

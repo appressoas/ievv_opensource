@@ -33,14 +33,25 @@ class NpmInstaller(AbstractNpmInstaller):
             return
         super(NpmInstaller, self).log_shell_command_stderr(line)
 
+    def npm_install_failure_output_checker(self, line):
+        return 'Error: Failed to replace env' in line
+
     def install_packages_from_packagejson(self):
         try:
             self.run_shell_command('npm',
                                    args=['install'],
-                                   _cwd=self.app.get_source_path())
-        except ShellCommandError:
+                                   _cwd=self.app.get_source_path(),
+                                   _failure_output_checker=self.npm_install_failure_output_checker)
+        except ShellCommandError as e:
             self.get_logger().command_error('npm install FAILED!')
-            raise SystemExit()
+            raise SystemExit(str(e))
+
+    def uninstall_npm_package(self, package):
+        try:
+            self._run_npm(args=['uninstall', package])
+        except ShellCommandError:
+            message = f'npm uninstall {package!r} FAILED!'
+            self.get_logger().command_error(message)
 
     def install_npm_package(self, package, properties):
         package_spec = package
@@ -56,11 +67,11 @@ class NpmInstaller(AbstractNpmInstaller):
             self.run_shell_command('npm',
                                    args=args,
                                    _cwd=self.app.get_source_path())
-        except ShellCommandError:
+        except ShellCommandError as e:
             self.get_logger().command_error(
                 'npm install {package} (properties: {properties!r}) FAILED!'.format(
                     package=package, properties=properties))
-            raise SystemExit()
+            raise SystemExit(str(e))
 
     def run_packagejson_script(self, script, args=None):
         args = args or []

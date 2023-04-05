@@ -9,7 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from ievv_opensource.utils import ievv_json
 from ievv_opensource.utils.ievvbuildstatic import filepath
-from ievv_opensource.utils.ievvbuildstatic.installers.yarn import YarnInstaller
+from ievv_opensource.utils.ievvbuildstatic.installers.npm import NpmInstaller
 from ievv_opensource.utils.ievvbuildstatic.watcher import WatchConfigPool
 from ievv_opensource.utils.logmixin import Logger, LogMixin
 
@@ -20,6 +20,11 @@ class App(LogMixin):
     """
     Configures how ``ievv buildstatic`` should build the static files for a Django app.
     """
+
+    @property
+    def fatal_shell_command_errors(self):
+        return self.apps.fatal_shell_command_errors
+
     def __init__(self, appname, version, plugins,
                  sourcefolder='staticsources',
                  destinationfolder='static',
@@ -61,7 +66,7 @@ class App(LogMixin):
     def _make_installers_config(self, installers_config_overrides):
         installers_config = {
             'npm': {
-                'installer_class': YarnInstaller
+                'installer_class': NpmInstaller
             },
         }
         installers_config_overrides = installers_config_overrides or {}
@@ -368,6 +373,7 @@ class Apps(LogMixin):
     """
     MODE_DEVELOP = 'develop'
     MODE_PRODUCTION = 'production'
+    fatal_shell_command_errors = False
 
     def __init__(self, *apps, **kwargs):
         """
@@ -435,6 +441,7 @@ class Apps(LogMixin):
         Run :meth:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin.run`
         for all plugins within all :class:`apps <.App>`.
         """
+        self.fatal_shell_command_errors = True
         for app in self.iterapps(appnames=appnames):
             app.run(skipgroups=skipgroups, includegroups=includegroups)
         self.log_deferred_messages()
