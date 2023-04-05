@@ -1,3 +1,9 @@
+## 9.1.3 (2023-04-05)
+
+### Fix
+
+- **ievvbuildstatic**: handle exit codes more correctly
+
 ## 9.1.2 (2023-04-03)
 
 ### Fix
