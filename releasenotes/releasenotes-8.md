@@ -46,3 +46,6 @@ launch (6. April 2024).
 - ievvbuildstatic...cssbuild*: Update for changes to postcss/stylelint.
   - postcss: Set custom syntax for scss.
   - stylelint: Replace deprecated and removed options with the correct options.
+
+### 8.2.2
+- ievvbuildstatic: handle exit codes more correctly
