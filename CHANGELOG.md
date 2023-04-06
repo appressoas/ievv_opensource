@@ -1,3 +1,9 @@
+## 9.1.6 (2023-04-06)
+
+### Fix
+
+- **ievvtasks**: make ievv task exit correctly
+
 ## 9.1.5 (2023-04-06)
 
 ### Fix
