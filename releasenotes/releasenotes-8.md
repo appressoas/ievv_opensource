@@ -52,3 +52,6 @@ launch (6. April 2024).
 
 ### 8.2.3
 - fix(ievvdevrun): port _bg argument to subprocess
+
+### 8.2.4
+- fix(npm installer): handle auth errors
