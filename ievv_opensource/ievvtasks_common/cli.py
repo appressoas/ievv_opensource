@@ -1,17 +1,24 @@
 import argparse
 import logging
-import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import textwrap
+from ievv_opensource.utils import ievv_colorize
 
 
 try:
     from shlex import quote as cmd_quote
 except ImportError:
     from pipes import quote as cmd_quote
+
+try:
+    from termcolor import colored
+except ImportError:
+    def colored(text, *args, **kwargs):
+        return text
 
 
 logger = logging.getLogger(__name__)
@@ -120,4 +127,29 @@ def cli():
         #     # args = parser.parse_args(unknown_args)
         # else:
         parsed_unknown_args = UnknownArgsParser(unknown_args)
-        os.system(f'{shutil.which("python")} manage.py ievvtasks_{args.command} {parsed_unknown_args.resultstring()}')
+
+        args = [
+            sys.executable,
+            'manage.py',
+            f'ievvtasks_{args.command}',
+            *shlex.split(parsed_unknown_args.resultstring())
+        ]
+        pretty_command = shlex.join(args)
+        try:
+            process = subprocess.Popen(args)
+            exitcode = process.wait()
+        except KeyboardInterrupt:
+            print(
+                colored(f'[KeyboardInterrupt]({pretty_command}) stopped by user', color='yellow', attrs=['bold']),
+                flush=True)
+            raise SystemExit()
+        else:
+            color = 'green'
+            status = 'DONE'
+            if exitcode != 0:
+                color = 'red'
+                status = 'FAILED'
+            print(
+                colored(f'[{status}]({pretty_command}) with exitcode: {exitcode}', color=color, attrs=['bold']),
+                flush=True)
+            sys.exit(exitcode)
