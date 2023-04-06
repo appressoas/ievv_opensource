@@ -55,3 +55,6 @@ launch (6. April 2024).
 
 ### 8.2.4
 - fix(npm installer): handle auth errors
+
+### 8.2.5
+- fix(ievvtasks): make ievv task exit correctly. With correct exit code and nice status message. Also handle KeyboardInterrupt.
