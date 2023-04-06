@@ -1,3 +1,9 @@
+## 9.1.5 (2023-04-06)
+
+### Fix
+
+- **npm installer**: handle auth errors
+
 ## 9.1.4 (2023-04-06)
 
 ### Fix
