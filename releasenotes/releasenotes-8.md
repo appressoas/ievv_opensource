@@ -49,3 +49,6 @@ launch (6. April 2024).
 
 ### 8.2.2
 - ievvbuildstatic: handle exit codes more correctly
+
+### 8.2.3
+- fix(ievvdevrun): port _bg argument to subprocess
