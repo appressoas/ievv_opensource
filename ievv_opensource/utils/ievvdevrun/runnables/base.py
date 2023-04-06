@@ -132,7 +132,7 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
     def _restartloop(self):
         while True:
             if self.is_running:
-                if self.command.process.is_alive():
+                if self.command.poll() is None:
                     try:
                         process = psutil.Process(self.command.pid)
                     except psutil.NoSuchProcess:
@@ -162,7 +162,6 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         self.detected_process_ids = set()
         commandconfig = self.get_command_config()
         kwargs = commandconfig.get('kwargs', {}).copy()
-        kwargs.update({'_bg': True})
         environment = commandconfig.get('environment')
         _env = None
         if environment:
@@ -171,7 +170,8 @@ class ShellCommandRunnableThread(AbstractRunnableThread,
         self.command = self.run_shell_command(commandconfig['executable'],
                                               args=commandconfig.get('args', []),
                                               kwargs=kwargs,
-                                              _env=_env)
+                                              _env=_env,
+                                              _background=True)
 
     def get_command_config(self):
         """

@@ -52,7 +52,8 @@ def run_executable(
         env: typing.Optional[dict] = None,
         cwd: typing.Optional[str] = None,
         output_handler = _default_out_handler,
-        failure_output_checker = None):
+        failure_output_checker = None,
+        background:bool = False):
     """
     Run executable.
 
@@ -70,24 +71,30 @@ def run_executable(
     popen_kwargs = {
         'args': full_args,
         'shell': False,
-        'stdout': subprocess.PIPE,
-        'stderr': subprocess.STDOUT,
         'env': env,
         'cwd': cwd
     }
-    process = subprocess.Popen(**popen_kwargs)
-    failure_checker_matched_lines = []
-    while True:
-        if process.poll() is not None:
-            break
-        output_line = process.stdout.readline().decode(sys.getfilesystemencoding(), 'replace').rstrip()
-        if failure_output_checker(output_line):
-            failure_checker_matched_lines.append(output_line)
-        output_handler(output_line)
-    returncode = process.poll()
-    if returncode != 0:
-        raise RunExecutableError(popen_kwargs=popen_kwargs)
-    elif failure_checker_matched_lines:
-        raise RunExecutableError(popen_kwargs=popen_kwargs)
+    if background:
+        process = subprocess.Popen(**popen_kwargs)
+        return process
     else:
-        print(f'SUCCESS: {prettyformat_popen_kwargs(popen_kwargs)}')
+        popen_kwargs.update({
+            'stdout': subprocess.PIPE,
+            'stderr': subprocess.STDOUT,
+        })
+        process = subprocess.Popen(**popen_kwargs)
+        failure_checker_matched_lines = []
+        while True:
+            if process.poll() is not None:
+                break
+            output_line = process.stdout.readline().decode(sys.getfilesystemencoding(), 'replace').rstrip()
+            if failure_output_checker(output_line):
+                failure_checker_matched_lines.append(output_line)
+            output_handler(output_line)
+        returncode = process.poll()
+        if returncode != 0:
+            raise RunExecutableError(popen_kwargs=popen_kwargs)
+        elif failure_checker_matched_lines:
+            raise RunExecutableError(popen_kwargs=popen_kwargs)
+        else:
+            print(f'SUCCESS: {prettyformat_popen_kwargs(popen_kwargs)}')
