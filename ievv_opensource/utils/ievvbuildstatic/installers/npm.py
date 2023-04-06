@@ -34,7 +34,10 @@ class NpmInstaller(AbstractNpmInstaller):
         super(NpmInstaller, self).log_shell_command_stderr(line)
 
     def npm_install_failure_output_checker(self, line):
-        return 'Error: Failed to replace env' in line
+        return (
+            'Error: Failed to replace env' in line
+            or 'npm ERR! code E401' in line
+        )
 
     def install_packages_from_packagejson(self):
         try:
