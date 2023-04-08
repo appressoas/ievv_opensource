@@ -1,3 +1,9 @@
+## 9.2.0 (2023-04-08)
+
+### Feat
+
+- **pyproject**: use .sh for creating venv
+
 ## 9.1.6 (2023-04-06)
 
 ### Fix
