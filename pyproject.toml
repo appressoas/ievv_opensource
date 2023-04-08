@@ -35,18 +35,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ipython",
-    "htmls",
     "flake8",
     "tox",
-    "coverage",
     "twine",
-    "pytest",
-    "pytest-django",
-    "pytest-env",
-    "model-bakery",
-    "autopep8"
-]
-optional = [
+    "autopep8",
     "arrow",
     "rq",
     "django-rq",
@@ -58,6 +50,14 @@ optional = [
     "termcolor",
     "psutil",
     "djangorestframework"
+]
+test = [
+    "htmls",
+    "pytest",
+    "pytest-django",
+    "pytest-env",
+    "model-bakery",
+    "coverage",
 ]
 
 [project.scripts]
