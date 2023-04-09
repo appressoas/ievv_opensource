@@ -58,3 +58,6 @@ launch (6. April 2024).
 
 ### 8.2.5
 - fix(ievvtasks): make ievv task exit correctly. With correct exit code and nice status message. Also handle KeyboardInterrupt.
+
+### 8.2.6
+fix(lessbuild): encode cli arguments for less correctly
