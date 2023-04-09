@@ -115,7 +115,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin):
                                        self.get_sourcefile_path(),
                                        self.get_destinationfile_path()
                                    ],
-                                   kwargs=kwargs)
+                                   kwargs=kwargs,
+                                   _kwargs_equals_encode=True)
         except ShellCommandError:
             self.get_logger().command_error('LESS build FAILED!')
         else:

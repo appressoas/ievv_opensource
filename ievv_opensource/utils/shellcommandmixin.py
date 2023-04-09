@@ -74,7 +74,7 @@ class ShellCommandMixin(object):
 
     def run_shell_command(self, executable, args=None, kwargs=None, _cwd=None,
                           _out=None, _err=None, _env=None, _failure_output_checker=None,
-                          _background=False):
+                          _background=False, _kwargs_equals_encode=False):
         """
         Run a shell command.
 
@@ -100,7 +100,8 @@ class ShellCommandMixin(object):
                 env=_env,
                 output_handler=_out,
                 failure_output_checker=_failure_output_checker,
-                background=_background)
+                background=_background,
+                kwargs_equals_encode=_kwargs_equals_encode)
         except run_sh_command.RunExecutableError as e:
             # We do not need to show any more errors here - they
             # have already been printed by the _out and _err handlers.

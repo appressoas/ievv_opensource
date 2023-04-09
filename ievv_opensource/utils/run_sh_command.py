@@ -6,7 +6,7 @@ import sys
 import typing
 
 
-def _parse_command_kwargs(**kwargs):
+def _parse_command_kwargs(_kwargs_equals_encode=False, **kwargs):
     args = []
     for key, value in kwargs.items():
         if len(key) == 1:
@@ -14,9 +14,15 @@ def _parse_command_kwargs(**kwargs):
         else:
             argkey = f'--{key.replace("_", "-")}'
         if value not in (False, None):
-            args.append(argkey)
-            if value != True:
-                args.append(f'{value}')
+            if _kwargs_equals_encode and argkey.startswith('--'):
+                if value == True:
+                    args.append(argkey)
+                else:
+                    args.append(f'{argkey}={value}')
+            else:
+                args.append(argkey)
+                if value != True:
+                    args.append(f'{value}')
     return args
 
 
@@ -53,7 +59,8 @@ def run_executable(
         cwd: typing.Optional[str] = None,
         output_handler = _default_out_handler,
         failure_output_checker = None,
-        background:bool = False):
+        background:bool = False,
+        kwargs_equals_encode:bool = False):
     """
     Run executable.
 
@@ -66,7 +73,7 @@ def run_executable(
     full_args = [
         shutil.which(executable),
         *args,
-        *_parse_command_kwargs(**kwargs)
+        *_parse_command_kwargs(**kwargs, _kwargs_equals_encode=kwargs_equals_encode)
     ]
     popen_kwargs = {
         'args': full_args,
