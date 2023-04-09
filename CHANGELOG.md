@@ -1,3 +1,9 @@
+## 9.2.1 (2023-04-09)
+
+### Fix
+
+- **lessbuild**: encode cli arguments for less correctly
+
 ## 9.2.0 (2023-04-08)
 
 ### Feat
