@@ -4,6 +4,11 @@
 
 - **apps_config**: use default is true
 
+    - batchframeworkdemo
+    - customsqldemo
+    - ievv_model_mommy_extras
+    - ievv_sms
+
 ## 9.2.1 (2023-04-09)
 
 ### Fix
