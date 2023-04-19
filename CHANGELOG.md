@@ -1,3 +1,9 @@
+## 9.2.2 (2023-04-19)
+
+### Fix
+
+- **apps_config**: use default is true
+
 ## 9.2.1 (2023-04-09)
 
 ### Fix
