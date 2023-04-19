@@ -3,6 +3,7 @@ from django.apps import AppConfig
 
 
 class CustomSqlDemoAppConfig(AppConfig):
+    default = True
     name = 'ievv_opensource.demo.customsqldemo'
     verbose_name = "IEVV CustomSQL demo"
 

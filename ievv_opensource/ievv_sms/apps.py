@@ -2,6 +2,7 @@ from django.apps import AppConfig
 
 
 class ModelSmsAppConfig(AppConfig):
+    default = True
     name = 'ievv_opensource.ievv_sms'
     verbose_name = "IEVV SMS"
 

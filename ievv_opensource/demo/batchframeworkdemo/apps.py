@@ -15,6 +15,7 @@ class HelloWorldAsyncAction(ievv_batchframework.Action):
 
 
 class BatchFrameworkDemoAppConfig(AppConfig):
+    default = True
     name = 'ievv_opensource.demo.batchframeworkdemo'
     verbose_name = "IEVV Batchframework demo"
 
