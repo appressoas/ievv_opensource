@@ -1,3 +1,9 @@
+## 9.2.3 (2023-06-05)
+
+### Refactor
+
+- **recreate-virtualenv.sh**: move into root tools folder
+
 ## 9.2.2 (2023-04-19)
 
 ### Fix
