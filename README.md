@@ -48,14 +48,14 @@ $ pyenv local 3.10
 
 #### Install dependencies in a virtualenv:
 ```
-$ ./recreate-virtualenv.sh
+$ ./tools/recreate-virtualenv.sh
 ```
 
 Alternatively, create virtualenv manually (this does the same as recreate-virtualenv.sh):
 ```
 $ python -m venv .venv
 ```
-the ./recreate-virtualenv.sh script is just here to make creating virtualenvs more uniform
+the ./tools/recreate-virtualenv.sh script is just here to make creating virtualenvs more uniform
 across different repos because some repos will require extra setup in the virtualenv
 for package authentication etc.
 
