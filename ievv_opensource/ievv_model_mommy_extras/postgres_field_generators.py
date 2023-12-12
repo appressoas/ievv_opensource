@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.utils.timezone import now
 
-from psycopg2.extras import DateTimeTZRange, DateRange
+from django.db.backends.postgresql.psycopg_any import DateTimeTZRange, DateRange
 
 
 def generate_datetime_range():

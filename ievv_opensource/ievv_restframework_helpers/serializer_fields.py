@@ -1,6 +1,6 @@
 import arrow
 import json
-from psycopg2._range import DateTimeTZRange
+from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
 
 from django.conf import settings
 from rest_framework.fields import ModelField
