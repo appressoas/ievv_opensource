@@ -1,3 +1,9 @@
+## 9.3.0 (2023-12-12)
+
+### Feat
+
+- Import psycopg types from django instead of psycopg2. Makes us compatible with psycopg3.
+
 ## 9.2.3 (2023-06-05)
 
 ### Refactor
