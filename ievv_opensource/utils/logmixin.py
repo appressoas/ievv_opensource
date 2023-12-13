@@ -206,7 +206,7 @@ class LogMixin(object):
     def get_command_error_message(self):
         return None
 
-    def get_logger(self):
+    def get_logger(self) -> Logger:
         """
         Get an instance of :meth:`.Logger` with :meth:`.get_logger_name`
         as the logger name.

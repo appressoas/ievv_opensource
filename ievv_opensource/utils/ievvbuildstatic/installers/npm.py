@@ -1,3 +1,4 @@
+import shlex
 from collections import OrderedDict
 
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
@@ -39,10 +40,17 @@ class NpmInstaller(AbstractNpmInstaller):
             or 'npm ERR! code E401' in line
         )
 
+    @property
+    def __use_lockfile(self):
+        return self.app.prefer_lockfile_install_in_production and self.app.apps.is_in_production_mode()
+
     def install_packages_from_packagejson(self):
+        install_arg = 'install'
+        if self.__use_lockfile:
+            install_arg = 'ci'
         try:
             self.run_shell_command('npm',
-                                   args=['install'],
+                                   args=[install_arg],
                                    _cwd=self.app.get_source_path(),
                                    _failure_output_checker=self.npm_install_failure_output_checker)
         except ShellCommandError as e:
@@ -57,6 +65,7 @@ class NpmInstaller(AbstractNpmInstaller):
             self.get_logger().command_error(message)
 
     def install_npm_package(self, package, properties):
+
         package_spec = package
         if properties['version']:
             package_spec = '{package}@{version}'.format(
@@ -66,6 +75,13 @@ class NpmInstaller(AbstractNpmInstaller):
             args.append('--save')
         else:
             args.append('--save-{}'.format(properties['installtype']))
+        if self.__use_lockfile:
+            fullcommand = ['npm'] + args
+            self.get_logger().warning(
+                f'Skipping {shlex.join(fullcommand)!r} because of the '
+                f'"prefer_lockfile_install_in_production" option. We assume '
+                f'dependencies are in the package-lock.json file already.')
+            return
         try:
             self.run_shell_command('npm',
                                    args=args,

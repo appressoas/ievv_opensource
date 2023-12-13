@@ -33,7 +33,8 @@ class App(LogMixin):
                  docbuilder_classes=None,
                  default_skipgroups=None,
                  default_includegroups=None,
-                 appspecific_fields=None):
+                 appspecific_fields=None,
+                 prefer_lockfile_install_in_production: bool = False):
         """
         Parameters:
             appname: Django app label (I.E.: ``myproject.myapp``).
@@ -45,6 +46,9 @@ class App(LogMixin):
             appspecific_fields: If your build-scenario requires more variables, add them in a dictionary here, and they
                 will be included in the config.
                 Defaults to ``{}``.
+            prefer_lockfile_install_in_production: Prefer installing ONLY from lockfile
+                when running in ``--production`` mode. I.e. with NPM, this will use ``npm ci``
+                to install from package-lock.json instead of from package.json.
         """
         self.apps = None
         self.version = version
@@ -58,6 +62,7 @@ class App(LogMixin):
         self.default_skipgroups = default_skipgroups or []
         self.default_includegroups = default_includegroups or []
         self.appspecific_fields = appspecific_fields or {}
+        self.prefer_lockfile_install_in_production = prefer_lockfile_install_in_production
         self.installers_config = self._make_installers_config(
             installers_config_overrides=installers_config)
         for plugin in plugins:
