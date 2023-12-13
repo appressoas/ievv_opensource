@@ -95,10 +95,13 @@ class Plugin(cssbuildbaseplugin.AbstractPlugin):
         self.sass_variables = sass_variables or {}
         super(Plugin, self).__init__(**kwargs)
 
+    def get_postcss_scss_version(self):
+        return None
+
     def install(self):
         super(Plugin, self).install()
         self.app.get_installer('npm').queue_install(
-            'postcss-scss')
+            'postcss-scss', version=self.get_postcss_scss_version())
 
     def get_sourcefolder_path(self):
         return self.app.get_source_path(self.sourcefolder)
