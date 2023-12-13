@@ -1,3 +1,9 @@
+## 9.3.2 (2023-12-13)
+
+### Fix
+
+- **ievvbuildstatic**: Add support for using "npm ci" in production build.
+
 ## 9.3.1 (2023-12-13)
 
 ### Fix
