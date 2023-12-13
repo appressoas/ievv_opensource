@@ -1,3 +1,9 @@
+## 9.3.1 (2023-12-13)
+
+### Fix
+
+- **ievvbuildstatic**: Add support for setting postcss-scss version.
+
 ## 9.3.0 (2023-12-12)
 
 ### Feat
