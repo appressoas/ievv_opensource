@@ -1,3 +1,9 @@
+## 9.3.3 (2024-04-11)
+
+### Fix
+
+- **buildstatic**: Ignore watchdog opened/closed events.
+
 ## 9.3.2 (2023-12-13)
 
 ### Fix
