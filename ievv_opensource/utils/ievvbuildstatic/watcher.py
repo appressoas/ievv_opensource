@@ -3,7 +3,7 @@ import threading
 from collections import OrderedDict
 
 import psutil
-from watchdog.events import RegexMatchingEventHandler
+from watchdog.events import RegexMatchingEventHandler, EVENT_TYPE_OPENED, EVENT_TYPE_CLOSED
 from watchdog.observers import Observer
 
 from ievv_opensource.utils.logmixin import LogMixin
@@ -160,6 +160,8 @@ class EventHandler(RegexMatchingEventHandler):
         self.is_running = False
 
     def on_any_event(self, event):
+        if event.event_type in (EVENT_TYPE_OPENED, EVENT_TYPE_CLOSED):
+            return
         if self.runtimer:
             self.runtimer.cancel()
         self.runtimer = threading.Timer(0.5, self.handle_plugin_run)
