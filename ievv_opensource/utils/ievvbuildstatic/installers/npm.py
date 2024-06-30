@@ -50,7 +50,7 @@ class NpmInstaller(AbstractNpmInstaller):
             install_arg = 'ci'
         try:
             self.run_shell_command('npm',
-                                   args=[install_arg],
+                                   args=[install_arg] + self.get_extra_install_args(),
                                    _cwd=self.app.get_source_path(),
                                    _failure_output_checker=self.npm_install_failure_output_checker)
         except ShellCommandError as e:
@@ -70,7 +70,7 @@ class NpmInstaller(AbstractNpmInstaller):
         if properties['version']:
             package_spec = '{package}@{version}'.format(
                 package=package, version=properties['version'])
-        args = ['install', package_spec]
+        args = ['install', package_spec] + self.get_extra_install_args()
         if properties['installtype'] is None:
             args.append('--save')
         else:

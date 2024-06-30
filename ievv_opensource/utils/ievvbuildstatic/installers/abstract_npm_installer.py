@@ -2,6 +2,7 @@ import json
 import os
 from collections import OrderedDict
 
+import shlex
 import shutil
 
 from ievv_opensource.utils.ievvbuildstatic.installers.base import AbstractInstaller
@@ -34,6 +35,11 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
                             metavar='PACKAGENAME',
                             required=False,
                             help='Link specified javascript package. Can be repeated multiple times.')
+        parser.add_argument('--{}-extra-install-args'.format(cls.optionprefix),
+                            dest='npmextrainstallargs',
+                            metavar='ARGS',
+                            required=False,
+                            help='Add extra npm install args.')
 
     def __init__(self, *args, **kwargs):
         super(AbstractNpmInstaller, self).__init__(*args, **kwargs)
@@ -282,6 +288,12 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
 
     def unlink_package(self, packagename):
         raise NotImplementedError()
+
+    def get_extra_install_args(self) -> list[str]:
+        args = self.get_option('npmextrainstallargs', '')
+        if not args:
+            return []
+        return shlex.split(args)
 
     def get_requested_link_packages_from_options(self):
         return self.get_option('npmlink', []) or []
