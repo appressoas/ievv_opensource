@@ -321,7 +321,5 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
                 self._remove_linked_packages(
                     linked_packages=packages_to_unlink)
             self.link_packages(packages_to_link)
-            for packagename in packages_to_link:
-                self._link_package(packagename=packagename)
             if linked_packages:
                 self.add_deferred_warning('Installing with linked packages: {!r}'.format(linked_packages))

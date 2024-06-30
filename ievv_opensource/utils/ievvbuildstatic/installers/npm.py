@@ -102,7 +102,7 @@ class NpmInstaller(AbstractNpmInstaller):
         self._run_npm(args=['unlink', packagename])
 
     def _link_packages(self, packages_to_link: list[str]):
-        self._run_npm(args=['link'] + packages_to_link)
+        self._run_npm(args=['link', *packages_to_link])
 
     def install(self):
         self.get_logger().command_start(
