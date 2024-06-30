@@ -1,3 +1,9 @@
+## 9.3.5 (2024-06-30)
+
+### Fix
+
+- **buildstatic**: Add support for extra npm installer args.
+
 ## 9.3.4 (2024-06-30)
 
 ### Fix
