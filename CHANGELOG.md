@@ -1,3 +1,11 @@
+## 9.3.4 (2024-06-30)
+
+### Fix
+
+- **buildstatic**: Correctly call npm link with multiple packages - bugfixes.
+- **buildstatic**: Correctly call npm link with multiple packages.
+- **buildstatic**: Remove yarn installer - not maintained
+
 ## 9.3.3 (2024-04-11)
 
 ### Fix
