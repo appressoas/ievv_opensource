@@ -273,16 +273,6 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
             if os.path.exists(path):
                 os.remove(path)
 
-    def _link_package(self, packagename):
-        self.get_logger().info('Linking package {!r}'.format(packagename))
-        self.link_package(packagename=packagename)
-        self.add_deferred_success(
-            'linked package {}'.format(packagename)
-        )
-
-    def link_package(self, packagename):
-        raise NotImplementedError()
-
     def _unlink_package(self, packagename):
         self.get_logger().info('Unlinking package {!r}'.format(packagename))
         self.unlink_package(packagename=packagename)
@@ -295,6 +285,15 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
 
     def get_requested_link_packages_from_options(self):
         return self.get_option('npmlink', []) or []
+
+    def link_packages(self, packages_to_link: list[str]):
+        self.get_logger().info(f'Linking packages {packages_to_link!r}')
+        self._link_packages(packages_to_link)
+        self.add_deferred_success(
+            f'linked packages {packages_to_link!r}')
+
+    def _link_packages(self, packages_to_link: list[str]):
+        raise NotImplementedError()
 
     def handle_linked_packages(self):
         linked_packages = self.get_linked_packages()
@@ -321,6 +320,7 @@ class AbstractNpmInstaller(AbstractInstaller, ShellCommandMixin):
                     ))
                 self._remove_linked_packages(
                     linked_packages=packages_to_unlink)
+            self.link_packages(packages_to_link)
             for packagename in packages_to_link:
                 self._link_package(packagename=packagename)
             if linked_packages:

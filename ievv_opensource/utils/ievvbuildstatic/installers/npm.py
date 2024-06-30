@@ -98,11 +98,11 @@ class NpmInstaller(AbstractNpmInstaller):
                                args=['run', script] + args,
                                _cwd=self.app.get_source_path())
 
-    def link_package(self, packagename):
-        self._run_npm(args=['link', packagename])
-
     def unlink_package(self, packagename):
         self._run_npm(args=['unlink', packagename])
+
+    def _link_packages(self, packages_to_link: list[str]):
+        self._run_npm(args=['link'] + packages_to_link)
 
     def install(self):
         self.get_logger().command_start(
