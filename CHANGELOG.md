@@ -1,3 +1,10 @@
+## 9.3.6 (2024-07-01)
+
+### Fix
+
+- **buildstatic**: Bring back and update yarn installer for latest yarn version.
+- **buildstatic**: Use get_installer() to run scripts in npmrun_jsbuild.
+
 ## 9.3.5 (2024-06-30)
 
 ### Fix
