@@ -324,6 +324,7 @@ Overview
 
    base.AbstractInstaller
    npm.NpmInstaller
+   yarn.YarnInstaller
 
 
 Details
@@ -334,6 +335,9 @@ Details
 
 .. currentmodule:: ievv_opensource.utils.ievvbuildstatic.installers.npm
 .. automodule:: ievv_opensource.utils.ievvbuildstatic.installers.npm
+
+.. currentmodule:: ievv_opensource.utils.ievvbuildstatic.installers.yarn
+.. automodule:: ievv_opensource.utils.ievvbuildstatic.installers.yarn
 
 
 *************
