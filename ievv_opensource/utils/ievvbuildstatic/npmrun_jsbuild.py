@@ -96,7 +96,7 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
                  gzip=False, gzip_compresslevel=9,
                  **kwargs):
         """
-        
+
         Args:
             extra_import_paths (list, optional): List of extra javascript import paths. Defaults to None.
             extra_import_aliases (list, optional): Mapping of extra import aliases. Defaults to None.
@@ -174,9 +174,8 @@ class Plugin(pluginbase.Plugin, ShellCommandMixin, GzipCompressMixin):
         self.get_logger().command_start('Running {about}'.format(
             about=about))
         try:
-            self.run_shell_command('npm',
-                                   args=['run', npm_script],
-                                   _cwd=self.app.get_source_path())
+            self.app.get_installer('npm').run_packagejson_script(
+                script=npm_script)
         except ShellCommandError:
             self.get_logger().command_error('{} FAILED!'.format(about))
         else:
