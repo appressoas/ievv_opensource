@@ -69,7 +69,7 @@ class YarnInstaller(AbstractNpmInstaller):
 
     def install_packages_from_packagejson(self):
         try:
-            self._run_yarn(args=['--json'])
+            self._run_yarn(args=['install', '--json'])
         except ShellCommandError:
             self.get_logger().command_error('yarn FAILED!')
             self.add_deferred_warning('Installing packages from package.json failed')
@@ -95,8 +95,7 @@ class YarnInstaller(AbstractNpmInstaller):
         try:
             self._run_yarn(args=['remove', package])
         except ShellCommandError:
-            message = 'yarn remove {package} FAILED!'.format(
-                    package=package)
+            message = "yarn remove {package} FAILED!".format(package=package)
             self.get_logger().command_error(message)
 
     def run_packagejson_script(self, script, args=None):
@@ -104,8 +103,8 @@ class YarnInstaller(AbstractNpmInstaller):
         args = ['run', script] + args
         self._run_yarn(args=args)
 
-    def link_package(self, packagename):
-        self._run_yarn(args=['link', packagename])
+    def _link_packages(self, packages_to_link: list[str]):
+        self._run_yarn(args=['link', *packages_to_link])
 
     def unlink_package(self, packagename):
         self._run_yarn(args=['unlink', packagename])
