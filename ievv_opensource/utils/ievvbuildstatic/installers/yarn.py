@@ -1,4 +1,5 @@
 import json
+import pathlib
 
 from .abstract_npm_installer import AbstractNpmInstaller
 from ievv_opensource.utils.shellcommandmixin import ShellCommandError
@@ -104,10 +105,15 @@ class YarnInstaller(AbstractNpmInstaller):
         self._run_yarn(args=args)
 
     def _link_packages(self, packages_to_link: list[str]):
-        self._run_yarn(args=['link', *packages_to_link])
+        absolute_paths_to_link = [
+            str(pathlib.Path(path).absolute())
+            for path in packages_to_link
+        ]
+        self._run_yarn(args=['link', *absolute_paths_to_link])
 
     def unlink_package(self, packagename):
-        self._run_yarn(args=['unlink', packagename])
+        path = str(pathlib.Path(packagename).absolute())
+        self._run_yarn(args=['unlink', path])
 
     def install(self):
         self.get_logger().command_start(
