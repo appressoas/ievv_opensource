@@ -1,3 +1,18 @@
+## 11.0.0 (2024-11-15)
+
+### BREAKING CHANGE
+
+- rq_console handler should now use the class `rq.logutils.ColorizingStreamHandler` instead of `rq.utils.ColorizingStreamHandler`
+
+### Feat
+
+- **settings**: change in rq_console class
+- **deps**: rq>=2.0.0, django-rq>=3.0.0
+
+### Fix
+
+- **buildstatic**: Update for yarn > 1.
+
 ## 9.3.6 (2024-07-01)
 
 ### Fix
