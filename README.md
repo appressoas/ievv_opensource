@@ -132,3 +132,24 @@ $ hatch build -t sdist
 $ hatch publish
 $ rm dist/*              # optional cleanup
 ```
+
+
+# Migrate to 10.0.0
+
+## BREAKING! Update log handlers for rq_console
+Replace `rq.utils` with `rq.logutils`
+```json
+"rq_console": {
+    "level": "DEBUG",
+    "class": "rq.logutils.ColorizingStreamHandler", //ColorizingStreamHandler is no longer in rq.utils, but in rq.logutils
+    "formatter": "rq_console",
+    "exclude": ["%(asctime)s"],
+}
+```
+
+## BREAKING! deps
+- `rq` is locked to >= 2.0.0 and < 3.0.0
+- Along with new `rq` major, `django-rq` is locked to >= 3.0.0 < 4.0.0 for new `rq` major support.
+
+## WARNING! The USE_L10N setting is deprecated
+Basically this is `True` by default.

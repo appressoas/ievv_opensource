@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "arrow",
-    "Django>=4.0.0,<5.0.0",
+    "Django>=4.0.0,<6.0.0",
     "psutil",
     "sh",
     "termcolor",
@@ -40,8 +40,8 @@ dev = [
     "twine",
     "autopep8",
     "arrow",
-    "rq",
-    "django-rq",
+    "rq>=2.0.0,<3.0.0",
+    "django-rq>=3.0.0,<4.0.0",
     "redis",
     "gsm0338",
     "psycopg2",

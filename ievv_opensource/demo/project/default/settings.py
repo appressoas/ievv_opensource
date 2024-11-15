@@ -125,7 +125,7 @@ LOGGING = {
         },
         "rq_console": {
             "level": "DEBUG",
-            "class": "rq.utils.ColorizingStreamHandler",
+            "class": "rq.logutils.ColorizingStreamHandler",
             "formatter": "rq_console",
             "exclude": ["%(asctime)s"],
         }
@@ -166,7 +166,6 @@ LOGGING = {
 LANGUAGE_CODE = 'en'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # Use bootstrap3 template pack to django-crispy-forms.
