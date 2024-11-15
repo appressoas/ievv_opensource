@@ -134,7 +134,7 @@ $ rm dist/*              # optional cleanup
 ```
 
 
-# Migrate to 10.0.0
+# Migrate to 11.0.0
 
 ## BREAKING! Update log handlers for rq_console
 Replace `rq.utils` with `rq.logutils`
