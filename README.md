@@ -22,15 +22,15 @@ conventional commits for your commit messages
 (see _Use conventional commits for GIT commit messages_ above).
 
 First install pipx with:
-```
-$ brew install pipx
-$ pipx ensurepath
+```bash
+brew install pipx
+pipx ensurepath
 ```
 
 Then install hatch and commitizen:
-```
-$ pipx install hatch 
-$ pipx install commitizen
+```bash
+pipx install hatch
+pipx install commitizen
 ```
 
 See https://github.com/pypa/pipx, https://hatch.pypa.io/latest/install/
@@ -41,58 +41,58 @@ needed, but we really recommend using pipx since that is isolated.
 ### Install development dependencies
 
 #### Install a local python version with pyenv:
-```
-$ pyenv install 3.10
-$ pyenv local 3.10
+```bash
+pyenv install $(pyenv latest -k 3.12)
+pyenv local 3.12
 ```
 
 #### Install dependencies in a virtualenv:
-```
-$ ./tools/recreate-virtualenv.sh
+```bash
+./tools/recreate-virtualenv.sh
 ```
 
 Alternatively, create virtualenv manually (this does the same as recreate-virtualenv.sh):
-```
-$ python -m venv .venv
+```bash
+python -m venv .venv
 ```
 the ./tools/recreate-virtualenv.sh script is just here to make creating virtualenvs more uniform
 across different repos because some repos will require extra setup in the virtualenv
 for package authentication etc.
 
 #### Install dependencies in a virtualenv:
-```
-$ source .venv/bin/activate   # enable virtualenv
-$ pip install -e ".[dev,test]"
+```bash
+source .venv/bin/activate   # enable virtualenv
+pip install -e ".[dev,test]"
 ```
 
 ### Upgrade your local packages
 This will upgrade all local packages according to the constraints
 set in pyproject.toml:
-```
-$ pip install --upgrade --upgrade-strategy=eager ".[dev,test]"
+```bash
+pip install --upgrade --upgrade-strategy=eager ".[dev,test]"
 ```
 
 ### Run postgres and redis
-```
-$ docker-compose up
+```bash
+docker compose up
 ```
 
 ### Run dev server
-```
-$ source .venv/bin/activate   # enable virtualenv
-$ ievv devrun
+```bash
+source .venv/bin/activate   # enable virtualenv
+ievv devrun
 ```
 
 ### Run tests
-```
-$ source .venv/bin/activate   # enable virtualenv
-$ pytest ievv_opensource
+```bash
+source .venv/bin/activate   # enable virtualenv
+pytest ievv_opensource
 ```
 
 
 ### Destroy postgres and redis
-```
-$ docker-compose down -v
+```bash
+docker compose down -v
 ```
 
 
@@ -104,9 +104,9 @@ http://ievv-opensource.readthedocs.org/
 First make sure you have NO UNCOMITTED CHANGES!
 
 Release (create changelog, increment version, commit and tag the change) with:
-```
-$ cz bump
-$ git push && git push --tags
+```bash
+cz bump
+git push && git push --tags
 ```
 
 ### NOTE (release):
@@ -127,10 +127,10 @@ $ git push && git push --tags
 See _How to revert a bump_ in the [commitizen FAQ](https://commitizen-tools.github.io/commitizen/faq/#how-to-revert-a-bump).
 
 ### Release to pypi:
-```
-$ hatch build -t sdist
-$ hatch publish
-$ rm dist/*              # optional cleanup
+```bash
+hatch build -t sdist
+hatch publish
+rm dist/*              # optional cleanup
 ```
 
 
