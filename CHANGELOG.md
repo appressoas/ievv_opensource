@@ -1,3 +1,9 @@
+## 11.1.1 (2024-11-26)
+
+### Fix
+
+- **virtualenv**: install/upgrade pip, setuptools and wheel
+
 ## 11.1.0 (2024-11-26)
 
 ### Feat
