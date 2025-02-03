@@ -1,3 +1,9 @@
+## 11.2.0 (2025-02-03)
+
+### Feat
+
+- **utils**: glob copy plugin for ievv buildstatic
+
 ## 11.1.1 (2024-11-26)
 
 ### Fix
