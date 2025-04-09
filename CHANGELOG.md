@@ -1,3 +1,13 @@
+## 12.0.0 (2025-04-09)
+
+### BREAKING CHANGE
+
+- Requires Django 5.2x or higher.
+
+### Feat
+
+- **django**: update Django version to >=5.2.0,<6.0.0
+
 ## 11.2.0 (2025-02-03)
 
 ### Feat
