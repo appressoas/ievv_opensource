@@ -1,3 +1,9 @@
+## 12.0.1 (2025-12-02)
+
+### Fix
+
+- **ievv_logging_admin**: reorder imports and update search_fields format
+
 ## 12.0.0 (2025-04-09)
 
 ### BREAKING CHANGE
