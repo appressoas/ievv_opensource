@@ -1,6 +1,8 @@
 import json
-from django.utils.html import format_html
+
 from django.contrib import admin
+from django.utils.html import format_html
+
 from .models import IevvLoggingEventBase, IevvLoggingEventItem
 
 
@@ -37,9 +39,7 @@ class IevvLoggingEventItemAdmin(admin.ModelAdmin):
         'created_datetime',
         'time_spent_in_seconds',
     ]
-    search_fields = [
-        'logging_base'
-    ]
+    search_fields = ["logging_base__slug"]
     list_filter = [
         'logging_base',
         'success_run',
