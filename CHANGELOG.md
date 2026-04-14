@@ -1,3 +1,9 @@
+## 12.0.2 (2026-04-14)
+
+### Fix
+
+- **i18n middleware**: remove language code from session data
+
 ## 12.0.1 (2025-12-02)
 
 ### Fix
