@@ -24,7 +24,6 @@ class LocaleMiddleware:
 
         translation_language = translation.get_language()
         request.LANGUAGE_CODE = translation_language
-        request.session["LANGUAGE_CODE"] = translation_language
         request.IEVV_I18N_URL_DEFAULT_LANGUAGE_CODE = (
             active_i18n_url_translation.get_default_languagecode()
         )
