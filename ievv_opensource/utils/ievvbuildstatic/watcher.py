@@ -3,7 +3,7 @@ import threading
 from collections import OrderedDict
 
 import psutil
-from watchdog.events import RegexMatchingEventHandler, EVENT_TYPE_OPENED, EVENT_TYPE_CLOSED
+from watchdog.events import EVENT_TYPE_CLOSED_NO_WRITE, EVENT_TYPE_CREATED, EVENT_TYPE_DELETED, EVENT_TYPE_MODIFIED, EVENT_TYPE_MOVED, RegexMatchingEventHandler, EVENT_TYPE_OPENED, EVENT_TYPE_CLOSED
 from watchdog.observers import Observer
 
 from ievv_opensource.utils.logmixin import LogMixin
@@ -25,6 +25,8 @@ class WatchdogWatchConfig(object):
             watchregexes: List of regexes to watch.
             plugin: A :class:`ievv_opensource.utils.ievvbuildstatic.pluginbase.Plugin` object.
         """
+        print('Creating WatchdogWatchConfig with watchfolders={!r}, watchregexes={!r}, plugin={!r}'.format(
+            watchfolders, watchregexes, plugin))
         self.folders = watchfolders
         self.regexes = watchregexes
         self.plugin = plugin
@@ -160,7 +162,13 @@ class EventHandler(RegexMatchingEventHandler):
         self.is_running = False
 
     def on_any_event(self, event):
-        if event.event_type in (EVENT_TYPE_OPENED, EVENT_TYPE_CLOSED):
+        actionable_events = (
+            EVENT_TYPE_MOVED,
+            EVENT_TYPE_DELETED,
+            EVENT_TYPE_CREATED,
+            EVENT_TYPE_MODIFIED,
+        )
+        if not event.event_type in actionable_events:
             return
         if self.runtimer:
             self.runtimer.cancel()
