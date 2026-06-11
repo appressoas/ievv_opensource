@@ -1,3 +1,9 @@
+## 12.0.3 (2026-06-11)
+
+### Fix
+
+- **ievvbuildstatic**: More concrete watch events.
+
 ## 12.0.2 (2026-04-14)
 
 ### Fix
