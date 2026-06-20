@@ -165,6 +165,28 @@ class TestChoicesWithMeta(test.TestCase):
             ],
             list(choices.iter_as_django_choices_long()))
 
+    def test_iter_as_django_choices_short_translated(self):
+        choices = choices_with_meta.ChoicesWithMeta(
+            choices_with_meta.Choice(value='test1', label='Test1'),
+            choices_with_meta.Choice(value='test2', label='Test2'))
+        self.assertEqual(
+            [
+                ('test1', 'Test1'),
+                ('test2', 'Test2'),
+            ],
+            list(choices.iter_as_django_choices_short_translated()))
+
+    def test_iter_as_django_choices_long_translated(self):
+        choices = choices_with_meta.ChoicesWithMeta(
+            choices_with_meta.Choice(value='test1', label='Test1', description='A description'),
+            choices_with_meta.Choice(value='test2', label='Test2'))
+        self.assertEqual(
+            [
+                ('test1', 'Test1 - A description'),
+                ('test2', 'Test2'),
+            ],
+            list(choices.iter_as_django_choices_long_translated()))
+
     def test_get_values_as_commaseparated_string(self):
         choices = choices_with_meta.ChoicesWithMeta(
             choices_with_meta.Choice(value='test1'),
