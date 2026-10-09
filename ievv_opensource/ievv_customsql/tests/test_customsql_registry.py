@@ -183,6 +183,63 @@ class TestAbstractCustomSqlCreateDropStatementsFromSqlCode(test.TestCase):
             'DROP TRIGGER IF EXISTS my_simple_trigger ON my_table',
         ])
 
+    def test_drop_trigger_drop_statements_from_sql_code_update_of_single_column(self):
+        """
+        ``UPDATE OF column`` is three words where every other event is one.
+
+        A pattern that assumes one word does not match such a trigger at all, so no DROP statement
+        is produced and ``clear()`` leaves the trigger in the database — which then blocks the DROP
+        of the function it depends on, with an error naming the *function*.
+        """
+        result = customsql_registry.AbstractCustomSql().make_drop_trigger_statements_from_sql_code(
+            """
+            CREATE TRIGGER my_trigger
+                AFTER UPDATE OF my_column ON my_table
+                FOR EACH ROW
+                    EXECUTE FUNCTION my_function();
+            """)
+        self.assertEqual(result, ['DROP TRIGGER IF EXISTS my_trigger ON my_table'])
+
+    def test_drop_trigger_drop_statements_from_sql_code_update_of_column_list(self):
+        result = customsql_registry.AbstractCustomSql().make_drop_trigger_statements_from_sql_code(
+            """
+            CREATE TRIGGER my_trigger
+                AFTER UPDATE OF first_column, second_column ON my_table
+                FOR EACH ROW
+                    EXECUTE FUNCTION my_function();
+            """)
+        self.assertEqual(result, ['DROP TRIGGER IF EXISTS my_trigger ON my_table'])
+
+    def test_drop_trigger_drop_statements_from_sql_code_update_of_within_an_or_list(self):
+        result = customsql_registry.AbstractCustomSql().make_drop_trigger_statements_from_sql_code(
+            """
+            CREATE TRIGGER my_trigger
+                BEFORE INSERT OR UPDATE OF my_column OR DELETE ON my_table
+                FOR EACH ROW
+                    EXECUTE FUNCTION my_function();
+            """)
+        self.assertEqual(result, ['DROP TRIGGER IF EXISTS my_trigger ON my_table'])
+
+    def test_drop_trigger_drop_statements_from_sql_code_instead_of(self):
+        result = customsql_registry.AbstractCustomSql().make_drop_trigger_statements_from_sql_code(
+            """
+            CREATE TRIGGER my_trigger
+                INSTEAD OF DELETE ON my_view
+                FOR EACH ROW
+                    EXECUTE FUNCTION my_function();
+            """)
+        self.assertEqual(result, ['DROP TRIGGER IF EXISTS my_trigger ON my_view'])
+
+    def test_drop_trigger_drop_statements_from_sql_code_truncate(self):
+        result = customsql_registry.AbstractCustomSql().make_drop_trigger_statements_from_sql_code(
+            """
+            CREATE TRIGGER my_trigger
+                AFTER TRUNCATE ON my_table
+                FOR EACH STATEMENT
+                    EXECUTE FUNCTION my_function();
+            """)
+        self.assertEqual(result, ['DROP TRIGGER IF EXISTS my_trigger ON my_table'])
+
     def test_make_drop_function_statements_from_sql_code(self):
         result = customsql_registry.AbstractCustomSql().make_drop_function_statements_from_sql_code(
             """

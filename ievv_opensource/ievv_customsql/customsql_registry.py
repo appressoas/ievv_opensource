@@ -140,11 +140,25 @@ class AbstractCustomSql(object):
     def _normalize_whitespace(self, sql):
         return re.sub(r'\s+', ' ', sql).strip()
 
+    #: A single trigger event: ``INSERT``, ``DELETE``, ``TRUNCATE``, or ``UPDATE`` optionally
+    #: followed by the column list that narrows it (``UPDATE OF col`` / ``UPDATE OF col1, col2``).
+    #:
+    #: Spelled out rather than matched as "one word", because ``UPDATE OF preferred_payment_method``
+    #: is three words. A pattern that assumed one would not match such a trigger at all, and
+    #: :meth:`.make_drop_trigger_statements_from_sql_code` would silently return nothing for it -
+    #: leaving the trigger in the database, and leaving ``clear()`` unable to drop the function it
+    #: depends on.
+    _TRIGGER_EVENT_PATTERN_PART = (
+        r'(?:INSERT|DELETE|TRUNCATE'
+        r'|UPDATE(?:\s+OF\s+[a-zA-Z0-9_]+(?:\s*,\s*[a-zA-Z0-9_]+)*)?)'
+    )
+
     CREATE_TRIGGER_PATTERN = re.compile(r'^\s*CREATE\s+TRIGGER\s+'
                                         r'(?P<trigger_name>[a-zA-Z0-9_]+)\s+'
                                         r'(?:BEFORE|AFTER|INSTEAD\s+OF)\s+'
-                                        r'(?:[^\s]+\s+OR\s+)*(?:[^\s]+)\s+'
-                                        r'ON\s+(?P<table_name>[a-zA-Z0-9_]+)',
+                                        + _TRIGGER_EVENT_PATTERN_PART +
+                                        r'(?:\s+OR\s+' + _TRIGGER_EVENT_PATTERN_PART + r')*'
+                                        r'\s+ON\s+(?P<table_name>[a-zA-Z0-9_]+)',
                                         re.IGNORECASE | re.MULTILINE)
 
     def make_drop_trigger_statements_from_sql_code(self, sql):
