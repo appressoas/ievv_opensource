@@ -1,3 +1,9 @@
+## 12.0.4 (2026-10-09)
+
+### Fix
+
+- match UPDATE OF triggers when generating DROP TRIGGER statements
+
 ## 12.0.3 (2026-06-11)
 
 ### Fix
